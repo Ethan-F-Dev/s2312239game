@@ -6666,7 +6666,8 @@ if (p.charIdx === 31) {
             console.log(`🚀 開始預載入角色 ${charId} 的音效...`);
             let loadedCount = 0;
             const skills = SOUND_CONFIG[charId];
-            let totalCount = Object.keys(skills).length;
+            let totalCount = Object.keys(skills ?? {}).length; 
+            if (totalCount === 0){return;}
             for (const skill in skills) {
                 const url = skills[skill];
                 // 如果還沒被快取過，才進行下載
