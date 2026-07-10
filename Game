@@ -6600,26 +6600,6 @@ if (p.charIdx === 31) {
     
     }
     function castRecover(p) { if(p.cd.recover > 0 || p.hp <= 0) return; playSkillSound(8888, "s1"); p.cd.recover = 45000; p.heal(p.maxHp * 0.05); }
-    window.onload = function() {
-        resize();
-        renderMenu(1); 
-        renderMenu(2);
-        bindButtons();
-        
-        const startBtn = document.getElementById('start-btn');
-        if(startBtn) {
-            startBtn.onclick = startGame;
-            startBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startGame(); });
-        }
-        
-        const restartBtn = document.getElementById('restart-btn');
-        if(restartBtn) {
-            restartBtn.onclick = backToMenu;
-            restartBtn.addEventListener('touchstart', (e) => { e.preventDefault(); backToMenu(); });
-        }
-        window.addEventListener('resize', resize);
-    };
-})();
         // 1. 音效管理系統 (新增)
         // ==========================================
         
@@ -6708,6 +6688,27 @@ if (p.charIdx === 31) {
         }
     }
 }
+    window.onload = function() {
+        resize();
+        renderMenu(1); 
+        renderMenu(2);
+        bindButtons();
+        
+        const startBtn = document.getElementById('start-btn');
+        if(startBtn) {
+            startBtn.onclick = startGame;
+            startBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startGame(); });
+        }
+        
+        const restartBtn = document.getElementById('restart-btn');
+        if(restartBtn) {
+            restartBtn.onclick = backToMenu;
+            restartBtn.addEventListener('touchstart', (e) => { e.preventDefault(); backToMenu(); });
+        }
+        window.addEventListener('resize', resize);
+    };
+})();
+
 </script>
 </body>
 </html>
