@@ -789,6 +789,7 @@
     class Player {
         constructor(id, charIdx, x, y) {
             const d = CHAR_DATA[charIdx];
+			preloadCharacterSounds(d)
             this.id = id; this.charIdx = charIdx; this.hp = d.hp; this.maxHp = d.hp; this.shield = 0;
             this.x = x; this.y = y; this.radius = 30;
             this.color = d.color; this.speed = d.speed;
@@ -6619,58 +6620,73 @@ if (p.charIdx === 31) {
         window.addEventListener('resize', resize);
     };
 })();
-
         // 1. 音效管理系統 (新增)
         // ==========================================
         
         // 音效配置表：把角色ID和技能對應到外部音訊網址
-        //9999勝利音效；8888恢復
+        //9999勝利音效；9998恢復
         const SOUND_CONFIG = {
-            9999: {
-                s1:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char9998_s1.mp3"
-                
-            },
-            8888: {
-                s1:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char8888_s1.mp3"
-            },
-            44: {
-                a:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_a.mp3",
-                s1: "https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_s1.mp3", 
-                s2: "https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_s2.mp3"
-            },
+            0: {},
+            1: {},
+            2: {},
+            3: {},
+            4: {},
+            5: {},
+            6: {},
+            7: {},
+            8: {},
+            9: {},
+            10: {},
+            11: {},
+            12: {},
+            13: {},
+            14: {},15: {},16: {},17: {},18: {},19: {},20: {},21: {},22: {},23: {},24: {},25: {},26: {},27: {},28: {},29: {},30: {},31: {},
             32: {
                 a:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_a.mp3",
                 s1:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char32_s1.mp3",
                 s2:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_s1.mp3",
                 s3:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char32_s3.mp3"
+            },33: {},34: {},35: {},36: {},37: {},38: {},39: {},40: {},41: {},42: {},43: {},
+            44: {
+                a:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_a.mp3",
+                s1: "https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_s1.mp3", // 暫用測試網址
+                s2: "https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_s2.mp3"
+                
             },
-            1: {
-                s1: "https://www.soundjay.com/buttons/sounds/button-08.mp3"
+            9998: {
+                s1:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char9998_s1.mp3"
+            },
+            9999: {
+                s1:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char9999_s1.mp3"
+                
             }
-            // ... 您可以繼續往下增加 50 個角色的設定 ...
         };
-
-        // 音效快取池
-        const audioCache = {};
-
-        // 播放音效的函數
-        function playSkillSound(charId, skillName) {
-            if (!SOUND_CONFIG[charId] || !SOUND_CONFIG[charId][skillName]) {
-                console.log(`找不到角色 ${charId} 的 ${skillName} 音效`);
-                return;
-            }
-
-            const soundUrl = SOUND_CONFIG[charId][skillName];
-            
-            if (!audioCache[soundUrl]) {
-                audioCache[soundUrl] = new Audio(soundUrl);
-                audioCache[soundUrl].volume = 0.5; // 設定音量 50%
-            }
-
-            const audio = audioCache[soundUrl];
-            audio.currentTime = 0;
-            audio.play().catch(err => console.log("音效播放失敗(可能是瀏覽器限制):", err));
+        function preloadCharacterSounds(charId) {
+            console.log(!SOUND_CONFIG[charId])
+            console.log(`🚀 開始預載入角色 ${charId} 的音效...`);
+            let loadedCount = 0;
+            const skills = SOUND_CONFIG[charId];
+            let totalCount = Object.keys(skills).length;
+            for (const skill in skills) {
+                const url = skills[skill];
+                // 如果還沒被快取過，才進行下載
+                if (!audioCache[url]) {
+                    const audio = new Audio();
+                    audio.preload = "auto";
+                    audio.src = url;
+                    audio.addEventListener('canplaythrough', () => {
+                        loadedCount++;
+                        console.log(`角色 ${charId} 音效載入進度: ${loadedCount}/${totalCount}`);
+                        
+                    },{ once: true });
+                    audio.load();
+                    audioCache[url] = audio;
+                } else {
+                    // 如果已經在快取裡，直接算加一
+                    loadedCount++;
         }
+    }
+}
 </script>
 </body>
 </html>
