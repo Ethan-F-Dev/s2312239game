@@ -238,7 +238,7 @@
     // --- Game Logic ---
     function checkMatchEnd() {
         if((p1.hp <= 0 || p2.hp <= 0) && !gameOver) {
-            playSkillSound(9999, 's1')
+            playSkillSound(9998, 's1')
             gameOver = true;
             setGameTimeout(() => { document.getElementById('winner-text').innerText = (p1.hp > 0 ? "玩家 1" : "玩家 2") + " 獲勝！"; document.getElementById('game-over').style.display = 'flex'; }, 2000);
         }
@@ -789,7 +789,6 @@
     class Player {
         constructor(id, charIdx, x, y) {
             const d = CHAR_DATA[charIdx];
-			preloadCharacterSounds(d)
             this.id = id; this.charIdx = charIdx; this.hp = d.hp; this.maxHp = d.hp; this.shield = 0;
             this.x = x; this.y = y; this.radius = 30;
             this.color = d.color; this.speed = d.speed;
@@ -6227,7 +6226,7 @@ if (p.charIdx === 31) {
 
         if(p.charIdx == 22){
           p.smSuper = true;
-		  let aimAngle = 0
+          let aimAngle = 0
           if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX)
           projectiles.push(new Projectile(p.x, p.y, aimAngle, 20, "gray", 350 , p, "✋", 2.8, null, 
           (e)=>{
@@ -6600,12 +6599,33 @@ if (p.charIdx === 31) {
     
     }
     function castRecover(p) { if(p.cd.recover > 0 || p.hp <= 0) return; playSkillSound(8888, "s1"); p.cd.recover = 45000; p.heal(p.maxHp * 0.05); }
+    window.onload = function() {
+        resize();
+        renderMenu(1); 
+        renderMenu(2);
+        bindButtons();
+        
+        const startBtn = document.getElementById('start-btn');
+        if(startBtn) {
+            startBtn.onclick = startGame;
+            startBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startGame(); });
+        }
+        
+        const restartBtn = document.getElementById('restart-btn');
+        if(restartBtn) {
+            restartBtn.onclick = backToMenu;
+            restartBtn.addEventListener('touchstart', (e) => { e.preventDefault(); backToMenu(); });
+        }
+        window.addEventListener('resize', resize);
+    };
+})();
+
         // 1. 音效管理系統 (新增)
         // ==========================================
         
         // 音效配置表：把角色ID和技能對應到外部音訊網址
-        //9999勝利音效；9998恢復
-        const SOUND_CONFIG = {
+        //9999勝利音效；8888恢復
+const SOUND_CONFIG = {
             0: {},
             1: {},
             2: {},
@@ -6633,14 +6653,14 @@ if (p.charIdx === 31) {
                 s2: "https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_s2.mp3"
                 
             },
+            8888: {
+                s1:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char8888_s1.mp3"
+            },
             9998: {
                 s1:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char9998_s1.mp3"
-            },
-            9999: {
-                s1:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char9999_s1.mp3"
-                
             }
         };
+
         // 音效快取池
         const audioCache = {};
 
@@ -6661,57 +6681,10 @@ if (p.charIdx === 31) {
             const audio = audioCache[soundUrl];
             audio.currentTime = 0;
             audio.play().catch(err => console.log("音效播放失敗(可能是瀏覽器限制):", err));
-        function preloadCharacterSounds(charId) {
-            console.log(!SOUND_CONFIG[charId])
-            console.log(`🚀 開始預載入角色 ${charId} 的音效...`);
-            let loadedCount = 0;
-            const skills = SOUND_CONFIG[charId];
-            let totalCount = Object.keys(skills ?? {}).length; 
-            if (totalCount === 0){return;}
-            for (const skill in skills) {
-                const url = skills[skill];
-                // 如果還沒被快取過，才進行下載
-                if (!audioCache[url]) {
-                    const audio = new Audio();
-                    audio.preload = "auto";
-                    audio.src = url;
-                    audio.addEventListener('canplaythrough', () => {
-                        loadedCount++;
-                        console.log(`角色 ${charId} 音效載入進度: ${loadedCount}/${totalCount}`);
-                        
-                    },{ once: true });
-                    audio.load();
-                    audioCache[url] = audio;
-                } else {
-                    // 如果已經在快取裡，直接算加一
-                    loadedCount++;
-        }
-    }
-}
-    window.onload = function() {
-        resize();
-        renderMenu(1); 
-        renderMenu(2);
-        bindButtons();
-        
-        const startBtn = document.getElementById('start-btn');
-        if(startBtn) {
-            startBtn.onclick = startGame;
-            startBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startGame(); });
         }
         
-        const restartBtn = document.getElementById('restart-btn');
-        if(restartBtn) {
-            restartBtn.onclick = backToMenu;
-            restartBtn.addEventListener('touchstart', (e) => { e.preventDefault(); backToMenu(); });
-        }
-        window.addEventListener('resize', resize);
-    };
-})();
-
 </script>
 </body>
 </html>
-
 
 
