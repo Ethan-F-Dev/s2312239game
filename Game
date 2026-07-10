@@ -238,7 +238,7 @@
     // --- Game Logic ---
     function checkMatchEnd() {
         if((p1.hp <= 0 || p2.hp <= 0) && !gameOver) {
-            playSkillSound(9999, 's1')
+            playSkillSound(9998, 's1')
             gameOver = true;
             setGameTimeout(() => { document.getElementById('winner-text').innerText = (p1.hp > 0 ? "玩家 1" : "玩家 2") + " 獲勝！"; document.getElementById('game-over').style.display = 'flex'; }, 2000);
         }
@@ -981,6 +981,7 @@
             this.nhS2SpdApplied = false;   // 二技能加速標記
             this.nhS3AtkSpdTimer = 0;      // 大招攻速計時
 	// Slime (42)
+			this.slS2Phase = 1
             this.slState = 0;              // 0: 黏性型態, 1: 無黏型態
             this.slLinkTarget = null;      // 綠色粗線連接目標
             this.slLinkTimer = 0;          // 連接持續時間
@@ -4135,7 +4136,7 @@ if (this.charIdx === 31) {
                 }
                 
                 // 【穿透修改 1】：移除 hit 終止條件，只看飛行距離是否達到極限 500px
-                if (traveled >= 400) {
+                if (traveled >= 450) {
                     stopCrutch(projX, projY);
                     return;
                 }
@@ -4631,7 +4632,7 @@ if (this.charIdx === 31) {
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
 
     if(p.charIdx === 44){
-        playSkillSound(44, "s1")
+        playSkillSound(44, "s2")
         const joy = p.id===1?p1Touch:p2Touch; 
         if(Math.abs(joy.joyX) < 0.1 && Math.abs(joy.joyY) < 0.1){
             p.cd.s2 = 0;
@@ -6225,7 +6226,9 @@ if (p.charIdx === 31) {
 
         if(p.charIdx == 22){
           p.smSuper = true;
-          projectiles.push(new Projectile(p.x, p.y, p.angle, 20, "gray", 350 , p, "✋", 2.8, null, 
+          let aimAngle = 0
+          if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX)
+          projectiles.push(new Projectile(p.x, p.y, aimAngle, 20, "gray", 350 , p, "✋", 2.8, null, 
           (e)=>{
             let en = p.target;
             en.isCasting = true;
@@ -6622,29 +6625,40 @@ if (p.charIdx === 31) {
         
         // 音效配置表：把角色ID和技能對應到外部音訊網址
         //9999勝利音效；8888恢復
-        const SOUND_CONFIG = {
-            9999: {
-                s1:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char9999_s1.mp3"
-                
-            },
-            8888: {
-                s1:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char8888_s1.mp3"
-            },
-            44: {
-                a:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_a.mp3",
-                s1: "https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_s1.mp3", // 暫用測試網址
-                s2: ""
-            },
+const SOUND_CONFIG = {
+            0: {},
+            1: {},
+            2: {},
+            3: {},
+            4: {},
+            5: {},
+            6: {},
+            7: {},
+            8: {},
+            9: {},
+            10: {},
+            11: {},
+            12: {},
+            13: {},
+            14: {},15: {},16: {},17: {},18: {},19: {},20: {},21: {},22: {},23: {},24: {},25: {},26: {},27: {},28: {},29: {},30: {},31: {},
             32: {
                 a:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_a.mp3",
                 s1:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char32_s1.mp3",
                 s2:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_s1.mp3",
                 s3:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char32_s3.mp3"
+            },33: {},34: {},35: {},36: {},37: {},38: {},39: {},40: {},41: {},42: {},43: {},
+            44: {
+                a:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_a.mp3",
+                s1: "https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_s1.mp3", // 暫用測試網址
+                s2: "https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_s2.mp3"
+                
             },
-            1: {
-                s1: "https://www.soundjay.com/buttons/sounds/button-08.mp3"
+            8888: {
+                s1:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char8888_s1.mp3"
+            },
+            9998: {
+                s1:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char9998_s1.mp3"
             }
-            // ... 您可以繼續往下增加 50 個角色的設定 ...
         };
 
         // 音效快取池
@@ -6668,9 +6682,9 @@ if (p.charIdx === 31) {
             audio.currentTime = 0;
             audio.play().catch(err => console.log("音效播放失敗(可能是瀏覽器限制):", err));
         }
+        
 </script>
 </body>
 </html>
-
 
 
