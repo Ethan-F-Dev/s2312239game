@@ -981,6 +981,7 @@
             this.nhS2SpdApplied = false;   // 二技能加速標記
             this.nhS3AtkSpdTimer = 0;      // 大招攻速計時
 	// Slime (42)
+			this.slS2Phase = 1
             this.slState = 0;              // 0: 黏性型態, 1: 無黏型態
             this.slLinkTarget = null;      // 綠色粗線連接目標
             this.slLinkTimer = 0;          // 連接持續時間
