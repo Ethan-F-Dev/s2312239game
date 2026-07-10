@@ -6661,6 +6661,26 @@ if (p.charIdx === 31) {
                 
             }
         };
+        // 音效快取池
+        const audioCache = {};
+
+        // 播放音效的函數
+        function playSkillSound(charId, skillName) {
+            if (!SOUND_CONFIG[charId] || !SOUND_CONFIG[charId][skillName]) {
+                console.log(`找不到角色 ${charId} 的 ${skillName} 音效`);
+                return;
+            }
+
+            const soundUrl = SOUND_CONFIG[charId][skillName];
+            
+            if (!audioCache[soundUrl]) {
+                audioCache[soundUrl] = new Audio(soundUrl);
+                audioCache[soundUrl].volume = 0.5; // 設定音量 50%
+            }
+
+            const audio = audioCache[soundUrl];
+            audio.currentTime = 0;
+            audio.play().catch(err => console.log("音效播放失敗(可能是瀏覽器限制):", err));
         function preloadCharacterSounds(charId) {
             console.log(!SOUND_CONFIG[charId])
             console.log(`🚀 開始預載入角色 ${charId} 的音效...`);
