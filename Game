@@ -789,6 +789,9 @@
     class Player {
         constructor(id, charIdx, x, y) {
             const d = CHAR_DATA[charIdx];
+            window.preloadCharacterSounds(charIdx)
+            window.preloadCharacterSounds(8888)
+            window.preloadCharacterSounds(9998)
             this.id = id; this.charIdx = charIdx; this.hp = d.hp; this.maxHp = d.hp; this.shield = 0;
             this.x = x; this.y = y; this.radius = 30;
             this.color = d.color; this.speed = d.speed;
@@ -6682,7 +6685,36 @@ const SOUND_CONFIG = {
             audio.currentTime = 0;
             audio.play().catch(err => console.log("音效播放失敗(可能是瀏覽器限制):", err));
         }
-        
+        function preloadCharacterSounds(charId) {
+            console.log(!SOUND_CONFIG[charId])
+            console.log(`🚀 開始預載入角色 ${charId} 的音效...`);
+            let loadedCount = 0;
+            const skills = SOUND_CONFIG[charId];
+            let totalCount = Object.keys(skills ?? {}).length; 
+            if (totalCount === 0){return;}
+            for (const skill in skills) {
+                const url = skills[skill];
+                // 如果還沒被快取過，才進行下載
+                if (!audioCache[url]) {
+                    const audio = new Audio();
+                    audio.preload = "auto";
+                    audio.src = url;
+                    audio.addEventListener('canplaythrough', () => {
+                        loadedCount++;
+                        console.log(`角色 ${charId} 音效載入進度: ${loadedCount}/${totalCount}`);
+                        
+                    },{ once: true });
+                    audio.load();
+                    audioCache[url] = audio;
+                } else {
+                    // 如果已經在快取裡，直接算加一
+                    loadedCount++;
+                    
+                }
+                
+            }
+            
+        }        
 </script>
 </body>
 </html>
