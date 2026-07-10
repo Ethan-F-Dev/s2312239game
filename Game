@@ -6226,7 +6226,9 @@ if (p.charIdx === 31) {
 
         if(p.charIdx == 22){
           p.smSuper = true;
-          projectiles.push(new Projectile(p.x, p.y, p.angle, 20, "gray", 350 , p, "✋", 2.8, null, 
+		  let aimAngle = 0
+          if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX)
+          projectiles.push(new Projectile(p.x, p.y, aimAngle, 20, "gray", 350 , p, "✋", 2.8, null, 
           (e)=>{
             let en = p.target;
             en.isCasting = true;
