@@ -4632,7 +4632,7 @@ if (this.charIdx === 31) {
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
 
     if(p.charIdx === 44){
-        playSkillSound(44, "s1")
+        playSkillSound(44, "s2")
         const joy = p.id===1?p1Touch:p2Touch; 
         if(Math.abs(joy.joyX) < 0.1 && Math.abs(joy.joyY) < 0.1){
             p.cd.s2 = 0;
@@ -6635,8 +6635,8 @@ if (p.charIdx === 31) {
             },
             44: {
                 a:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_a.mp3",
-                s1: "https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_s1.mp3", // 暫用測試網址
-                s2: ""
+                s1: "https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_s1.mp3", 
+                s2: "https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_s2.mp3"
             },
             32: {
                 a:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char44_a.mp3",
