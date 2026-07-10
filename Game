@@ -6626,8 +6626,8 @@ if (p.charIdx === 31) {
         // 音效配置表：把角色ID和技能對應到外部音訊網址
         //9999勝利音效；8888恢復
         const SOUND_CONFIG = {
-            9999: {
-                s1:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char9999_s1.mp3"
+            9998: {
+                s1:"https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char9998_s1.mp3"
                 
             },
             8888: {
