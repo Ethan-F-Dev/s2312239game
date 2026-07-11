@@ -3337,7 +3337,6 @@ if (this.charIdx === 31) {
                 let localY = vX * Math.sin(-aimAngle) + vY * Math.cos(-aimAngle);
                 
                 if (localX >= 0 && localX <= rectW && Math.abs(localY) <= rectH / 2 + p.target.radius) {
-                    playSkillSound(32, "a")
                     p.target.takeDamage(95 * p.buffs.atk, 32);
                     // 小幅度擊退強制位移
                     p.target.x += Math.cos(aimAngle) * 20; 
@@ -4632,12 +4631,12 @@ if (this.charIdx === 31) {
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
 
     if(p.charIdx === 44){
-        playSkillSound(44, "s2")
         const joy = p.id===1?p1Touch:p2Touch; 
         if(Math.abs(joy.joyX) < 0.1 && Math.abs(joy.joyY) < 0.1){
             p.cd.s2 = 0;
             floatTexts.push(new FloatText(p.x, p.y - 80, "無法使用！", "gray"));
         } else {
+		playSkillSound(44, "s2")
         if(dist(p, enemy) < 60){p.ycanCombo = false; p.target.takeDamage(121); p.cd.s1 = 0; p.cd.s2 = 300; if(p.yCombo <= 7){p.yCombo += 1;} if(p.yProtection <= 99){p.yProtection += 10;}else{p.yProtection = 100;}}
         let startX = p.x, startY = p.y; 
         let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*400, ty = p.y + Math.sin(aimAngle)*400; 
@@ -5078,7 +5077,6 @@ if (p.charIdx === 32) {
             let rippleInt = setGameInterval(() => {
                 count++;
                 if (count <= 3) {
-                    playSkillSound(32,"s2")
                     let currentRadius = 100 + count * 50; // 逐漸變大
                     p.heal(100); // 每次恢復 100 血
                     p.activeWarning = { type: 'circle', r: currentRadius, x: p.x, y: p.y, color: 'rgba(0,191,255,0.5)' };
