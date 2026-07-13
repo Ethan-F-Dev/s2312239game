@@ -4135,7 +4135,7 @@ if (this.charIdx === 31) {
                 }
                 
                 // 【穿透修改 1】：移除 hit 終止條件，只看飛行距離是否達到極限 500px
-                if (traveled >= 450) {
+                if (traveled >= 500) {
                     stopCrutch(projX, projY);
                     return;
                 }
