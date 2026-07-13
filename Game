@@ -2598,16 +2598,16 @@ if (this.charIdx === 31) {
                 let energyCost = dmg / 10;
                 if (this.clovisEnergy >= energyCost) {
                     this.clovisEnergy -= energyCost;
-                    return; // 能量足夠，完全抵銷傷害
+                    return { hpDmg: 0, shieldDmg: 0 }; // 能量足夠，完全抵銷傷害
                 } else {
                     this.clovisEnergy = 0;
-                    return; // 超出傷害免疫一次，並讓能量歸零
+                    return { hpDmg: 0, shieldDmg: 0 }; // 超出傷害免疫一次，並讓能量歸零
                 }
             }
             // 致命傷害觸發被動：清醒送院
             if (this.hp <= dmg && this.clovisPassiveCd <= 0) {
                 this.triggerClovisPassive();
-                return; // 免除此次致命傷害
+                return { hpDmg: 0, shieldDmg: 0 }; // 免除此次致命傷害
             }
         }
 
