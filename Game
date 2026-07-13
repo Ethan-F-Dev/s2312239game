@@ -5712,7 +5712,7 @@ if (p.charIdx === 31) {
             
             if (p.target.hp < 800) {
                 p.target.isYnS3Execute = true; // 開啟斬殺許可
-                p.target.takeDamage(p.target.hp, 39);
+                p.target.takeDamage(9999, 39);
                 particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "━", 5.0, 1, 60)); 
                 floatTexts.push(new FloatText(p.target.x, p.target.y - 80, "終結", "red"));
             } else {
