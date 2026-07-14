@@ -4773,7 +4773,7 @@ if (this.charIdx === 31) {
                     let localX = vX * Math.cos(-aimAngle) - vY * Math.sin(-aimAngle);
                     let localY = vX * Math.sin(-aimAngle) + vY * Math.cos(-aimAngle);
                     if (localX >= 0 && localX <= 150 && Math.abs(localY) <= 100 + p.target.radius) {
-                        p.target.takeDamage(180 * p.buffs.atk, 42);
+                        p.target.takeDamage(130 * p.buffs.atk, 42);
                         p.target.applyStatus('stunned', 1500); // 💡 暈眩加強為 3 秒
                         shakeAmount = 30;
                     }
