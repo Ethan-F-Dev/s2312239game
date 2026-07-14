@@ -4686,8 +4686,7 @@ if (this.charIdx === 31) {
                 }, 40, false, false, false, true)); 
             } else {
                 // 雙刀：扇形持續
-                const joy = p.id === 1 ? p1Touch : p2Touch;
-                p.dxS2FanAngle = (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) ? Math.atan2(joy.joyY, joy.joyX) : Math.atan2(p.target.y - p.y, p.target.x - p.x);
+                p.dxS2FanAngle = p.angleCalculate("hand","on")
                 p.dxS2FanTimer = 3000;
                 p.dxS2FanTick = 0;
             }
