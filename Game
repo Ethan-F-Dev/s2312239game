@@ -594,7 +594,14 @@
                 const wy = p.activeWarning.y !== undefined ? p.activeWarning.y : p.y;
                 ctx.translate(wx, wy); if(p.activeWarning.x === undefined) ctx.rotate(p.angle);
                 ctx.globalAlpha = 0.6; ctx.fillStyle = p.activeWarning.color || "red";
-                if(p.activeWarning.type === 'sector') { ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,p.activeWarning.r, -p.activeWarning.ap/2, p.activeWarning.ap/2); ctx.fill(); }
+                if(p.activeWarning.type === 'sector') { 
+                    if(typeof(p.activeWarning.angle)!=="undefined"){
+                        ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,p.activeWarning.r, -p.activeWarning.ap/2+p.activeWarning.angle, p.activeWarning.ap/2+p.activeWarning.angle); ctx.fill(); 
+                    }else{
+                        ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,p.activeWarning.r, -p.activeWarning.ap/2, p.activeWarning.ap/2); ctx.fill(); 
+                        
+                    }
+                }
                 else if(p.activeWarning.type === 'rect') { ctx.fillRect(0, -p.activeWarning.h/2, p.activeWarning.l, p.activeWarning.h); }
                 else if(p.activeWarning.type === 'circle') { ctx.beginPath(); ctx.arc(0,0,p.activeWarning.r, 0, Math.PI*2); ctx.fill(); }
                 ctx.restore();
