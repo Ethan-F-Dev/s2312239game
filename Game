@@ -4896,7 +4896,7 @@ if (this.charIdx === 31) {
                 }
 
                 // 產生漣漪特效 (傷害型態每 0.25 秒，恢復型態更密集)
-                rippleTimer += 16 * timeScale;
+                rippleTimer += 250 * timeScale;
                 let rippleLimit = stance === 0 ? 250 : 100;
                 if (rippleTimer >= rippleLimit) {
                     rippleTimer -= rippleLimit;
