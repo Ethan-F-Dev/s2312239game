@@ -5441,7 +5441,7 @@ if (p.charIdx === 31) {
                  }
              }        } else if(p.charIdx === 7) { // Micah S2
              if(dist(p, p.target) < 180) { // Range check
-                p.target.takeDamage(300, 7); p.target.applyStatus('slow', 2000); p.target.buffs.slow = 0.8;
+                p.target.takeDamage(500, 7); p.target.applyStatus('slow', 2000); p.target.buffs.slow = 0.8;
                 p.heal(200); p.funds = Math.max(0, p.funds - 20);
                 let ang = Math.atan2(p.target.y - p.y, p.target.x - p.x);
                 // Force Push
