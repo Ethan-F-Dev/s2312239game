@@ -2557,6 +2557,25 @@ if (this.charIdx === 31) {
                 }
             }
         }
+        // input: mode: "hand"/"auto", nomove: "on","off" (meaning if joystick no movement return auto angle or not), default off
+        //output: angle/null/"wrong input"
+        angleCalculate(mode, nomove="off"){
+            let joy = this.id===1?p1Touch:p2Touch;
+            if(mode === "hand"){
+                if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1){
+                    return Math.atan2(joy.joyY, joy.joyX)
+                }else{
+                    if(nomove ==="on"){
+                        return this.angle
+                    }
+                    return null
+                }
+            }else if(mode === "auto"){
+                return p.angle
+            }else{
+                return"wrong input"
+            }
+        }
         takeDamage(dmg, attackerCharIdx = -1, isCrit = false) {
             if(this.isUntouchable) return { hpDmg: 0, shieldDmg: 0 };
 // 刀俠 (43) 雙刀大絕：所有傷害轉換為真傷，吸血量增加30%
