@@ -1073,6 +1073,7 @@
 
             // 二技能雙刀：巨大紅色扇形範圍
             if (this.dxS2FanTimer > 0) {
+                this.dxS2FanAngle = this.angleCalculate("hand","on")
                 this.dxS2FanTimer -= dt * timeScale;
                 this.applyStatus('superArmor', 100); 
                 this.dxS2FanTick += dt * timeScale;
