@@ -773,6 +773,12 @@
                     if (this.owner.charIdx === 13) { // Jing Cha S1 hit
                         if(this.emoji === '🚀') { enemy.applyStatus('slow', 2000); enemy.buffs.slow = 0.8; }
                     }
+                    if (this.owner.charIdx === 21) { // divine S3🟡hit
+                        if(this.emoji === '🟡') {
+                            this.owner.heal(200);
+                            this.owner.shield += 200
+                        }
+                    }
                     if(this.onHit) this.onHit(enemy);
                     this.life = 0;
                 }
@@ -6280,7 +6286,7 @@ if (p.charIdx === 31) {
                 let c = 0;
                 let sf = setGameInterval(()=> {if(p.divineS3 == 2){c++;p.activeWarning = { type:'circle', r:200, x: tx, y: ty, color: 'rgba(255,255,0,0.6)' };if(dist({x: tx, y: ty}, enemy) < 200){ enemy.takeDamage(30 * p.divineAtk , 1); shakeAmount=5;} }}, 150)
                 let se = setGameInterval(()=> {if(c >= 10){clearInterval(sf); p.divineEnh += 3; p.divineAtk += 0.25;clearInterval(se); p.divineS3 = 3;}},1)
-                let be = setGameInterval(()=> {if(p.divineS3 == 3){p.activeWarning = null; projectiles.push(new Projectile(p.x, p.y, p.angle, 35, "gray", 400 * p.divineAtk, p, "🟡", 1.6, null, (e)=>{for(let i=0; i<15; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "🟡", 10.0));shakeAmount = 20;}, 20, false, false, false, false));setGameTimeout(()=> {p.divineAtk -= 0.25; p.divineS3 = 1;}, 3000);clearInterval(be);}}, 1)
+                let be = setGameInterval(()=> {if(p.divineS3 == 3){p.activeWarning = null; projectiles.push(new Projectile(p.x, p.y, p.angle, 35, "gray", 0, p, "🟡", 1.6, null, (e)=>{for(let i=0; i<15; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "🟡", 10.0));shakeAmount = 20;}, 20, false, false, false, false));setGameTimeout(()=> {p.divineAtk -= 0.25; p.divineS3 = 1;}, 3000);clearInterval(be);}}, 1)
                 setGameTimeout(()=> {clearInterval(df)}, 5000)
                 setGameTimeout(()=> p.isCasting = false, 5000)
             } else {
