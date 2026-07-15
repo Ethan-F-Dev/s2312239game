@@ -1012,14 +1012,18 @@
             this.dxS2FanAngle = 0;         // 雙刀 S2 鎖定扇形角度
             this.dxS3SingleTimer = 0;      // 單刀大絕強化時間
             this.dxS3DualTimer = 0;        // 雙刀大絕強化時間
-    	// Waves (44)
+    // Waves (44)
             this.yProtection = 100;
             this.yRegenTimer = 0;
             this.yAim = false;
             this.ycanCombo = true;
             this.yCombo = 0;
             this.ySuper = false;
-	// 鹿冠 (代碼45) 專用 this.deerEnergyStacks = 0; // 0..2，普攻蓄能 this.deerMaxStacks = 2; this.deerMarkTimer = 0; // 當此玩家被標記時（標記存在於被標記的 Player 上），用以倒計時（ms）
+	 // jerk (45) 專用 this.deerEnergyStacks = 0; // 0..2，普攻蓄能 this.deerMaxStacks = 2; this.deerMarkTimer = 0; // 當此玩家被標記時（標記存在於被標記的 Player 上），用以倒計時（ms）
+        
+    // kill (46)
+            this.kState = 0;
+            this.ksState = 1;
         }
         triggerClovisPassive() {
             if (this.charIdx !== 35 || this.clovisPassiveCd > 0) return;
