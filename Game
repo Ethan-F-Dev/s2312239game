@@ -6636,7 +6636,11 @@ if (p.charIdx === 31) {
         const soundUrl = "https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char"+String(charId)+"_"+skillName+".mp3"
         if (!audioCache[soundUrl]) {
             audioCache[soundUrl] = new Audio(soundUrl);
-            audioCache[soundUrl].volume = 0.5; // 設定音量 50%
+            if(skillName === "s3"){
+                audioCache[soundUrl].volume = 1.0; // 設定音量 大件100%
+            }else{
+                audioCache[soundUrl].volume = 0.5; // 設定音量 50%
+            }
         }
         const audio = audioCache[soundUrl];
         audio.currentTime = 0;
