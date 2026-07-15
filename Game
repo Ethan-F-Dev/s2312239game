@@ -2945,16 +2945,33 @@ if (this.charIdx === 31) {
          setGameTimeout(() => { if(dist(p, enemy) < 150) { enemy.takeDamage(90 * p.buffs.atk, 1); shakeAmount=5;} p.activeWarning = null; }, 100); 
     }
 
-    if(p.charIdx === 44){
-        playSkillSound(44, 'a')
-        projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 0, p, "💧", 0.85, 600, (e) => {
-                        let dmg = 41
-                        p.yProtection += 1
-                        e.takeDamage(dmg, 41);
-                        if(p.ySuper){
-                          p.cd.atk = 10;
-                        }
-                    }, 25));
+    if(p.charIdx === 46){
+        if(p.hp > 1750){
+             p.activeWarning = { type:'rect', l: 150, h: 20}; 
+             setGameTimeout(() => { if(dist(p, enemy) < 150) { enemy.takeDamage(90 * p.buffs.atk, 1); shakeAmount=5;} p.activeWarning = null; }, 100); 
+        }
+        if(p.hp <= 1750 && p.hp > 1050){
+             let wave = 0;
+             let ln = Math.floor(Math.random() * 3) + 2;
+             let lc = setGameInterval(()=> {
+             wave++;
+             if(wave <= ln){
+             p.activeWarning = { type:'rect', l: 150, h: 20}; 
+             setGameTimeout(() => { if(dist(p, enemy) < 150) { enemy.takeDamage(90 * p.buffs.atk, 1); shakeAmount=5;} p.activeWarning = null; }, 100); }
+             else{clearInterval(lc)}
+             }, 200)
+        }
+        if(p.hp <= 1050){
+             let wave = 0;
+             let ln = Math.floor(Math.random() * 3) + 3;
+             let lc = setGameInterval(()=> {
+             wave++;
+             if(wave <= ln){
+             p.activeWarning = { type:'rect', l: 150, h: 20}; 
+             setGameTimeout(() => { if(dist(p, enemy) < 150) { enemy.takeDamage(90 * p.buffs.atk, 1); shakeAmount=5;} p.activeWarning = null; }, 100); }
+             else{clearInterval(lc)}
+             }, 200)
+        }
     }
 
     if (p.charIdx === 43) {
