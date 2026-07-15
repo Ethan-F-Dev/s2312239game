@@ -141,7 +141,7 @@
         { name: "刀俠", hp: 2670, atk: 145, speed: 3.5, color: "#8B0000", s1Cd: 3000, s2Cd: 5000, s3Cd: 25000, atkInt: 800 },
         { name: "凌汐", hp: 1000, atk: 22, speed: 3.4, color: "#27C5F5", s1Cd: 3000, s2Cd: 4500, s3Cd: 35000, atkInt: 300 },
         { name: "鹿冠", hp: 2800, atk: 91, speed: 3.2, color: "#8B4513", s1Cd: 4000, s2Cd: 7800, s3Cd: 20000, atkInt: 600 },
-        { name: "戮", hp: 3500, atk: 90, speed: 3.5, color: "#8B4513", s1Cd: 4000, s2Cd: 7800, s3Cd: 20000, atkInt: 1000 }
+        { name: "戮", hp: 3500, atk: 90, speed: 3.5, color: "#FF2A00", s1Cd: 7000, s2Cd: 8000, s3Cd: 15000, atkInt: 1000 }
 
 
     ]);
