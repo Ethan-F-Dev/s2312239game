@@ -2948,14 +2948,14 @@ if (this.charIdx === 31) {
         p.activeWarning = { type:'rect', l: 150, h: 20}; 
         setGameTimeout(() => { if(dist(p, enemy) < 150) { 
         if(p.hp > 1750){
-        enemy.takeDamage(90 * p.buffs.atk, 1);}
+        enemy.takeDamage(70 * p.buffs.atk, 1);}
         if(p.hp <= 1750 && p.hp > 1050){
             let wave = 0;
              let ln = Math.floor(Math.random() * 3) + 2;
              let lc = setGameInterval(()=> {
              wave++;
              if(wave <= ln){
-              enemy.takeDamage(90 * p.buffs.atk, 1);
+              enemy.takeDamage(70 * p.buffs.atk, 1);
               } else {
                 clearInterval(lc)}
              }, 200)
@@ -2966,7 +2966,7 @@ if (this.charIdx === 31) {
              let lc = setGameInterval(()=> {
              wave++;
              if(wave <= ln){
-              enemy.takeDamage(90 * p.buffs.atk, 1);
+              enemy.takeDamage(70 * p.buffs.atk, 1);
               } else {
                 clearInterval(lc)}
              }, 200)
