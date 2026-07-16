@@ -2595,11 +2595,11 @@ if (this.charIdx === 31) {
                 return"wrong input"
             }
         }
-        //mode must be "hand"/"auto" , dist and time must be a number, 
+        //mode must be "hand"/"auto" , dist, time, rectW, rectH must be a number, 
         //warningColor must be a string 'color' or '', nomove defaulted "off", can be "on"
         //"on" means still dash when on joystick input
-        //call by dash(mode, dist, time, warningColor, nomove)
-        dash(mode, dist, time, warningColor, nomove){
+        //call by dash(mode, dist, time, warningColor, rectW, rectH, nomove)
+        dash(mode, dist, time, warningColor,rectW, rectH, nomove){
             function getEasingFraction(durationMs, completionTarget = 0.99) {
                 const frames = durationMs / 16; // Total frames during the timeout
                 const remainingDistance = 1 - completionTarget; // e.g., 0.01 for 99%
@@ -2612,7 +2612,7 @@ if (this.charIdx === 31) {
             let joy = this.id===1?p1Touch:p2Touch;
             let fraction = getEasingFraction(time)
             this.isCasting = true;
-            this.activeWarning = { type:'rect', l:dist, h:50, color: warningColor };
+            this.activeWarning = { type:'rect', l:rectW, h:rectH, color: warningColor };
             let aimAngle = this.angle;
             if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1 && mode === "hand") {
                 aimAngle = Math.atan2(joy.joyY, joy.joyX);
@@ -4662,7 +4662,7 @@ if (this.charIdx === 31) {
         else if(p.charIdx === 4) { let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.applyStatus('superArmor', 500); p.enhancedAtk = true; if(p.critStacks < 2) p.critStacks++; p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*160, ty = p.y + Math.sin(aimAngle)*160; let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.25; p.y += (ty - p.y)*0.25; }, 16); setGameTimeout(() => clearInterval(sInt), 150); document.getElementById(`p${p.id}-btn-atk`).classList.add('special-active'); }
         else if(p.charIdx === 14) { let aimAngle = p.angle; if(Math.abs(joy.joyX)>0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); let startX = p.x, startY = p.y; p.x += Math.cos(aimAngle)*200; p.y += Math.sin(aimAngle)*200; for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "🍃")); } if(dist(p.target, {x:(startX+p.x)/2, y:(startY+p.y)/2}) < 100); p.heal(3 * p.healBuff);p.applyStatus('superArmor', 250); shakeAmount = 0;setGameTimeout(() => { if(dist(p, enemy) < 175) {enemy.takeDamage(20 * p.buffs.atk, 1);} p.target.buffs.disarmed = 5000;p.activeWarning = null;}, 0);p.cd.s2 = 0; if (p.luckStacks < 6){p.luckStacks += 1;}p.heal(100); p.forestAtk = true;}
         else if(p.charIdx === 17) {if(dist(p, enemy) < 100){enemy.takeDamage(100)}; let aimAngle = p.angle; if(Math.abs(joy.joyX)>0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); let startX = p.x, startY = p.y; p.x += Math.cos(aimAngle)*200; p.y += Math.sin(aimAngle)*200; for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "💨")); } if(dist(p.target, {x:(startX+p.x)/2, y:(startY+p.y)/2}) < 100); p.applyStatus('chill', 2000);shakeAmount = 15;p.addShield(200); setGameTimeout(() => { if(dist(p, enemy) < 105) {enemy.takeDamage(180, 1);p.addShield(80)} p.activeWarning = null;}, 200);}
-        else if(p.charIdx === 0) { p.dash("hand", 200, 200, 'rgba(255,0,255,0.6)', "on");p.enhanceAtk(); }
+        else if(p.charIdx === 0) { p.dash("hand", 200, 200, 200, 50, 'rgba(255,0,255,0.6)', "on");p.enhanceAtk(); }
         else if(p.charIdx === 2) { projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gold", 162, p, "✨", 2.0, 500, (t) => { if(t) { t.applyStatus('stunned', 630); t.applyStatus('slow', 3000); t.buffs.slow = 0.6; } }, 60, false, true)); }
         else if(p.charIdx === 3) { projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "red", 325, p, "👊", 2, 250, (t) => { if(!p.isRageMode && p.rage < 3) p.rage++; if(t) { t.applyStatus('stunned', 1000); t.applyStatus('slow', 3000); t.buffs.slow = 0.5; } })); }
         else if(p.charIdx === 6) { let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; p.addShield(100); let dashSteps = 0; let maxSteps = 20; p.applyStatus('superArmor', 500); p.isCasting = true; let si = setGameInterval(() => { p.x += Math.cos(aimAngle) * 12; p.y += Math.sin(aimAngle) * 12; dashSteps++; if(p.commanderMode) { p.soldiers.forEach(s => { s.x += Math.cos(aimAngle)*12; s.y += Math.sin(aimAngle)*12; }); if(dist(p, p.target) < 80) { p.target.x += Math.cos(aimAngle)*15; p.target.y += Math.sin(aimAngle)*15; } } if(dashSteps >= maxSteps) { clearInterval(si); p.isCasting = false; if(p.commanderMode) { p.superEnhancedAtk = true; shakeAmount = 10; floatTexts.push(new FloatText(p.x, p.y-80, "Ready!", "purple")); } } }, 16); }
