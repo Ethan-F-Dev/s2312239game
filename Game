@@ -2580,13 +2580,10 @@ if (this.charIdx === 31) {
         //output: angle/null/"wrong input"
         angleCalculate(mode, nomove="off"){
             let joy = this.id===1?p1Touch:p2Touch;
-            if(mode === "hand"){
+            if(mode === "hand" && nomove === "off"){
                 if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1){
                     return Math.atan2(joy.joyY, joy.joyX)
                 }else{
-                    if(nomove ==="on"){
-                        return this.angle
-                    }
                     return null
                 }
             }else if(mode === "auto"){
