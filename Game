@@ -3046,6 +3046,7 @@ if (this.charIdx === 31) {
                 p.cd.atk = CHAR_DATA[43].atkInt / atkSpdMult;
                 
                 if (p.dxState === 0) {
+                    if(dist(p, p.target)>150){p.cd.atk = 0;return;}
                     // 單刀普攻 (已修復判定 Bug)
                     let rectW = 200, rectH = 40;
                     p.activeWarning = { type: 'rect', l: rectW, h: rectH, angle: aimAngle, color: 'rgba(255, 0, 0, 0.4)' };
