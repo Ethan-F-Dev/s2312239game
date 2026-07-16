@@ -2576,6 +2576,9 @@ if (this.charIdx === 31) {
                 }
             }
         }
+        enhanceAtk(){
+            this.enhancedAtk = true;
+            document.getElementById(`p${this.id}-btn-atk`).classList.add('special-active');}
         // input: mode: "hand"/"auto", nomove: "on","off" (meaning if joystick no movement return auto angle or not), default off
         //output: angle/null/"wrong input"
         angleCalculate(mode, nomove="off"){
