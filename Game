@@ -2592,6 +2592,37 @@ if (this.charIdx === 31) {
                 return"wrong input"
             }
         }
+        //mode must be "hand"/"auto" , dist and time must be a number, 
+        //warningColor must be a string 'color' or '', nomove defaulted "off", can be "on"
+        //"on" means still dash when on joystick input
+        //call by dash(mode, dist, time, warningColor, nomove)
+        dash(mode, dist, time, warningColor, nomove){
+            function getEasingFraction(durationMs, completionTarget = 0.99) {
+                const frames = durationMs / 16; // Total frames during the timeout
+                const remainingDistance = 1 - completionTarget; // e.g., 0.01 for 99%
+                // Calculate the required fraction per frame
+                return 1 - Math.pow(remainingDistance, 1 / frames);
+            }
+            if(nomove === "off" && (Math.abs(joy.joyX) <= 0.1 || Math.abs(joy.joyY) <= 0.1)){
+                return null
+            }
+            let joy = this.id===1?p1Touch:p2Touch;
+            let fraction = getEasingFraction(time)
+            this.isCasting = true;
+            this.activeWarning = { type:'rect', l:dist, h:50, color: warningColor };
+            let aimAngle = this.angle;
+            if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1 && mode === "hand") {
+                aimAngle = Math.atan2(joy.joyY, joy.joyX);
+                
+            }
+            let tx = this.x + Math.cos(aimAngle)*dist, ty = this.y + Math.sin(aimAngle)*dist; 
+            let sInt = setGameInterval(() => { this.x += (tx - this.x)*fraction; this.y += (ty - this.y)*fraction; }, 16);
+            setGameTimeout(() => {
+                clearInterval(sInt);
+                this.isCasting = false; 
+                this.activeWarning = null;
+            }, time);
+        }
         takeDamage(dmg, attackerCharIdx = -1, isCrit = false) {
             if(this.isUntouchable) return { hpDmg: 0, shieldDmg: 0 };
 // 刀俠 (43) 雙刀大絕：所有傷害轉換為真傷，吸血量增加30%
