@@ -1101,7 +1101,6 @@
 
             // 二技能雙刀：巨大紅色扇形範圍
             if (this.dxS2FanTimer > 0) {
-                this.dxS2FanAngle = this.angleCalculate("hand","on")
                 this.dxS2FanTimer -= dt * timeScale;
                 this.applyStatus('superArmor', 100); 
                 this.dxS2FanTick += dt * timeScale;
@@ -2607,7 +2606,7 @@ if (this.charIdx === 31) {
                     return null
                 }
             }else if(mode === "auto"){
-                return p.angle
+                return this.angle
             }else{
                 return"wrong input"
             }
@@ -4776,7 +4775,7 @@ if (this.charIdx === 31) {
                 }, 40, false, false, false, true)); 
             } else {
                 // 雙刀：扇形持續
-                p.dxS2FanAngle = p.angleCalculate("hand","on")
+                p.dxS2FanAngle = p.angleCalculate("auto")
                 p.dxS2FanTimer = 3000;
                 p.dxS2FanTick = 0;
             }
