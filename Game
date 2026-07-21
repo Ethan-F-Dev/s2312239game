@@ -15,7 +15,13 @@
         .mode-btn:active {transform: translateY(1px) scale(0.98); }
         .mode-btn.selected { border-color: #ffd700; background: rgba(255, 215, 0, 0.15); color: #ffd700;box-shadow: 0 0 25px rgba(255, 215, 0, 0.35), inset 0 0 15px rgba(255, 215, 0, 0.15);text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);}
         .mode-title-desc {font-size: 11px; color: #aaa; margin-top: 6px; font-weight: 500; text-transform: uppercase;letter-spacing: 2px;transition: color 0.25s ease; }
-        .mode-btn.selected .mode-title-desc {color: #ffeb7a;}
+		.char-btn.selected { border-color: gold; background: rgba(255,215,0,0.25); box-shadow: 0 0 15px gold; }
+        .char-btn.disabled { border-color: #555; background: rgba(50,50,50,0.8); }
+        .char-btn.disabled .cd-text { color: #888; display: none; }
+        .char-btn.disabled::after { content: '❌'; font-size: 60px; position: absolute; }  
+        .char-btn.selected1 { border-color: red; background: rgba(184, 15, 10, 0.25); box-shadow: 0 0 15px rgba(255, 0, 0, 0.8); }
+        .char-btn.selected2 { border-color: yellow; background: rgba(255, 215, 0, 0.25); box-shadow: 0 0 15px rgba(255, 215, 0, 0.8); }
+        .char-btn.selected3 { border-color: blue; background: rgba(0, 0, 255, 0.25); box-shadow: 0 0 15px rgba(0, 0, 255, 0.8); }
         #ui-layer { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
         #menu { position: absolute; inset: 0; background: radial-gradient(circle, #222, #000); display: flex; flex-direction: column; z-index: 9999; pointer-events: auto; }
         .split-half { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; justify-items: center; align-content: center; padding: 20px; position: relative; }
