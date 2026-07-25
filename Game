@@ -115,9 +115,6 @@
     const ctx = canvas.getContext('2d');
     
     // --- Globals ---
-    let currentGameMode = 'normal';
-    let p1CharSel = {}
-    let p2CharSel = {}
     let width, height, gameRunning = false;
     let p1CharIdx = 0, p2CharIdx = 0;
     let p1Page = 0, p2Page = 0;
@@ -6755,6 +6752,9 @@ if (p.charIdx === 31) {
     }
     let currentGameMode = 'normal';
     window.onload = function() {
+    	let currentGameMode = 'normal';
+    	let p1CharSel = {}
+    	let p2CharSel = {}
         const modeButtons = document.querySelectorAll('.mode-btn');
         const gameModeOverlay = document.getElementById('game-mode');
         
@@ -6778,7 +6778,6 @@ if (p.charIdx === 31) {
                 } else {
                     currentGameMode = 'normal';
                 }
-                console.log("Current Game Mode set to:", currentGameMode);
             
                 // Fade out the overlay smoothly
                 setTimeout(() => {
