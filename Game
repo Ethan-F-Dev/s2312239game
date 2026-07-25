@@ -208,11 +208,25 @@
         container.innerHTML = '';
         const start = pIdx * PAGE_SIZE, end = Math.min(start + PAGE_SIZE, CHAR_DATA.length);
         for (let i = start; i < end; i++) {
+            let name = "char-btn"
             let charSelected = Object.values(selDict).includes(i);
-            const btn = document.createElement('div'); btn.className = `char-btn ${i === sel ? ccsClass : ''}`;
+            if(currentGameMode === "sf"){
+                if(charSelected){
+                    const charChoosenOrder = Object.keys(selDict).find(charChoosenOrder => selDict[charChoosenOrder] === i);
+                    name += " selected"
+                    name += String(charChoosenOrder)
+                }
+            }else{
+                if(i === sel){
+                    name += " selected"
+                }
+            }
+            const btn = document.createElement('div'); 
+            btn.className = name;
             btn.innerHTML = CHAR_DATA[i].name;
             if(charSelected === false){
                 btn.onclick = () => selectChar(pid === 1 ? 0 : 1, i);
+                
             }
             container.appendChild(btn);
         }
@@ -244,14 +258,12 @@
             if (pIdx === 0) {
                 if(p1SelProgress >=4){return}
                 p1SelChar[p1SelProgress] = charIdx;
-                p1CharIdx = charIdx;
                 p1SelProgress += 1;
                 renderMenu(1)
             } 
             else{
                 if(p2SelProgress >=4){return}
                 p2SelChar[p2SelProgress] = charIdx;
-                p2CharIdx = charIdx;
                 p2SelProgress += 1;
                 renderMenu(2)
             }
