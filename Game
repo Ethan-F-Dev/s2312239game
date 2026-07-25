@@ -361,7 +361,7 @@
         p1 = new Player(1, p1CharIdx, width/2, height - 200); p2 = new Player(2, p2CharIdx, width/2, 200);
         p1.target = p2; p2.target = p1; gameRunning = true; gameOver = false; timeScale = 1.0; shakeAmount = 0; deathFocus = null;
         projectiles = []; particles = []; floatTexts = [];
-        requestAnimationFrame(gameLoop);
+        if(currentGameMode === " normal" || (p1PlayProgress === 1 && p2PlayProgress === 1)){requestAnimationFrame(gameLoop);}
     }
     function backToMenu() {
         gameRunning = false; clearGameTimers();
