@@ -329,6 +329,12 @@
             if(currentGameMode === "normal" || p1PlayProgress === 3 || p2PlayProgress === 3){
                 playSkillSound(9998, 's1')
                 gameOver = true;
+                p1SelProgress = 1
+                p2SelProgress = 1
+                p1SelChar = {}
+                p2SelChar = {}
+                p1PlayProgress = 1
+                p2PlayProgress = 1
                 setGameTimeout(() => { 
                     document.getElementById('winner-text').innerText = (p1.hp > 0 ? "玩家 1" : "玩家 2") + " 獲勝！"; 
                     document.getElementById('game-over').style.display = 'flex'; 
