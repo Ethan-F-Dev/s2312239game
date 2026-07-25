@@ -348,8 +348,10 @@
                     lastGameHPSave.pop();
                 }
                 if(p1.hp <= 0){
+					lastGameHPSave = ["p2", p2.hp]
                     p1PlayProgress += 1
                 }else{
+					lastGameHPSave = ["p1", p1.hp]
                     p2PlayProgress += 1
                 }
 				startGame()
