@@ -239,12 +239,14 @@
             if (pIdx === 0) {
                 if(p1SelProgress >=4){return}
                 p1SelChar[p1SelProgress] = charIdx;
+                p1CharIdx = charIdx;
                 p1SelProgress += 1;
                 renderMenu(1)
             } 
             else{
                 if(p2SelProgress >=4){return}
                 p2SelChar[p2SelProgress] = charIdx;
+                p2CharIdx = charIdx;
                 p2SelProgress += 1;
                 renderMenu(2)
             }
