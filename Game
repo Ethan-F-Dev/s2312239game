@@ -340,6 +340,10 @@
                     document.getElementById('game-over').style.display = 'flex'; 
                 }, 2000);
             }else{
+                if(currentGameMode === "sf" && p1PlayProgress > 1 && p2PlayProgress > 1){
+                    lastGameHPSave.pop();
+                    lastGameHPSave.pop();
+                }
                 if(p1.hp <= 0){
                     p1PlayProgress += 1
                 }else{
