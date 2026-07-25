@@ -230,7 +230,22 @@
         nb.onclick = (e) => { e.stopPropagation(); if (pid === 1) { p1Page = (p1Page+1)*PAGE_SIZE < CHAR_DATA.length ? p1Page+1 : 0; renderMenu(1); } else { p2Page = (p2Page+1)*PAGE_SIZE < CHAR_DATA.length ? p2Page+1 : 0; renderMenu(2); } };
         container.appendChild(nb);
     }
-    function selectChar(pIdx, charIdx) { if (pIdx === 0) p1CharIdx = charIdx; else p2CharIdx = charIdx; renderMenu(pIdx === 0 ? 1 : 2); }
+    function selectChar(pIdx, charIdx) {
+        if(currentGameMode === "sf"){
+            if (pIdx === 0) {
+                p1SelChar[p1SelProgress] = charIdx;
+                p1SelProgress += 1;
+            } 
+            else{
+                p2SelChar[p1SelProgress] = charIdx;
+                p2SelProgress += 1;
+            }
+            renderMenu(pIdx === 0 ? 1 : 2);
+        }else{
+            if (pIdx === 0) p1CharIdx = charIdx; else p2CharIdx = charIdx; renderMenu(pIdx === 0 ? 1 : 2); 
+        }
+        
+    }
     function updateButtonCD(p, prefix) {
         ['s1', 's2', 's3', 'recover', 'atk'].forEach(k => {
             const el = document.getElementById(`${prefix}-btn-${k}`); if(!el) return;
