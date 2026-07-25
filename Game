@@ -123,6 +123,9 @@
     let p2SelProgress = 1;
     let p1SelChar = {};
     let p2SelChar = {};
+    let p1PlayProgress = 1;
+    let p2PlayProgress = 1;
+    let lastGameHPSave = null;
     let width, height, gameRunning = false;
     let p1CharIdx = 0, p2CharIdx = 0;
     let p1Page = 0, p2Page = 0;
