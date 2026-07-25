@@ -326,9 +326,20 @@
     // --- Game Logic ---
     function checkMatchEnd() {
         if((p1.hp <= 0 || p2.hp <= 0) && !gameOver) {
-            playSkillSound(9998, 's1')
-            gameOver = true;
-            setGameTimeout(() => { document.getElementById('winner-text').innerText = (p1.hp > 0 ? "玩家 1" : "玩家 2") + " 獲勝！"; document.getElementById('game-over').style.display = 'flex'; }, 2000);
+            if(currentGameMode === "normal" || p1PlayProgress === 3 || p2PlayProgress === 3){
+                playSkillSound(9998, 's1')
+                gameOver = true;
+                setGameTimeout(() => { 
+                    document.getElementById('winner-text').innerText = (p1.hp > 0 ? "玩家 1" : "玩家 2") + " 獲勝！"; 
+                    document.getElementById('game-over').style.display = 'flex'; 
+                }, 2000);
+            }else{
+                if(p1.hp <= 0){
+                    p1PlayProgress += 1
+                }else{
+                    p2PlayProgress += 1
+                }
+            }
         }
     }
     
