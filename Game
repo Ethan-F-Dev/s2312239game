@@ -237,14 +237,17 @@
     function selectChar(pIdx, charIdx) {
         if(currentGameMode === "sf"){
             if (pIdx === 0) {
+                if(p1SelProgress >=4){return}
                 p1SelChar[p1SelProgress] = charIdx;
                 p1SelProgress += 1;
+                renderMenu(1)
             } 
             else{
-                p2SelChar[p1SelProgress] = charIdx;
+                if(p2SelProgress >=4){return}
+                p2SelChar[p2SelProgress] = charIdx;
                 p2SelProgress += 1;
+                renderMenu(2)
             }
-            renderMenu(pIdx === 0 ? 1 : 2);
         }else{
             if (pIdx === 0) p1CharIdx = charIdx; else p2CharIdx = charIdx; renderMenu(pIdx === 0 ? 1 : 2); 
         }
