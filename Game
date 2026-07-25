@@ -204,11 +204,16 @@
         const container = document.getElementById(pid === 1 ? 'p1-char-container' : 'p2-char-container');
         const pIdx = pid === 1 ? p1Page : p2Page;
         const sel = pid === 1 ? p1CharIdx : p2CharIdx;
+        const selDict = pid === 1 ? p1SelChar : p2SelChar;
         container.innerHTML = '';
         const start = pIdx * PAGE_SIZE, end = Math.min(start + PAGE_SIZE, CHAR_DATA.length);
         for (let i = start; i < end; i++) {
+            let charSelected = Object.values(selDict).includes(i);
             const btn = document.createElement('div'); btn.className = `char-btn ${i === sel ? ccsClass : ''}`;
-            btn.innerHTML = CHAR_DATA[i].name; btn.onclick = () => selectChar(pid === 1 ? 0 : 1, i);
+            btn.innerHTML = CHAR_DATA[i].name;
+            if(charSelected === false){
+                btn.onclick = () => selectChar(pid === 1 ? 0 : 1, i);
+            }
             container.appendChild(btn);
         }
         // 建立向左按鈕
