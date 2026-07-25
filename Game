@@ -365,6 +365,12 @@
         p1 = new Player(1, p1CharIdx, width/2, height - 200); p2 = new Player(2, p2CharIdx, width/2, 200);
         p1.target = p2; p2.target = p1; gameRunning = true; gameOver = false; timeScale = 1.0; shakeAmount = 0; deathFocus = null;
         projectiles = []; particles = []; floatTexts = [];
+        if(currentGameMode === "sf" && (p1PlayProgress > 1 || p2PlayProgress > 1)){
+            let p = lastGameHPSave[0] === "p1" ? p1 : p2;
+            p.hp = lastGameHPSave[1]
+            console.log(lastGameHPSave[1])
+            console.log(p1.hp , p2.hp)
+        }
         if(currentGameMode === " normal" || (p1PlayProgress === 1 && p2PlayProgress === 1)){requestAnimationFrame(gameLoop);}
     }
     function backToMenu() {
