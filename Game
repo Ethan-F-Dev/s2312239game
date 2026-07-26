@@ -373,8 +373,6 @@
         if(currentGameMode === "sf" && (p1PlayProgress > 1 || p2PlayProgress > 1)){
             let p = lastGameHPSave[0] === "p1" ? p1 : p2;
             p.hp = lastGameHPSave[1]
-            console.log(lastGameHPSave[1])
-            console.log(p1.hp , p2.hp)
         }
         if(currentGameMode === " normal" || (p1PlayProgress === 1 && p2PlayProgress === 1)){requestAnimationFrame(gameLoop);}
     }
