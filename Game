@@ -6910,6 +6910,26 @@ if (p.charIdx === 31) {
             restartBtn.onclick = handleRestart;
             restartBtn.addEventListener('touchstart', handleRestart);
         }
+        const rechooseCharbtn = document.getElementById('rechooseChar-btn');
+        if(rechooseCharbtn) {
+            const handleRestart = (e) => {
+                if (e) e.preventDefault()
+                // Run your original backToMenu logic
+                backToMenu();
+            };
+
+            rechooseCharbtn.onclick = handleRestart;
+            rechooseCharbtn.addEventListener('touchstart', handleRestart);
+        }
+        const playAgainbtn = document.getElementById('playAgain-btn');
+        if(playAgainbtn) {
+            const handleRestart = (e) => {
+                if (e) e.preventDefault()
+                startGame()
+            };
+            playAgainbtn.onclick = handleRestart;
+            playAgainbtn.addEventListener('touchstart', handleRestart);
+        }
         window.addEventListener('resize', resize);
     };
 })();
