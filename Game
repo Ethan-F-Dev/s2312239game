@@ -471,7 +471,13 @@
                       p.isMarsFlying = false; p.isCasting = false; p.isUntouchable = false;
                       p.activeWarning = null;
                       let dmg = 300 + (p.energyConsumed / 100) * 85;
-                      if(dist(p, p.target) < 250) { p.target.takeDamage(dmg, 11); p.target.applyStatus('stunned', 1000); }
+                      if(dist(p, p.target) < 250) { 
+                        p.target.takeDamage(dmg, 11); 
+                        p.target.applyStatus('stunned', 1000);
+                        if (p.energyConsumed >= 1000 && p.target.hp <= 0) {
+                            showAchievement("天外來星", "255, 69, 0", "#ffffff"); 
+                        }
+                      }
                       shakeAmount = 40; for(let i=0; i<180; i++) particles.push(new Particle(p.x, p.y, "orange", "normal", "🔥", 3.0)); 
                       p.marsBuffTimer = 5000; 
                   }
