@@ -6711,7 +6711,30 @@ if (p.charIdx === 31) {
         } else if(p.charIdx === 0) {if(dist(p, p.target) > 250) { p.cd.s3 = 0; floatTexts.push(new FloatText(p.x, p.y-80, "No Target!", "gray")); return; }p.isCasting = true; p.x = p.target.x - Math.cos(p.angle)*60; p.y = p.target.y - Math.sin(p.angle)*60; p.activeWarning = { type:'circle', r: 150, color: 'rgba(75,0,130,0.5)' }; setGameTimeout(() => { p.target.applyStatus('stunned', 1000); let c = 0; let si = setGameInterval(() => { c++; let act = p.target.takeDamage(400, 0); p.heal(act.hpDmg + act.shieldDmg*0.5); shakeAmount = 20; if(c >= 3) { clearInterval(si); p.isCasting = false; p.activeWarning = null; } }, 350); }, 100); }
         else if(p.charIdx === 1) { if(!p.taiS1Active){p.isUntouchable = true; p.isCasting = true; p.buffs.speed = 4.0; p.activeWarning = { type:'circle', r:120, color:'rgba(255,165,0,0.4)' }; let c = 0; let iInt = setGameInterval(() => { c++; p.x += (p.id===1?p1Touch.joyX:p2Touch.joyX)*p.speed*4; p.y += (p.id===1?p1Touch.joyY:p2Touch.joyY)*p.speed*4; if(c%30===0 && dist(p, p.target)<120) {p.target.takeDamage(80, 1);p.flame += 10} if(c > 200) { clearInterval(iInt); p.isUntouchable = false; p.isCasting = false; p.stateTimer = 8000; p.buffs.atk = 1.2; p.taiUltActive = true; p.cd.s1 = 0; p.cd.s2 = 0; floatTexts.push(new FloatText(p.x, p.y-100, "Refreshed!", "gold")); } }, 16); }else{p.cd.s3 = 0;}}
         else if(p.charIdx === 2) { const tx = p.target.x, ty = p.target.y; p.activeWarning = { type:'circle', r:120, x: tx, y: ty, color: 'rgba(255,255,0,0.6)' }; setGameTimeout(() => { for(let i=0; i<15; i++) particles.push(new Particle(tx, ty, "gold", "normal", "⚡", 1.0, 2.0)); if(dist({x: tx, y: ty}, p.target) < 120) { p.target.takeDamage(600, 2); p.applySlow(0.4); p.cd.s1 = 0; p.cd.s2 = 0; shakeAmount = 20; floatTexts.push(new FloatText(p.x, p.y-80, "Refreshed!", "gold")); } p.activeWarning = null; }, 1000); }
-        else if(p.charIdx === 3) { let rageUsed = p.isRageMode ? 3 : p.rage; const targetX = p.target.x, targetY = p.target.y; p.isCasting = true; p.activeWarning = { type:'circle', r:252, x: targetX, y: targetY, color:'rgba(255,0,0,0.7)' }; p.isUntouchable = true; p.applyStatus('superArmor', 2000); setGameTimeout(() => { p.isVisible = false; setGameTimeout(() => { p.x = targetX; p.y = targetY; p.isVisible = true; p.isCasting = false; p.isUntouchable = false; p.activeWarning = null; shakeAmount = 60; p.addShield(p.rage*250); p.rage = 0; p.isRageMode = false; p.buffs.atk = 1.0; if(dist(p, p.target) < 252) { p.target.takeDamage(960 * (1 + rageUsed * 0.4), 3); p.target.applyStatus('stunned', 1500); p.target.applyStatus('slow', 3000); p.target.buffs.slow = 0.4; } }, 1200); }, 300); }
+        else if(p.charIdx === 3) {
+            let rageUsed = p.isRageMode ? 3 : p.rage; const targetX = p.target.x, targetY = p.target.y; p.isCasting = true; 
+            p.activeWarning = { type:'circle', r:252, x: targetX, y: targetY, color:'rgba(255,0,0,0.7)' }; 
+            p.isUntouchable = true; p.applyStatus('superArmor', 2000); 
+            setGameTimeout(() => { 
+                p.isVisible = false; 
+                setGameTimeout(() => { 
+                    p.x = targetX; p.y = targetY; 
+                    p.isVisible = true; p.isCasting = false; 
+                    p.isUntouchable = false; p.activeWarning = null; 
+                    shakeAmount = 60; p.addShield(p.rage*250); p.rage = 0; 
+                    p.isRageMode = false; p.buffs.atk = 1.0;
+                    if(dist(p, p.target) < 252) { 
+                        p.target.takeDamage(960 * (1 + rageUsed * 0.4), 3); 
+                        p.target.applyStatus('stunned', 1500); p.target.applyStatus('slow', 3000); 
+                        p.target.buffs.slow = 0.4;
+                        if (rageUsed >= 3 && p.target.hp <= 0) {
+                            showAchievement("山丘之王！", "220, 20, 60", "#ffd700");
+                        }
+                    } 
+                }, 1200); 
+            }, 300);
+        }
+
         else if(p.charIdx === 6) { if(p.commanderMode) { let count = p.soldiers.length; p.heal(count * 300); p.soldiers = []; p.commanderMode = false; floatTexts.push(new FloatText(p.x, p.y-100, "Retreat & Heal", "green")); }
              else { p.commanderMode = true; p.stateTimer = 20000; p.cd.s3 = 60000; p.soldiers.forEach(s => s.type = 'soldier'); let baseAngle = p.angle; let perpAngle = baseAngle + Math.PI/2; let cx = p.x + 60 * Math.cos(baseAngle); let cy = p.y + 60 * Math.sin(baseAngle); let count = p.soldiers.length; let spacing = 40; p.soldiers.forEach((s, i) => { let offset = -((count-1)*spacing)/2 + i * spacing; s.x = cx + Math.cos(perpAngle) * offset; s.y = cy + Math.sin(perpAngle) * offset; }); p.addShield(120 * p.soldiers.length); floatTexts.push(new FloatText(p.x, p.y-100, "ATTACK!", "purple")); } }
         else if(p.charIdx === 7) { if(dist(p, p.target) > 180) { p.cd.s3 = 0; floatTexts.push(new FloatText(p.x, p.y-80, "Too Far!", "gray")); return; } p.isGrappling = true; p.target.isGrappling = true; p.isCasting = true; let spins = 0; let spinInt = setGameInterval(() => { spins++; p.target.x = p.x + 50 * Math.cos(spins * 0.5); p.target.y = p.y + 50 * Math.sin(spins * 0.5); if(spins > 30) { clearInterval(spinInt); p.isGrappling = false; p.target.isGrappling = false; p.isCasting = false; let throwAng = p.angle; p.target.x += 150 * Math.cos(throwAng); p.target.y += 150 * Math.sin(throwAng); p.target.takeDamage(495, 7); p.target.applyStatus('stunned', 1000 + (p.funds/20)*500); if(p.funds > 0) p.target.heal(200); p.funds = 0; p.micahEnhanced = true; for(let i=0; i<50; i++) particles.push(new Particle(p.target.x, p.target.y, "white", "normal", "🦷", 1.0)); } }, 30); }
