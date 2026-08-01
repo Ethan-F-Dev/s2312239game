@@ -119,6 +119,7 @@
     const ctx = canvas.getContext('2d');
     
     // --- Globals ---
+    let currentGameMode = 'normal';
     let p1SelProgress = 1;
     let p2SelProgress = 1;
     let p1SelChar = {};
@@ -6835,7 +6836,33 @@ if (p.charIdx === 31) {
         audio.currentTime = 0;
         audio.play().catch(err => console.log("音效播放失敗(可能是瀏覽器限制):"+soundUrl, err));
     }
-    let currentGameMode = 'normal';
+    function drawImage(url, x, y, w, h, angle = null, flip = null){
+        const canvas = document.getElementById("myCanvas");
+        const ctx = canvas.getContext("2d");
+        const img = new Image();
+        img.crossOrigin = "anonymous"; 
+        img.scr = url
+        img.onload = function() {
+            ctx.save();        
+            ctx.translate(x, y); 
+            if(flip ==! null){
+                if(flip === "horizontal"){
+                    ctx.scale(-1, 1);
+                }else{
+                    ctx.scale(1, -1);
+                }
+            }
+            if(angle ==! null){
+                let rotateAngke = angle * Math.PI / 180;
+                ctx.rotate(angle);
+            }
+            ctx.drawImage(img, -w / 2, -h / 2, w, h);
+            ctx.restore(); 
+        };
+        img.onerror = function() {
+            console.error("The image failed to load. Check the URL or CORS settings.");
+        };
+    }
     window.onload = function() {
         const modeButtons = document.querySelectorAll('.mode-btn');
         const gameModeOverlay = document.getElementById('game-mode');
