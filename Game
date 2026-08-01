@@ -6668,7 +6668,7 @@ if (p.charIdx === 31) {
              p.activeWarning = { type:'circle', r: 250, x: p.ultTargetX, y: p.ultTargetY, color: 'orange' };
              p.energyConsumed = p.energy; 
              p.energy = 0;
-             p.marsS3State = 1; 
+             p.marsS3State = 0; 
              p.marsS3Timer = 0;
         }
         
