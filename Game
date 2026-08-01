@@ -32,11 +32,9 @@
             display: flex;align-items: center;
             justify-content: center; color: var(--text-color); font-family: 'Impact', 'Noto Sans TC', sans-serif; font-size: 24px; font-weight: 900;
             letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 5px rgba(255, 255, 255, 0.8), 0 0 12px rgba(var(--banner-color), 1), 
-            2px 2px 4px rgba(0, 0, 0, 0.9); opacity: 0; transform: scaleY(0); transition: opacity 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-            transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);}
-        .achievement-banner.p2 {transform: rotate(180deg) scaleY(0);}
-        .achievement-banner.show {opacity: 1; transform: scaleY(1);}
-        .achievement-banner.p2.show {opacity: 1; transform: rotate(180deg) scaleY(1); }
+            2px 2px 4px rgba(0, 0, 0, 0.9); clip-path: inset(0 100% 0 0); opacity: 0; transition: clip-path 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;}
+        .achievement-banner.p2 {transform: rotate(180deg);}
+        .achievement-banner.show {opacity: 1; clip-path: inset(0 0% 0 0);}
         #menu { position: absolute; inset: 0; background: radial-gradient(circle, #222, #000); display: flex; flex-direction: column; z-index: 9999; pointer-events: auto; }
         .split-half { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; justify-items: center; align-content: center; padding: 20px; position: relative; }
         .p2-menu { transform: rotate(180deg); border-bottom: 2px solid #444; }
@@ -354,6 +352,7 @@
      * @param {string} [textColor="#ffffff"] - Hex or CSS color for text (e.g., "#fff", "#ffff00").
      */
     function showAchievement(text, bannerRGB = "255, 215, 0", textColor = "#ffffff") {
+        if(currentGameMode ==! "sf"){return}
         const uiLayer = document.getElementById('ui-layer');
         if (!uiLayer) return;
         let overlay = uiLayer.querySelector('.achievement-overlay');
@@ -375,8 +374,10 @@
             banner.style.setProperty('--text-color', textColor);
             banner.textContent = text;
         });
-        topBanner.classList.add('show');
-        bottomBanner.classList.add('show');
+        setTimeout(() => {
+            topBanner.classList.add('show');
+            bottomBanner.classList.add('show');
+        }, 20);
         setTimeout(() => {
             topBanner.classList.remove('show');
             bottomBanner.classList.remove('show');
@@ -458,30 +459,44 @@
              }
              
              // Mars S3 Flight
-             if(p.charIdx === 11 && p.isMarsFlying) {
-                  p.applyStatus("stunned", 500)
-                  let distToTarget = dist(p, {x:p.ultTargetX, y:p.ultTargetY});
-                  let step = 20 * timeScale;
-                  if(distToTarget > step) {
-                      let ang = Math.atan2(p.ultTargetY - p.y, p.ultTargetX - p.x);
-                      p.x += Math.cos(ang) * step; p.y += Math.sin(ang) * step; 
-                      particles.push(new Particle(p.x, p.y, "red", "normal", "", 0.5)); 
-                  } else {
-                      p.x = p.ultTargetX; p.y = p.ultTargetY;
-                      p.isMarsFlying = false; p.isCasting = false; p.isUntouchable = false;
-                      p.activeWarning = null;
-                      let dmg = 300 + (p.energyConsumed / 100) * 85;
-                      if(dist(p, p.target) < 250) { 
+            if(p.charIdx === 11 && p.isMarsFlying) {
+                p.applyStatus("stunned", 500);
+                let distToTarget = dist(p, {x: p.ultTargetX, y: p.ultTargetY});
+                let step = 20 * timeScale;
+            
+                if(distToTarget > step) {
+                    let ang = Math.atan2(p.ultTargetY - p.y, p.ultTargetX - p.x);
+                    p.x += Math.cos(ang) * step; 
+                    p.y += Math.sin(ang) * step; 
+                    particles.push(new Particle(p.x, p.y, "red", "normal", "", 0.5)); 
+                } else {
+                    // --- 1. Snap to target position and unlock Mars IMMEDIATELY ---
+                    p.x = p.ultTargetX; 
+                    p.y = p.ultTargetY;
+                    p.isMarsFlying = false; 
+                    p.isCasting = false;        // Fixed: Unlocks movement & abilities
+                    p.isUntouchable = false;
+                    p.activeWarning = null;
+            
+                    // Visual effects & buff
+                    shakeAmount = 40; 
+                    for(let i = 0; i < 180; i++) particles.push(new Particle(p.x, p.y, "orange", "normal", "🔥", 3.0)); 
+                    p.marsBuffTimer = 5000; 
+            
+                    // --- 2. Calculate Damage & Check Achievement ---
+                    let dmg = 300 + (p.energyConsumed / 100) * 85;
+                    
+                    if(dist(p, p.target) < 250) { 
                         p.target.takeDamage(dmg, 11); 
-                        p.target.applyStatus('stunned', 1000);
+                        p.target.applyStatus('stunned', 1000); 
+            
+                        // Trigger "天外來星" on full-energy kill
                         if (p.energyConsumed >= 1000 && p.target.hp <= 0) {
-                            showAchievement("天外來星", "255, 69, 0", "#ffffff"); 
+                            showAchievement("天外來星", "255, 69, 0", "#ffffff");
                         }
-                      }
-                      shakeAmount = 40; for(let i=0; i<180; i++) particles.push(new Particle(p.x, p.y, "orange", "normal", "🔥", 3.0)); 
-                      p.marsBuffTimer = 5000; 
-                  }
-             }
+                    }
+                }
+            }
              if(p.charIdx === 10 && p.activeWarning && p.activeWarning.type === 'circle') { p.activeWarning.x = p.x; p.activeWarning.y = p.y; }
              
              p.x = Math.max(p.radius, Math.min(width - p.radius, p.x)); p.y = Math.max(p.radius, Math.min(height - p.radius, p.y));
