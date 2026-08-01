@@ -3121,7 +3121,7 @@ if (this.charIdx === 31) {
         }
         addShield(amt) { if(this.hp <= 0) return; this.shield += amt; if(amt>0) floatTexts.push(new FloatText(this.x, this.y - 60, `+${Math.round(amt)}`, "white")); }
         addStoneS3Circle(){if(this.stoneS3 == true) {ctx.strokeStyle = "gray"; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(0,0, this.radius + 10, 0, Math.PI*2); ctx.stroke();}}
-        triggerDeath(attackerCharIdx) { this.isDying = true; timeScale = 0.2; deathFocus = this; setGameTimeout(checkMatchEnd, 2000); for(let i=0; i<50; i++) particles.push(new Particle(this.x, this.y, "#888", "ash")); }
+        triggerDeath(attackerCharIdx) { this.isDying = true; timeScale = 0.2; if(currentGameMode ==! "sf"){deathFocus = this;} setGameTimeout(checkMatchEnd, 2000); for(let i=0; i<50; i++) particles.push(new Particle(this.x, this.y, "#888", "ash")); }
         endJimingUlt() { this.isJimingUlt = false; this.jimingUltZone.active = false; if(this.target) this.target.struggleSpeedStacks = 0; this.heal(this.jimingTotalDmg * 0.48); this.cd.s3 = CHAR_DATA[5].s3Cd; }
         addCombo() { this.comboCount++; this.comboTimer = 3000; this.heal(this.comboCount * 30); if(this.charIdx===4 && this.comboCount%5===0) this.cd.s3 = Math.max(0, this.cd.s3 - 500); }
         addJimingStack() { if(this.charIdx !== 5) return; this.speedStacks = Math.min(4, this.speedStacks + 1); this.speedStackTimer = 10000; }
