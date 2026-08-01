@@ -6837,8 +6837,6 @@ if (p.charIdx === 31) {
         audio.play().catch(err => console.log("音效播放失敗(可能是瀏覽器限制):"+soundUrl, err));
     }
     function drawImage(url, x, y, w, h, angle = null, flip = null){
-        const canvas = document.getElementById("myCanvas");
-        const ctx = canvas.getContext("2d");
         const img = new Image();
         img.crossOrigin = "anonymous"; 
         img.scr = url
