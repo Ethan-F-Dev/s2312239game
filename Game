@@ -7,15 +7,36 @@
     <title>巔峰對決 - 浪潮者 </title>
     <style>
         :root { --p1-ui: #3498db; --p2-ui: #e74c3c; --font-main: 'Noto Sans TC', sans-serif; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; user-select: none; -webkit-user-select: none; touch-action: none; font-family: var(--font-main); }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; user-select: none; 
+            -webkit-user-select: none; touch-action: none; font-family: var(--font-main); }
         canvas { display: block; }
-        #game-mode {position: absolute;inset: 0;background: rgba(0, 0, 0, 0.45); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 24px; z-index: 20000; pointer-events: auto; backdrop-filter: blur(4px);}
-        .mode-btn { width: 320px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #1e1e1e; border: 2px solid #444; color: #ffffff; border-radius: 12px; font-size: 20px; font-weight: 800; letter-spacing: 1.5px;cursor: pointer; user-select: none; transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);position: relative;}
+        #game-mode {position: absolute;inset: 0;background: rgba(0, 0, 0, 0.45); display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; gap: 24px; z-index: 20000; pointer-events: auto; backdrop-filter: blur(4px);}
+        .mode-btn { width: 320px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            background: #1e1e1e; border: 2px solid #444; color: #ffffff; border-radius: 12px; font-size: 20px; font-weight: 800; 
+            letter-spacing: 1.5px;cursor: pointer; user-select: none; transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); position: relative;}
         .mode-btn:hover {background: #2a2a2a;border-color: #888;transform: translateY(-2px);box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7);}
         .mode-btn:active {transform: translateY(1px) scale(0.98); }
-        .mode-btn.selected { border-color: #ffd700; background: rgba(255, 215, 0, 0.15); color: #ffd700;box-shadow: 0 0 25px rgba(255, 215, 0, 0.35), inset 0 0 15px rgba(255, 215, 0, 0.15);text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);}
+        .mode-btn.selected { border-color: #ffd700; background: rgba(255, 215, 0, 0.15); color: #ffd700; 
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.35), inset 0 0 15px rgba(255, 215, 0, 0.15);text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);}
         .mode-title-desc {font-size: 11px; color: #aaa; margin-top: 6px; font-weight: 500; text-transform: uppercase;letter-spacing: 2px;transition: color 0.25s ease; }
         #ui-layer { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
+        .achievement-overlay {position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; z-index: 100; overflow: hidden; }
+        .achievement-banner {width: 100%; height: 60px; margin-top: 10px; --banner-color: 255, 215, 0; --text-color: #ffffff; 
+            background: linear-gradient(90deg, rgba(var(--banner-color), 0) 0%, rgba(var(--banner-color), 0.1) 15%,  rgba(var(--banner-color), 0.5) 50%,  
+            rgba(var(--banner-color), 0.1) 85%,  rgba(var(--banner-color), 0) 100%);
+            border-top: 3px solid rgba(var(--banner-color), 0.6);   
+            border-bottom: 3px solid rgba(var(--banner-color), 0.6); 
+            box-shadow: 0 0 25px rgba(var(--banner-color), 0.4), inset 0 0 15px rgba(var(--banner-color), 0.3); backdrop-filter: blur(6px);
+            display: flex;align-items: center;
+            justify-content: center; color: var(--text-color); font-family: 'Impact', 'Noto Sans TC', sans-serif; font-size: 24px; font-weight: 900;
+            letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 5px rgba(255, 255, 255, 0.8), 0 0 12px rgba(var(--banner-color), 1), 
+            2px 2px 4px rgba(0, 0, 0, 0.9); opacity: 0; transform: scaleY(0); transition: opacity 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+            transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);}
+        .achievement-banner.p2 {transform: rotate(180deg) scaleY(0);}
+        .achievement-banner.show {opacity: 1; transform: scaleY(1);}
+        .achievement-banner.p2.show {opacity: 1; transform: rotate(180deg) scaleY(1); }
         #menu { position: absolute; inset: 0; background: radial-gradient(circle, #222, #000); display: flex; flex-direction: column; z-index: 9999; pointer-events: auto; }
         .split-half { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; justify-items: center; align-content: center; padding: 20px; position: relative; }
         .p2-menu { transform: rotate(180deg); border-bottom: 2px solid #444; }
@@ -326,6 +347,41 @@
         };
         setupJoy(1, "p1-joy", "p1-stick", p1Touch); setupJoy(2, "p2-joy", "p2-stick", p2Touch);
         ['atk', 's1', 's2', 's3', 'recover'].forEach(t => { setupBtn(1, t); setupBtn(2, t); });
+    }
+    /**
+     * Triggers an achievement banner overlay mid-game, centered on screen.
+     * @param {string} text - The achievement text to display.
+     * @param {string} [bannerRGB="255, 215, 0"] - RGB values for banner (e.g., "255, 0, 0" for Red, "0, 200, 255" for Cyan).
+     * @param {string} [textColor="#ffffff"] - Hex or CSS color for text (e.g., "#fff", "#ffff00").
+     */
+    function showAchievement(text, bannerRGB = "255, 215, 0", textColor = "#ffffff") {
+        const uiLayer = document.getElementById('ui-layer');
+        if (!uiLayer) return;
+        let overlay = uiLayer.querySelector('.achievement-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.className = 'achievement-overlay';
+            const topBanner = document.createElement('div');
+            topBanner.className = 'achievement-banner p2';
+            const bottomBanner = document.createElement('div');
+            bottomBanner.className = 'achievement-banner p1';
+            overlay.appendChild(topBanner);
+            overlay.appendChild(bottomBanner);
+            uiLayer.appendChild(overlay);
+        }
+        const topBanner = overlay.querySelector('.achievement-banner.p2');
+        const bottomBanner = overlay.querySelector('.achievement-banner.p1');
+        [topBanner, bottomBanner].forEach(banner => {
+            banner.style.setProperty('--banner-color', bannerRGB);
+            banner.style.setProperty('--text-color', textColor);
+            banner.textContent = text;
+        });
+        topBanner.classList.add('show');
+        bottomBanner.classList.add('show');
+        setTimeout(() => {
+            topBanner.classList.remove('show');
+            bottomBanner.classList.remove('show');
+        }, 1500);
     }
     // --- Game Logic ---
     function checkMatchEnd() {
@@ -6837,6 +6893,8 @@ if (p.charIdx === 31) {
         audio.play().catch(err => console.log("音效播放失敗(可能是瀏覽器限制):"+soundUrl, err));
     }
     function drawImage(url, x, y, w, h, angle = null, flip = null){
+        const canvas = document.getElementById("myCanvas");
+        const ctx = canvas.getContext("2d");
         const img = new Image();
         img.crossOrigin = "anonymous"; 
         img.scr = url
@@ -6961,4 +7019,3 @@ if (p.charIdx === 31) {
 </script>
 </body>
 </html>
-
