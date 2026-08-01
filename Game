@@ -147,7 +147,6 @@
     let p2SelChar = {};
     let p1PlayProgress = 1;
     let p2PlayProgress = 1;
-    let lastGameHPSave = null;
     let width, height, gameRunning = false;
     let p1CharIdx = 0, p2CharIdx = 0;
     let p1Page = 0, p2Page = 0;
@@ -400,18 +399,23 @@
                     document.getElementById('game-over').style.display = 'flex'; 
                 }, 2000);
             }else{
-                if(currentGameMode === "sf" && p1PlayProgress > 1 && p2PlayProgress > 1){
-                    lastGameHPSave.pop();
-                    lastGameHPSave.pop();
-                }
-                if(p1.hp <= 0){
-					lastGameHPSave = ["p2", p2.hp]
-                    p1PlayProgress += 1
+                projectiles = []; particles = []; floatTexts = [];
+                if(p1.hp <= 0 ){
+                    let x = p1.x;
+                    let y = p1.y;
+                    p1PlayProgress += 1;
+                    p1 = new Player(1, p1SelChar[p1PlayProgress], width/2, height - 200); 
+                    p1.x = x
+                    p1.y = y
                 }else{
-					lastGameHPSave = ["p1", p1.hp]
-                    p2PlayProgress += 1
+                    let x = p2.x;
+                    let y = p2.y;
+                    p2PlayProgress += 1;
+                    p2 = new Player(2, p2SelChar[p2PlayProgress], width/2, 200);
+                    p2.x = x;
+                    p2.y = y;
                 }
-				startGame()
+                p1.target = p2; p2.target = p1; gameRunning = true; gameOver = false;
             }
         }
     }
@@ -427,10 +431,6 @@
         p1 = new Player(1, p1CharIdx, width/2, height - 200); p2 = new Player(2, p2CharIdx, width/2, 200);
         p1.target = p2; p2.target = p1; gameRunning = true; gameOver = false; timeScale = 1.0; shakeAmount = 0; deathFocus = null;
         projectiles = []; particles = []; floatTexts = [];
-        if(currentGameMode === "sf" && (p1PlayProgress > 1 || p2PlayProgress > 1)){
-            let p = lastGameHPSave[0] === "p1" ? p1 : p2;
-            p.hp = lastGameHPSave[1]
-        }
         if(currentGameMode === " normal" || (p1PlayProgress === 1 && p2PlayProgress === 1)){requestAnimationFrame(gameLoop);}
     }
     function backToMenu() {
@@ -439,7 +439,7 @@
         renderMenu(1); renderMenu(2);
     }
     function gameLoop() {
-        if(!gameRunning) return;
+        if(!gameRunning){return};
         const dt = 16.6; p1.update(dt); p2.update(dt);
         [p1, p2].forEach(p => {
              const t = p.id === 1 ? p1Touch : p2Touch;
@@ -3121,7 +3121,13 @@ if (this.charIdx === 31) {
         }
         addShield(amt) { if(this.hp <= 0) return; this.shield += amt; if(amt>0) floatTexts.push(new FloatText(this.x, this.y - 60, `+${Math.round(amt)}`, "white")); }
         addStoneS3Circle(){if(this.stoneS3 == true) {ctx.strokeStyle = "gray"; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(0,0, this.radius + 10, 0, Math.PI*2); ctx.stroke();}}
-        triggerDeath(attackerCharIdx) { this.isDying = true; timeScale = 0.2; if(currentGameMode ==! "sf"){deathFocus = this;} setGameTimeout(checkMatchEnd, 2000); for(let i=0; i<50; i++) particles.push(new Particle(this.x, this.y, "#888", "ash")); }
+        triggerDeath(attackerCharIdx) {
+            this.isDying = true;
+            setGameTimeout(checkMatchEnd, 2000);
+            if(currentGameMode ==! "sf" || (p1PlayProgress === 3 && p1.hp <= 0) || (p2PlayProgress === 3 && p2.hp <= 0)){
+                this.isDying = true; timeScale = 0.2; deathFocus = this; for(let i=0; i<50; i++) particles.push(new Particle(this.x, this.y, "#888", "ash")); 
+            }
+        }
         endJimingUlt() { this.isJimingUlt = false; this.jimingUltZone.active = false; if(this.target) this.target.struggleSpeedStacks = 0; this.heal(this.jimingTotalDmg * 0.48); this.cd.s3 = CHAR_DATA[5].s3Cd; }
         addCombo() { this.comboCount++; this.comboTimer = 3000; this.heal(this.comboCount * 30); if(this.charIdx===4 && this.comboCount%5===0) this.cd.s3 = Math.max(0, this.cd.s3 - 500); }
         addJimingStack() { if(this.charIdx !== 5) return; this.speedStacks = Math.min(4, this.speedStacks + 1); this.speedStackTimer = 10000; }
