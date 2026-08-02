@@ -139,8 +139,8 @@
     
     // --- Globals ---
     let currentGameMode = 'normal';
-    let p1SelProgress = 1;
-    let p2SelProgress = 1;
+    let p1SelProgress = [1,2,3];
+    let p2SelProgress = [1,2,3];
     let p1SelChar = {};
     let p2SelChar = {};
     let p1PlayProgress = 1;
@@ -221,7 +221,7 @@
     function renderMenu(pid) {
         let ccsClass = 'selected'
         if(currentGameMode === "sf"){
-            ccsClass += String(pid === 1 ? p1SelProgress : p2SelProgress)
+            ccsClass += String(pid === 1 ? p1SelProgress[0] : p2SelProgress[0])
         }
         const container = document.getElementById(pid === 1 ? 'p1-char-container' : 'p2-char-container');
         const pIdx = pid === 1 ? p1Page : p2Page;
@@ -232,9 +232,9 @@
         for (let i = start; i < end; i++) {
             let name = "char-btn"
             let charSelected = Object.values(selDict).includes(i);
+            let charChoosenOrder = Object.keys(selDict).find(charChoosenOrder => selDict[charChoosenOrder] === i);
             if(currentGameMode === "sf"){
                 if(charSelected){
-                    const charChoosenOrder = Object.keys(selDict).find(charChoosenOrder => selDict[charChoosenOrder] === i);
                     name += " selected"
                     name += String(charChoosenOrder)
                 }
@@ -249,6 +249,8 @@
             if(charSelected === false){
                 btn.onclick = () => selectChar(pid === 1 ? 0 : 1, i);
                 
+            }else{
+                btn.onclick = () => selectChar(pid === 1 ? 0 : 1, i, true, charChoosenOrder);
             }
             container.appendChild(btn);
         }
@@ -275,19 +277,34 @@
         nb.onclick = (e) => { e.stopPropagation(); if (pid === 1) { p1Page = (p1Page+1)*PAGE_SIZE < CHAR_DATA.length ? p1Page+1 : 0; renderMenu(1); } else { p2Page = (p2Page+1)*PAGE_SIZE < CHAR_DATA.length ? p2Page+1 : 0; renderMenu(2); } };
         container.appendChild(nb);
     }
-    function selectChar(pIdx, charIdx) {
+    function selectChar(pIdx, charIdx, choosed = false, order = null) {
         if(currentGameMode === "sf"){
-            if (pIdx === 0) {
-                if(p1SelProgress >=4){return}
-                p1SelChar[p1SelProgress] = charIdx;
-                p1SelProgress += 1;
-                renderMenu(1)
-            } 
-            else{
-                if(p2SelProgress >=4){return}
-                p2SelChar[p2SelProgress] = charIdx;
-                p2SelProgress += 1;
-                renderMenu(2)
+            if(!choosed){
+                if (pIdx === 0) {
+                    if(p1SelProgress.length === 0){return}
+                    p1SelChar[p1SelProgress[0]] = charIdx;
+                    p1SelProgress.shift();
+                    renderMenu(1);
+                } 
+                else{
+                    if(p2SelProgress.length === 0){return}
+                    p2SelChar[p2SelProgress[0]] = charIdx;
+                    p2SelProgress.shift();
+                    renderMenu(2);
+                }
+            }else{
+                if (pIdx === 0) {
+                    delete p1SelChar[order];
+                    p1SelProgress.push(order);
+                    p1SelProgress.sort();
+                    renderMenu(1);
+                } 
+                else{
+                    delete p2SelChar[order];
+                    p2SelProgress.push(order);
+                    p2SelProgress.sort();
+                    renderMenu(2);
+                }
             }
         }else{
             if (pIdx === 0) p1CharIdx = charIdx; else p2CharIdx = charIdx; renderMenu(pIdx === 0 ? 1 : 2); 
@@ -867,7 +884,7 @@
                 if(p.charIdx === 14) { ctx.fillStyle = "green"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.luckStacks/6), 5); ctx.fillStyle="black"; ctx.fillRect(p.x, p.y-75, 1, 5); }
                 if(p.charIdx === 1) { ctx.fillStyle = "orange"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.flame/150), 5);}
                 if(p.charIdx === 44) { ctx.fillStyle = "cyan"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.yProtection/100), 5);}
-                if(p.charIdx === 34) { ctx.fillStyle = "lime"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.qxEnergy/100), 5); ctx.fillStyle = "black"; ctx.fillRect(p.x, p.y-75, 1, 5);}
+                if( p.charIdx === 34) { ctx.fillStyle = "lime"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.qxEnergy/100), 5); ctx.fillStyle = "black"; ctx.fillRect(p.x, p.y-75, 1, 5);}
                 if(p.charIdx === 23 && p.uniState == 1) { ctx.fillStyle = "rgba(0, 36, 122, 1)"; ctx.fillRect(p.x - bw/2, p.y - 75, bw, 5);}
                 if(p.charIdx === 23 && p.uniState == 2) { ctx.fillStyle = "green"; ctx.fillRect(p.x - bw/2, p.y - 75, bw, 5);}
                 if(p.charIdx === 23 && p.uniState == 3) { ctx.fillStyle = "orange"; ctx.fillRect(p.x - bw/2, p.y - 75, bw, 5);}
@@ -4879,7 +4896,7 @@ if (this.charIdx === 31) {
         else if(p.charIdx === 17) {if(dist(p, enemy) < 100){enemy.takeDamage(100)}; let aimAngle = p.angle; if(Math.abs(joy.joyX)>0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); let startX = p.x, startY = p.y; p.x += Math.cos(aimAngle)*200; p.y += Math.sin(aimAngle)*200; for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "💨")); } if(dist(p.target, {x:(startX+p.x)/2, y:(startY+p.y)/2}) < 100); p.applyStatus('chill', 2000);shakeAmount = 15;p.addShield(200); setGameTimeout(() => { if(dist(p, enemy) < 105) {enemy.takeDamage(180, 1);p.addShield(80)} p.activeWarning = null;}, 200);}
         else if(p.charIdx === 0) { p.dash("hand", 200, 200, 200, 50, 'rgba(255,0,255,0.6)', "on");p.enhanceAtk(); }
         else if(p.charIdx === 2) { projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gold", 162, p, "✨", 2.0, 500, (t) => { if(t) { t.applyStatus('stunned', 630); t.applyStatus('slow', 3000); t.buffs.slow = 0.6; } }, 60, false, true)); }
-        else if(p.charIdx === 3) { projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "red", 325, p, "👊", 2, 250, (t) => { if(!p.isRageMode && p.rage < 3) p.rage++; if(t) { t.applyStatus('stunned', 1000); t.applyStatus('slow', 3000); t.buffs.slow = 0.5; } })); }
+         else if(p.charIdx === 3) { projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "red", 325, p, "👊", 2, 250, (t) => { if(!p.isRageMode && p.rage < 3) p.rage++; if(t) { t.applyStatus('stunned', 1000); t.applyStatus('slow', 3000); t.buffs.slow = 0.5; } })); }
         else if(p.charIdx === 6) { let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; p.addShield(100); let dashSteps = 0; let maxSteps = 20; p.applyStatus('superArmor', 500); p.isCasting = true; let si = setGameInterval(() => { p.x += Math.cos(aimAngle) * 12; p.y += Math.sin(aimAngle) * 12; dashSteps++; if(p.commanderMode) { p.soldiers.forEach(s => { s.x += Math.cos(aimAngle)*12; s.y += Math.sin(aimAngle)*12; }); if(dist(p, p.target) < 80) { p.target.x += Math.cos(aimAngle)*15; p.target.y += Math.sin(aimAngle)*15; } } if(dashSteps >= maxSteps) { clearInterval(si); p.isCasting = false; if(p.commanderMode) { p.superEnhancedAtk = true; shakeAmount = 10; floatTexts.push(new FloatText(p.x, p.y-80, "Ready!", "purple")); } } }, 16); }
         else if(p.charIdx === 7) { let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); let steps = 0; let dashInt = setGameInterval(() => { p.x += Math.cos(aimAngle) * 20; p.y += Math.sin(aimAngle) * 20; steps++; if(steps > 8) clearInterval(dashInt); }, 16); p.enhancedAtk = true; p.funds = Math.max(0, p.funds - 10); }
         else if(p.charIdx === 8) { p.isUntouchable = false; p.applyStatus('superArmor', 3000); p.isTransparent = true; p.shiliS1Lock = true; let count = 0; let si = setGameInterval(() => { p.heal(25); p.activeWarning = { type:'circle', r: 50, x: p.x, y: p.y, color: 'rgba(139,0,0,0.5)' }; if(dist(p, p.target) < 50) { p.target.takeDamage(30, 8); p.cd.s2 = Math.max(0, p.cd.s2-250); p.cd.s3 = Math.max(0, p.cd.s3-250); } count++; if(count > 12) { clearInterval(si); p.activeWarning = null; p.isTransparent = false; p.shiliS1Lock = false; } }, 250); }
