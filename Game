@@ -409,10 +409,8 @@
             if(currentGameMode === "normal" || (p1.hp <= 0 && p1PlayProgress === 3 )||(p2.hp <= 0 && p2PlayProgress === 3)){
                 playSkillSound(9998, 's1')
                 gameOver = true;
-                p1SelProgress = 1
-                p2SelProgress = 1
-                p1SelChar = {}
-                p2SelChar = {}
+                p1SelProgress = [1,2,3];
+                p2SelProgress = [1,2,3];
                 p1PlayProgress = 1
                 p2PlayProgress = 1
                 setGameTimeout(() => { 
@@ -7045,7 +7043,8 @@ if (p.charIdx === 31) {
         if(restartBtn) {
             const handleRestart = (e) => {
                 if (e) e.preventDefault();
-                
+                p1SelChar = {};
+                p2SelChar = {};
                 // FORCE the game mode screen to reappear when restarting
                 if (gameModeOverlay) {
                     gameModeOverlay.style.display = "flex";
@@ -7066,6 +7065,8 @@ if (p.charIdx === 31) {
         if(rechooseCharbtn) {
             const handleRestart = (e) => {
                 if (e) e.preventDefault()
+                p1SelChar = {};
+                p2SelChar = {};
                 // Run your original backToMenu logic
                 backToMenu();
             };
@@ -7076,8 +7077,9 @@ if (p.charIdx === 31) {
         const playAgainbtn = document.getElementById('playAgain-btn');
         if(playAgainbtn) {
             const handleRestart = (e) => {
-                if (e) e.preventDefault()
-                startGame()
+                if (e) e.preventDefault();
+                document.getElementById('game-over').style.display = 'none';
+                startGame();
             };
             playAgainbtn.onclick = handleRestart;
             playAgainbtn.addEventListener('touchstart', handleRestart);
