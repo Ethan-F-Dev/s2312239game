@@ -1,4 +1,3 @@
 # s2312239game
-Game
-commit in Branch 2.0(starting from 3/8)
-we will merge per roughly a month 
+
+Please commit in your own branch. I will merge them once per a week or two.
