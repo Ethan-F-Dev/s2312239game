@@ -138,6 +138,7 @@
     const ctx = canvas.getContext('2d');
     
     // --- Globals ---
+    let playAgain = false
     let currentGameMode = 'normal';
     let p1SelProgress = [1,2,3];
     let p2SelProgress = [1,2,3];
@@ -369,7 +370,7 @@
      * @param {string} [textColor="#ffffff"] - Hex or CSS color for text (e.g., "#fff", "#ffff00").
      */
     function showAchievement(text, bannerRGB = "255, 215, 0", textColor = "#ffffff") {
-        if(currentGameMode ==! "sf"){return}
+        if(currentGameMode === "normal"){return}
         const uiLayer = document.getElementById('ui-layer');
         if (!uiLayer) return;
         if (uiLayer.dataset.achievementPlaying === "true") return;
@@ -450,10 +451,10 @@
         p1 = new Player(1, p1CharIdx, width/2, height - 200); p2 = new Player(2, p2CharIdx, width/2, 200);
         p1.target = p2; p2.target = p1; gameRunning = true; gameOver = false; timeScale = 1.0; shakeAmount = 0; deathFocus = null;
         projectiles = []; particles = []; floatTexts = [];
-        if(currentGameMode === " normal" || (p1PlayProgress === 1 && p2PlayProgress === 1)){requestAnimationFrame(gameLoop);}
+        if((currentGameMode === " normal" || (p1PlayProgress === 1 && p2PlayProgress === 1)) && !playAgain){requestAnimationFrame(gameLoop);}
     }
     function backToMenu() {
-        gameRunning = false; clearGameTimers();
+        gameRunning = false; playAgain = false;clearGameTimers();
         document.getElementById('game-over').style.display = 'none'; document.getElementById('menu').style.display = 'flex';
         renderMenu(1); renderMenu(2);
     }
@@ -7079,6 +7080,7 @@ if (p.charIdx === 31) {
             const handleRestart = (e) => {
                 if (e) e.preventDefault();
                 document.getElementById('game-over').style.display = 'none';
+                playAgain = true;
                 startGame();
             };
             playAgainbtn.onclick = handleRestart;
