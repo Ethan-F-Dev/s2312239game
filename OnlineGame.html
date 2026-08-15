@@ -10,57 +10,62 @@
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; user-select: none; 
             -webkit-user-select: none; touch-action: none; font-family: var(--font-main); }
         canvas { display: block; }
-        #game-mode {position: absolute;inset: 0;background: rgba(0, 0, 0, 0.45); display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; gap: 24px; z-index: 20000; pointer-events: auto; backdrop-filter: blur(4px);}
+        
+        #game-mode { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; gap: 24px; z-index: 20000; pointer-events: auto; backdrop-filter: blur(4px); }
         .mode-btn { width: 320px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
             background: #1e1e1e; border: 2px solid #444; color: #ffffff; border-radius: 12px; font-size: 20px; font-weight: 800; 
-            letter-spacing: 1.5px;cursor: pointer; user-select: none; transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1); 
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); position: relative;}
-        .mode-btn:hover {background: #2a2a2a;border-color: #888;transform: translateY(-2px);box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7);}
-        .mode-btn:active {transform: translateY(1px) scale(0.98); }
+            letter-spacing: 1.5px; cursor: pointer; user-select: none; transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); position: relative; }
+        .mode-btn:hover { background: #2a2a2a; border-color: #888; transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7); }
+        .mode-btn:active { transform: translateY(1px) scale(0.98); }
         .mode-btn.selected { border-color: #ffd700; background: rgba(255, 215, 0, 0.15); color: #ffd700; 
-        box-shadow: 0 0 25px rgba(255, 215, 0, 0.35), inset 0 0 15px rgba(255, 215, 0, 0.15);text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);}
-        .mode-title-desc {font-size: 11px; color: #aaa; margin-top: 6px; font-weight: 500; text-transform: uppercase;letter-spacing: 2px;transition: color 0.25s ease; }
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.35), inset 0 0 15px rgba(255, 215, 0, 0.15); text-shadow: 0 0 8px rgba(255, 215, 0, 0.6); }
+        .mode-title-desc { font-size: 11px; color: #aaa; margin-top: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; transition: color 0.25s ease; }
+        
         #ui-layer { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
-        .achievement-overlay {position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; z-index: 100; overflow: hidden; }
-        .achievement-banner {width: 100%; height: 60px; margin-top: 10px; --banner-color: 255, 215, 0; --text-color: #ffffff; 
+        .achievement-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; z-index: 100; overflow: hidden; }
+        .achievement-banner { width: 100%; height: 60px; margin-top: 10px; --banner-color: 255, 215, 0; --text-color: #ffffff; 
             background: linear-gradient(90deg, rgba(var(--banner-color), 0) 0%, rgba(var(--banner-color), 0.1) 15%,  rgba(var(--banner-color), 0.5) 50%,  
             rgba(var(--banner-color), 0.1) 85%,  rgba(var(--banner-color), 0) 100%);
             border-top: 3px solid rgba(var(--banner-color), 0.6);   
             border-bottom: 3px solid rgba(var(--banner-color), 0.6); 
             box-shadow: 0 0 25px rgba(var(--banner-color), 0.4), inset 0 0 15px rgba(var(--banner-color), 0.3); backdrop-filter: blur(6px);
-            display: flex;align-items: center;
-            justify-content: center; color: var(--text-color); font-family: 'Impact', 'Noto Sans TC', sans-serif; font-size: 24px; font-weight: 900;
+            display: flex; align-items: center; justify-content: center; color: var(--text-color); font-family: 'Impact', 'Noto Sans TC', sans-serif; font-size: 24px; font-weight: 900;
             letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 5px rgba(255, 255, 255, 0.8), 0 0 12px rgba(var(--banner-color), 1), 
-            2px 2px 4px rgba(0, 0, 0, 0.9); clip-path: inset(0 100% 0 0); opacity: 0; transition: clip-path 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;}
-        .achievement-banner.p2 {transform: rotate(180deg);}
-        .achievement-banner.show {opacity: 1; clip-path: inset(0 0% 0 0);}
-        #menu { position: absolute; inset: 0; background: radial-gradient(circle, #222, #000); display: flex; flex-direction: column; z-index: 9999; pointer-events: auto; }
-        .split-half { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; justify-items: center; align-content: center; padding: 20px; position: relative; }
-        .p2-menu { transform: rotate(180deg); border-bottom: 2px solid #444; }
-        .char-btn { width: 100%; height: 70px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border: 2px solid #555; color: #eee; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; user-select: none; transition: 0.1s; }
-        .char-btn:active { transform: scale(0.95); }
-        .char-btn.selected { border-color: gold; background: rgba(255,215,0,0.25); box-shadow: 0 0 15px gold; }
-        .char-btn { width: 100%; height: 70px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border: 2px solid #555; color: #eee; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; user-select: none; transition: 0.1s; }
+            2px 2px 4px rgba(0, 0, 0, 0.9); clip-path: inset(0 100% 0 0); opacity: 0; transition: clip-path 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease; }
+        .achievement-banner.p2 { transform: rotate(180deg); }
+        .achievement-banner.show { opacity: 1; clip-path: inset(0 0% 0 0); }
+        
+        #menu { position: absolute; inset: 0; background: radial-gradient(circle, #222, #000); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; pointer-events: auto; }
+        .split-half { width: 100%; max-width: 600px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; justify-items: center; align-content: center; padding: 20px; position: relative; }
+        
+        /* Hide P2 selection menu and overlay UI on client side */
+        .p2-menu { display: none !important; }
+        .p2-ui { display: none !important; }
+
+        .char-btn { width: 100%; height: 70px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border: 2px solid #555; color: #eee; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; user-select: none; transition: 0.1s; position: relative; }
         .char-btn:active { transform: scale(0.95); }
         .char-btn.selected { border-color: gold; background: rgba(255,215,0,0.25); box-shadow: 0 0 15px gold; }
         .char-btn.disabled { border-color: #555; background: rgba(50,50,50,0.8); }
         .char-btn.disabled .cd-text { color: #888; display: none; }
         .char-btn.disabled::after { content: '❌'; font-size: 60px; position: absolute; }  
         .char-btn.selected1 { border-color: red; background: rgba(184, 15, 10, 0.25); box-shadow: 0 0 15px rgba(255, 0, 0, 0.8); }
-        .char-btn.selected1::after { content: '1️⃣'; font-size: 60px; position: absolute; }  
+        .char-btn.selected1::after { content: '1️⃣'; font-size: 50px; position: absolute; }  
         .char-btn.selected2 { border-color: yellow; background: rgba(255, 215, 0, 0.25); box-shadow: 0 0 15px rgba(255, 215, 0, 0.8); }
-        .char-btn.selected2::after { content: '2️⃣'; font-size: 60px; position: absolute; }  
+        .char-btn.selected2::after { content: '2️⃣'; font-size: 50px; position: absolute; }  
         .char-btn.selected3 { border-color: blue; background: rgba(0, 0, 255, 0.25); box-shadow: 0 0 15px rgba(0, 0, 255, 0.8); }
-        .char-btn.selected3::after { content: '3️⃣'; font-size: 60px; position: absolute; }  
+        .char-btn.selected3::after { content: '3️⃣'; font-size: 50px; position: absolute; }  
+        
         .next-page-btn { position: absolute; bottom: 10px; right: 10px; width: 40px; height: 40px; background: #444; border: 2px solid #777; color: white; border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto; z-index: 10000; }
         .next-page-btn:active { background: #666; }
         .prev-page-btn { position: absolute; bottom: 10px; left: 10px; width: 40px; height: 40px; background: #444; border: 2px solid #777; color: white; border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto; z-index: 10000; }
         .prev-page-btn:active { background: #666; }
-        #start-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90px; height: 90px; border-radius: 50%; background: #e74c3c; border: 5px solid #fff; color: white; font-weight: bold; font-size: 22px; cursor: pointer; z-index: 10000; }
+        
+        #start-btn { margin-top: 20px; width: 90px; height: 90px; border-radius: 50%; background: #e74c3c; border: 5px solid #fff; color: white; font-weight: bold; font-size: 22px; cursor: pointer; z-index: 10000; }
         .controls-container { position: absolute; width: 320px; height: 320px; pointer-events: none; }
         #p1-controls { bottom: 20px; right: 20px; }
-        #p2-controls { bottom: 20px; right: 20px; } 
+        
         .game-btn { position: absolute; border-radius: 50%; background: rgba(0,0,0,0.7); border: 3px solid rgba(255,255,255,0.4); color: white; display: flex; align-items: center; justify-content: center; pointer-events: auto; touch-action: manipulation; transition: 0.1s; cursor: pointer; }
         .game-btn:active { transform: scale(0.9); }
         .game-btn.special-active { border-color: #ff0000; box-shadow: 0 0 15px #ff0000; }
@@ -75,16 +80,16 @@
         .btn-rec { width: 65px; height: 65px; bottom: 15px; right: 240px; border-color: #2ecc71; }
         .joystick { position: absolute; width: 140px; height: 140px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; pointer-events: auto; bottom: 50px; left: 50px; }
         .stick { position: absolute; width: 60px; height: 60px; background: rgba(255,255,255,0.3); border-radius: 50%; left: 40px; top: 40px; }
-        .p2-ui { position: absolute; inset: 0; pointer-events: none; transform: rotate(180deg); }
+        
         #game-over { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: none; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 10001; pointer-events: auto; }
-        .btn-container {display: flex;gap: 12px;justify-content: center;align-items: center;flex-wrap: wrap;font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;}
-        .btn {padding: 12px 24px;font-size: 16px;font-weight: 600;border-radius: 10px;border: none;cursor: pointer;transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);outline: none;user-select: none;}
-        .btn-secondary {background-color: #f3f4f6;color: #374151;border: 1px solid #e5e7eb;}
-        .btn-secondary:hover {background-color: #e5e7eb;color: #111827;transform: translateY(-2px);}
-        .btn-secondary:active {transform: translateY(0);}
-        .btn-primary {background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color: #ffffff;box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);}
-        .btn-primary:hover {background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);box-shadow: 0 6px 16px rgba(79, 70, 229, 0.45);transform: translateY(-2px);}
-        .btn-primary:active {transform: translateY(0);box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);}
+        .btn-container { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .btn { padding: 12px 24px; font-size: 16px; font-weight: 600; border-radius: 10px; border: none; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); outline: none; user-select: none; }
+        .btn-secondary { background-color: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
+        .btn-secondary:hover { background-color: #e5e7eb; color: #111827; transform: translateY(-2px); }
+        .btn-secondary:active { transform: translateY(0); }
+        .btn-primary { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #ffffff; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35); }
+        .btn-primary:hover { background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); box-shadow: 0 6px 16px rgba(79, 70, 229, 0.45); transform: translateY(-2px); }
+        .btn-primary:active { transform: translateY(0); box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3); }
     </style>
 </head>
 <body>
@@ -99,9 +104,10 @@
     </button>
 </div>
 <div id="menu">
+    <!-- P2 menu remains in DOM for variable/logic binding, hidden via CSS -->
     <div class="split-half p2-menu" id="p2-char-container"></div>
-    <button id="start-btn">VS</button>
     <div class="split-half p1-menu" id="p1-char-container"></div>
+    <button id="start-btn">VS</button>
 </div>
 <div id="ui-layer">
     <div class="joystick" id="p1-joy"><div class="stick" id="p1-stick"></div></div>
@@ -112,6 +118,7 @@
         <div class="game-btn btn-s3" id="p1-btn-s3"><span class="cd-text">終</span></div>
         <div class="game-btn btn-atk" id="p1-btn-atk"><span class="cd-text">攻</span></div>
     </div>
+    <!-- P2 UI remains in DOM for variable/logic binding, hidden via CSS -->
     <div class="p2-ui">
         <div class="joystick" id="p2-joy"><div class="stick" id="p2-stick"></div></div>
         <div class="controls-container" id="p2-controls">
@@ -137,8 +144,8 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     
-    // --- Globals ---
-    let playAgain = false
+    // --- Globals (All original P1 & P2 variables restored) ---
+    let playAgain = false;
     let currentGameMode = 'normal';
     let p1SelProgress = [1,2,3];
     let p2SelProgress = [1,2,3];
@@ -155,6 +162,7 @@
     let gameOver = false, deathFocus = null;
     const p1Touch = { joyX:0, joyY:0 }, p2Touch = { joyX:0, joyY:0 };
     let gameIntervals = [], gameTimeouts = [];
+
     const CHAR_DATA = Object.freeze([
         // page 1
         { name: "駭爪", hp: 3050, atk: 95, speed: 4.0, color: "#9b59b6", s1Cd: 6000, s2Cd: 8000, s3Cd: 30000, atkInt: 1000 },
@@ -211,37 +219,39 @@
         { name: "凌汐", hp: 1000, atk: 22, speed: 3.4, color: "#27C5F5", s1Cd: 3000, s2Cd: 4500, s3Cd: 35000, atkInt: 300 },
         { name: "鹿冠", hp: 2800, atk: 91, speed: 3.2, color: "#8B4513", s1Cd: 4000, s2Cd: 7800, s3Cd: 20000, atkInt: 600 },
         { name: "戮", hp: 3500, atk: 90, speed: 3.5, color: "#FF2A00", s1Cd: 7000, s2Cd: 8000, s3Cd: 15000, atkInt: 1000 }
-
-
     ]);
+
     function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
     function resize() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
     function setGameInterval(cb, d) { const id=setInterval(cb,d); gameIntervals.push(id); return id; }
     function setGameTimeout(cb, d) { const id=setTimeout(cb,d); gameTimeouts.push(id); return id; }
     function clearGameTimers() { gameIntervals.forEach(clearInterval); gameTimeouts.forEach(clearTimeout); gameIntervals=[]; gameTimeouts=[]; }
+    
     function renderMenu(pid) {
-        let ccsClass = 'selected'
+        let ccsClass = 'selected';
         if(currentGameMode === "sf"){
-            ccsClass += String(pid === 1 ? p1SelProgress[0] : p2SelProgress[0])
+            ccsClass += String(pid === 1 ? p1SelProgress[0] : p2SelProgress[0]);
         }
         const container = document.getElementById(pid === 1 ? 'p1-char-container' : 'p2-char-container');
+        if(!container) return;
+        
         const pIdx = pid === 1 ? p1Page : p2Page;
         const sel = pid === 1 ? p1CharIdx : p2CharIdx;
         const selDict = pid === 1 ? p1SelChar : p2SelChar;
         container.innerHTML = '';
         const start = pIdx * PAGE_SIZE, end = Math.min(start + PAGE_SIZE, CHAR_DATA.length);
         for (let i = start; i < end; i++) {
-            let name = "char-btn"
+            let name = "char-btn";
             let charSelected = Object.values(selDict).includes(i);
             let charChoosenOrder = Object.keys(selDict).find(charChoosenOrder => selDict[charChoosenOrder] === i);
             if(currentGameMode === "sf"){
                 if(charSelected){
-                    name += " selected"
-                    name += String(charChoosenOrder)
+                    name += " selected";
+                    name += String(charChoosenOrder);
                 }
             }else{
                 if(i === sel){
-                    name += " selected"
+                    name += " selected";
                 }
             }
             const btn = document.createElement('div'); 
@@ -249,35 +259,42 @@
             btn.innerHTML = CHAR_DATA[i].name;
             if(charSelected === false){
                 btn.onclick = () => selectChar(pid === 1 ? 0 : 1, i);
-                
             }else{
                 btn.onclick = () => selectChar(pid === 1 ? 0 : 1, i, true, charChoosenOrder);
             }
             container.appendChild(btn);
         }
-        // 建立向左按鈕
+        
         const pb = document.createElement('div'); 
         pb.className = 'prev-page-btn'; 
         pb.innerHTML = '◀';
         
-        // 設定點擊後的翻頁邏輯
         pb.onclick = (e) => { 
             e.stopPropagation(); 
             if (pid === 1) { 
-                // 玩家一：如果頁數 -1 大於等於 0 就往前一頁，否則跳到最後一頁
                 p1Page = p1Page - 1 >= 0 ? p1Page - 1 : Math.floor((CHAR_DATA.length - 1) / PAGE_SIZE); 
                 renderMenu(1); 
             } else { 
-                // 玩家二：同理
                 p2Page = p2Page - 1 >= 0 ? p2Page - 1 : Math.floor((CHAR_DATA.length - 1) / PAGE_SIZE); 
                 renderMenu(2); 
             } 
         };
         container.appendChild(pb);
+        
         const nb = document.createElement('div'); nb.className = 'next-page-btn'; nb.innerHTML = '▶';
-        nb.onclick = (e) => { e.stopPropagation(); if (pid === 1) { p1Page = (p1Page+1)*PAGE_SIZE < CHAR_DATA.length ? p1Page+1 : 0; renderMenu(1); } else { p2Page = (p2Page+1)*PAGE_SIZE < CHAR_DATA.length ? p2Page+1 : 0; renderMenu(2); } };
+        nb.onclick = (e) => { 
+            e.stopPropagation(); 
+            if (pid === 1) { 
+                p1Page = (p1Page+1)*PAGE_SIZE < CHAR_DATA.length ? p1Page+1 : 0; 
+                renderMenu(1); 
+            } else { 
+                p2Page = (p2Page+1)*PAGE_SIZE < CHAR_DATA.length ? p2Page+1 : 0; 
+                renderMenu(2); 
+            } 
+        };
         container.appendChild(nb);
     }
+
     function selectChar(pIdx, charIdx, choosed = false, order = null) {
         if(currentGameMode === "sf"){
             if(!choosed){
@@ -308,10 +325,11 @@
                 }
             }
         }else{
-            if (pIdx === 0) p1CharIdx = charIdx; else p2CharIdx = charIdx; renderMenu(pIdx === 0 ? 1 : 2); 
+            if (pIdx === 0) p1CharIdx = charIdx; else p2CharIdx = charIdx; 
+            renderMenu(pIdx === 0 ? 1 : 2); 
         }
-        
     }
+
     function updateButtonCD(p, prefix) {
         ['s1', 's2', 's3', 'recover', 'atk'].forEach(k => {
             const el = document.getElementById(`${prefix}-btn-${k}`); if(!el) return;
@@ -325,16 +343,18 @@
             if(p.charIdx === 3 && k === 's3' && (p.status.stunned > 0 || p.isLock)) disabled = true; 
             if(p.charIdx === 11 && k === 's3' && p.energy < 500) { disabled = true; txt.innerText = "❌"; }
             if(p.charIdx === 17 && k === 's3' && p.cd.s1 < 1 && p.cd.s2 < 1 && p.hp > 1440) { disabled = true; txt.innerText = "❌"; }
-            if(p.charIdx === 27 && k === 'atk' && p.hp < 1000) disabled = true; // 康絲特斯血量低於1000無法普攻
+            if(p.charIdx === 27 && k === 'atk' && p.hp < 1000) disabled = true;
             
             if (disabled) el.classList.add('disabled'); else el.classList.remove('disabled');
             if(p.cd[k] > 0) { txt.innerText = Math.ceil(p.cd[k]/1000); el.style.opacity = "0.4"; }
             else { txt.innerText = k==='recover'?'復':(k==='s3'?'終':(k==='atk'?'攻':k.slice(1))); el.style.opacity = "1"; }
         });
     }
+
     function bindButtons() {
         const setupJoy = (id, joyId, stickId, touchObj) => {
             const joy = document.getElementById(joyId), stick = document.getElementById(stickId);
+            if(!joy || !stick) return;
             const move = (e) => {
                 const t = e.targetTouches[0], rect = joy.getBoundingClientRect();
                 let dx = t.clientX - (rect.left + rect.width/2), dy = t.clientY - (rect.top + rect.height/2);
@@ -360,9 +380,11 @@
                  else if(type === 'recover') castRecover(p); 
              });
         };
-        setupJoy(1, "p1-joy", "p1-stick", p1Touch); setupJoy(2, "p2-joy", "p2-stick", p2Touch);
+        setupJoy(1, "p1-joy", "p1-stick", p1Touch); 
+        setupJoy(2, "p2-joy", "p2-stick", p2Touch);
         ['atk', 's1', 's2', 's3', 'recover'].forEach(t => { setupBtn(1, t); setupBtn(2, t); });
     }
+
     /**
      * Triggers an achievement banner overlay mid-game, centered on screen.
      * @param {string} text - The achievement text to display.
@@ -6993,7 +7015,6 @@ if (p.charIdx === 31) {
         const modeButtons = document.querySelectorAll('.mode-btn');
         const gameModeOverlay = document.getElementById('game-mode');
         
-        // FORCE the menu to be fully visible and active right away on load
         if (gameModeOverlay) {
             gameModeOverlay.style.display = "flex";
             gameModeOverlay.style.opacity = "1";
@@ -7003,11 +7024,9 @@ if (p.charIdx === 31) {
 
         modeButtons.forEach(button => {
             button.addEventListener('click', () => {
-                // Remove 'selected' from all buttons, add to this one
                 modeButtons.forEach(btn => btn.classList.remove('selected'));
                 button.classList.add('selected');
                 
-                // Update the currentGameMode variable based on the clicked button's ID
                 if (button.id === 'btn-mode-sf') {
                     currentGameMode = 'sf';
                 } else {
@@ -7015,12 +7034,9 @@ if (p.charIdx === 31) {
                 }
                 console.log("Current Game Mode set to:", currentGameMode);
             
-                // Fade out the overlay smoothly
                 setTimeout(() => {
                     gameModeOverlay.style.opacity = "0";
                     gameModeOverlay.style.visibility = "hidden";
-                
-                    // Completely hide after transition completes
                     setTimeout(() => {
                         gameModeOverlay.style.display = "none";
                     }, 400); 
@@ -7028,7 +7044,6 @@ if (p.charIdx === 31) {
             });
         });
 
-        // Keep your original game initialization functions untouched
         resize();
         renderMenu(1); 
         renderMenu(2);
@@ -7046,7 +7061,6 @@ if (p.charIdx === 31) {
                 if (e) e.preventDefault();
                 p1SelChar = {};
                 p2SelChar = {};
-                // FORCE the game mode screen to reappear when restarting
                 if (gameModeOverlay) {
                     gameModeOverlay.style.display = "flex";
                     setTimeout(() => {
@@ -7054,8 +7068,6 @@ if (p.charIdx === 31) {
                         gameModeOverlay.style.visibility = "visible";
                     }, 10);
                 }
-                
-                // Run your original backToMenu logic
                 backToMenu();
             };
 
@@ -7065,10 +7077,9 @@ if (p.charIdx === 31) {
         const rechooseCharbtn = document.getElementById('rechooseChar-btn');
         if(rechooseCharbtn) {
             const handleRestart = (e) => {
-                if (e) e.preventDefault()
+                if (e) e.preventDefault();
                 p1SelChar = {};
                 p2SelChar = {};
-                // Run your original backToMenu logic
                 backToMenu();
             };
 
@@ -7089,8 +7100,6 @@ if (p.charIdx === 31) {
         window.addEventListener('resize', resize);
     };
 })();
-
-
 </script>
 </body>
 </html>
