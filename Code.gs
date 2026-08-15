@@ -12,6 +12,13 @@ function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
+function getGameContent(playerName, mode) {
+  const template = HtmlService.createTemplateFromFile('Game');
+  template.playerName = playerName;
+  template.mode = mode;
+  return template.evaluate().getContent();
+}
+
 function getSheet(sheetName) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet = ss.getSheetByName(sheetName);
@@ -27,7 +34,7 @@ function getSheet(sheetName) {
 }
 
 function isValidGmail(email) {
-  const gmailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|googlemail\.com|ccsc\.edu\.hk)$/i;
+  const gmailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|googlemail\.com)$/i;
   return gmailRegex.test(email.trim());
 }
 
@@ -117,10 +124,4 @@ function signIn(email, password) {
   } catch (err) {
     return { success: false, message: 'Error: ' + err.toString() };
   }
-}
-function getGameContent(p1, p2) {
-  const template = HtmlService.createTemplateFromFile('Game');
-  template.p1 = p1;
-  template.p2 = p2;
-  return template.evaluate().getContent();
 }
