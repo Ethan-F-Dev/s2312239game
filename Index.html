@@ -7,7 +7,6 @@
 </head>
 <body>
 
-  <!-- NAVIGATION BAR -->
   <nav class="navbar">
     <div class="nav-container">
       <a href="#" class="nav-logo">巔峰對決</a>
@@ -21,118 +20,67 @@
     </div>
   </nav>
 
-  <!-- HERO BANNER -->
   <header class="hero-banner">
     <div class="title-tag"><i class="fa-solid fa-shield-halved"></i> 1v1 Arena Battle</div>
     <h1>巔峰對決</h1>
   </header>
 
-  <!-- MAIN ENTRY BUTTONS CARD -->
   <section class="container">
     <div class="entry-card">
       <h3><i class="fa-solid fa-gamepad"></i> ARENA ACCESS</h3>
       <p class="section-desc">Select your entrance mode to launch into battle</p>
       
       <div class="action-buttons">
-        <button onclick="launchGuest()" class="btn btn-guest">
-          <i class="fa-solid fa-bolt"></i> Play as Guest
+        <!-- Direct launch: No Login required for Classic -->
+        <button onclick="launchClassicMode()" class="btn btn-guest">
+          <i class="fa-solid fa-bolt"></i> Play Classic Mode
         </button>
 
+        <!-- Opens Auth Modal for Online -->
         <button onclick="openLoginModal()" class="btn btn-terminal">
-          <i class="fa-solid fa-user-shield"></i> Account Terminal
+          <i class="fa-solid fa-globe"></i> Play Online (Login)
         </button>
       </div>
     </div>
   </section>
 
-  <!-- GAMEPLAY PREVIEW & SOCIAL CONTENT -->
-  <main class="container">
-    <h2 class="section-title">GAMEPLAY PREVIEW</h2>
-    <div class="screenshots-grid">
-      <div class="screenshot-card">
-        <span class="card-badge">STAGE 01</span>
-        <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80" alt="Arena 1">
-      </div>
-      <div class="screenshot-card">
-        <span class="card-badge">STAGE 02</span>
-        <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80" alt="Arena 2">
-      </div>
-      <div class="screenshot-card">
-        <span class="card-badge">STAGE 03</span>
-        <img src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=800&q=80" alt="Arena 3">
-      </div>
-    </div>
-
-    <h2 class="section-title">MEDIA & COMMUNITY</h2>
-    <div class="social-grid">
-      <div class="social-card">
-        <h3><i class="fa-brands fa-youtube" style="color: #ff0000;"></i> Developer's Channel</h3>
-        <div class="yt-dev-box">
-          <div class="yt-avatar"><i class="fa-solid fa-gamepad"></i></div>
-          <div class="yt-channel-info">
-            <h4 class="channel-title">DF COLOSSEUM</h4>
-            <span class="channel-tag">Official Game Developer</span>
-          </div>
-          <a href="https://www.youtube.com/@The_DF_Colosseums" target="_blank" class="yt-sub-btn">
-            <i class="fa-brands fa-youtube"></i> Visit Channel
-          </a>
-        </div>
-      </div>
-
-      <div class="social-card">
-        <h3><i class="fa-brands fa-instagram" style="color: #e1306c;"></i> Official Instagram</h3>
-        <div class="ig-box">
-          <i class="fa-brands fa-instagram fa-4x" style="color: #e1306c;"></i>
-          <a href="https://www.instagram.com/rick.rolled.daily/" target="_blank" class="ig-link">
-            @rick.rolled.daily
-          </a>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- ACCOUNT TERMINAL MODAL -->
+  <!-- ONLINE LOGIN & RECOVERY MODAL -->
   <div id="login-modal" class="modal-overlay">
     <div class="modal-content">
       <button class="close-btn" onclick="closeLoginModal()">&times;</button>
       
       <div class="modal-header">
-        <h3><i class="fa-solid fa-users-gear"></i> ACCOUNT TERMINAL</h3>
+        <h3><i class="fa-solid fa-globe"></i> ONLINE BATTLE TERMINAL</h3>
         <div id="player-step-banner" class="step-indicator">
-          Step 1: Player 1 Login Required
+          Sign in required for online features
         </div>
       </div>
 
-      <!-- PLAYER BADGES -->
-      <div class="player-status-grid">
-        <div id="p1-badge" class="player-badge unverified">
+      <div style="margin-bottom: 15px;">
+        <div id="p-badge" class="player-badge unverified">
           <i class="fa-solid fa-user-ninja"></i>
-          <span id="p1-label">P1: Unverified</span>
-        </div>
-        <div id="p2-badge" class="player-badge unverified">
-          <i class="fa-solid fa-user-ninja"></i>
-          <span id="p2-label">P2: Unverified</span>
+          <span id="p-label">Checking Google Account...</span>
         </div>
       </div>
 
-      <!-- TABS -->
       <div class="auth-tabs">
         <button id="tab-login" class="tab-btn active" onclick="switchModalTab('login')">Sign In</button>
         <button id="tab-register" class="tab-btn" onclick="switchModalTab('register')">Create Account</button>
+        <button id="tab-reset" class="tab-btn" onclick="switchModalTab('reset')">Forgot Pass</button>
       </div>
 
       <!-- SIGN IN FORM -->
       <form id="modal-form-login" onsubmit="event.preventDefault(); handleLogin();">
         <div class="input-group">
-          <label id="lbl-login-user">Player 1 Gmail</label>
-          <input type="email" id="login-user" placeholder="player1@gmail.com" required>
+          <label>Gmail</label>
+          <input type="email" id="login-user" placeholder="yourname@gmail.com" required>
         </div>
         <div class="input-group">
           <label>Password</label>
           <input type="password" id="login-pass" placeholder="••••••••" required>
         </div>
         <button type="submit" id="btn-login-submit" class="btn btn-primary" style="margin-top: 10px;">
-          <i class="fa-solid fa-key"></i> Authenticate Player 1
+          <i class="fa-solid fa-key"></i> Authenticate Account
         </button>
       </form>
 
@@ -167,9 +115,36 @@
         </div>
       </form>
 
-      <!-- LAUNCH GAME BUTTON -->
-      <button id="btn-launch" class="btn btn-launch-disabled" onclick="launchGame()" disabled style="margin-top: 15px;">
-        <i class="fa-solid fa-gamepad"></i> BOTH PLAYERS MUST LOG IN
+      <!-- FORGOT PASSWORD FORM -->
+      <form id="modal-form-reset" style="display: none;" onsubmit="event.preventDefault();">
+        <div id="reset-phase-1">
+          <div class="input-group">
+            <label>Registered Gmail</label>
+            <input type="email" id="reset-user" placeholder="yourgmail@gmail.com" required>
+          </div>
+          <button type="button" onclick="requestResetCode()" class="btn btn-primary" style="margin-top: 10px;">
+            <i class="fa-solid fa-paper-plane"></i> Send Reset Code
+          </button>
+        </div>
+
+        <div id="reset-phase-2" style="display: none;">
+          <div class="input-group">
+            <label>6-Digit Reset Code</label>
+            <input type="text" id="reset-code" placeholder="123456" required>
+          </div>
+          <div class="input-group">
+            <label>New Password</label>
+            <input type="password" id="reset-new-pass" placeholder="••••••••" required>
+          </div>
+          <button type="button" onclick="submitPasswordReset()" class="btn btn-primary" style="margin-top: 10px;">
+            <i class="fa-solid fa-lock-open"></i> Reset Password
+          </button>
+        </div>
+      </form>
+
+      <!-- LAUNCH ONLINE BUTTON -->
+      <button id="btn-launch" class="btn btn-launch-disabled" onclick="launchOnlineMode()" disabled style="margin-top: 15px;">
+        <i class="fa-solid fa-gamepad"></i> LOGIN REQUIRED TO PLAY ONLINE
       </button>
 
       <div id="auth-status"></div>
@@ -181,31 +156,87 @@
   </footer>
 
   <script>
-    const GAME_BASE_URL = "https://script.google.com/a/macros/ccsc.edu.hk/s/AKfycbzsEn3AjoJL-j_Y_a5jZxr5i7hMvWm1nAyl5eD_l8mTEOY_ZosbBpLJ18dhefmGUZuB/exec";
+    let authenticatedPlayer = null;
 
-    let player1 = null;
-    let player2 = null;
+    function loadGameView(playerName, mode) {
+      const modal = document.getElementById('login-modal');
+      if (modal) modal.style.display = 'none';
+
+      document.body.innerHTML = `
+        <div style="display:flex; justify-content:center; align-items:center; height:100vh; background:#08090d; color:#00f0ff; font-family:sans-serif;">
+          <h2>LOADING ARENA (${mode.toUpperCase()})...</h2>
+        </div>`;
+
+      google.script.run
+        .withSuccessHandler(html => {
+          document.open();
+          document.write(html);
+          document.close();
+        })
+        .getGameContent(playerName, mode);
+    }
+
+    // Classic mode immediately loads ClassicGame.html directly with no login required
+    function launchClassicMode() {
+      loadGameView('Guest', 'Classic');
+    }
+
+    function launchOnlineMode() {
+      if (authenticatedPlayer) {
+        loadGameView(authenticatedPlayer, 'Online');
+      }
+    }
 
     function openLoginModal() {
       document.getElementById('login-modal').style.display = 'flex';
+      checkCurrentGoogleAccount();
     }
 
     function closeLoginModal() {
       document.getElementById('login-modal').style.display = 'none';
     }
 
+    // Check if the user's active Google Account is already registered in the sheet
+    function checkCurrentGoogleAccount() {
+      const badgeLabel = document.getElementById('p-label');
+      google.script.run
+        .withSuccessHandler(res => {
+          if (res.exists) {
+            badgeLabel.innerText = 'Account Detected: ' + res.playerName;
+            document.getElementById('login-user').value = res.email;
+          } else if (res.email) {
+            badgeLabel.innerText = 'Google Account Not Registered (' + res.email + ')';
+            document.getElementById('reg-user').value = res.email;
+          } else {
+            badgeLabel.innerText = 'Status: Not Authenticated';
+          }
+        })
+        .checkActiveGoogleAccount();
+    }
+
     function switchModalTab(type) {
       document.getElementById('auth-status').innerText = '';
+      const formLogin = document.getElementById('modal-form-login');
+      const formReg = document.getElementById('modal-form-register');
+      const formReset = document.getElementById('modal-form-reset');
+
+      formLogin.style.display = 'none';
+      formReg.style.display = 'none';
+      formReset.style.display = 'none';
+
+      document.getElementById('tab-login').classList.remove('active');
+      document.getElementById('tab-register').classList.remove('active');
+      document.getElementById('tab-reset').classList.remove('active');
+
       if (type === 'login') {
-        document.getElementById('modal-form-login').style.display = 'block';
-        document.getElementById('modal-form-register').style.display = 'none';
+        formLogin.style.display = 'block';
         document.getElementById('tab-login').classList.add('active');
-        document.getElementById('tab-register').classList.remove('active');
-      } else {
-        document.getElementById('modal-form-login').style.display = 'none';
-        document.getElementById('modal-form-register').style.display = 'block';
+      } else if (type === 'register') {
+        formReg.style.display = 'block';
         document.getElementById('tab-register').classList.add('active');
-        document.getElementById('tab-login').classList.remove('active');
+      } else {
+        formReset.style.display = 'block';
+        document.getElementById('tab-reset').classList.add('active');
       }
     }
 
@@ -215,7 +246,7 @@
       const statusDiv = document.getElementById('auth-status');
       
       statusDiv.className = '';
-      statusDiv.innerText = 'Verifying credentials with Google Sheets...';
+      statusDiv.innerText = 'Verifying credentials...';
 
       google.script.run
         .withSuccessHandler(res => {
@@ -223,30 +254,19 @@
           statusDiv.className = res.success ? 'status-success' : 'status-error';
 
           if (res.success) {
-            if (!player1) {
-              player1 = res.playerName;
-              document.getElementById('p1-badge').className = 'player-badge verified';
-              document.getElementById('p1-label').innerText = 'P1: ' + player1;
-              
-              document.getElementById('player-step-banner').innerText = 'Step 2: Player 2 Login Required';
-              document.getElementById('lbl-login-user').innerText = 'Player 2 Gmail';
-              document.getElementById('login-user').placeholder = 'player2@gmail.com';
-              document.getElementById('btn-login-submit').innerHTML = '<i class="fa-solid fa-key"></i> Authenticate Player 2';
-              document.getElementById('login-user').value = '';
-              document.getElementById('login-pass').value = '';
-            } else {
-              if (res.playerName === player1) {
-                statusDiv.innerText = 'Player 2 cannot be the same account as Player 1!';
-                statusDiv.className = 'status-error';
-                return;
-              }
-              player2 = res.playerName;
-              document.getElementById('p2-badge').className = 'player-badge verified';
-              document.getElementById('p2-label').innerText = 'P2: ' + player2;
-              document.getElementById('player-step-banner').innerText = 'Both Players Authenticated!';
-            }
-            checkBothReady();
+            authenticatedPlayer = res.playerName;
+            document.getElementById('p-badge').className = 'player-badge verified';
+            document.getElementById('p-label').innerText = 'Logged in: ' + authenticatedPlayer;
+            
+            const launchBtn = document.getElementById('btn-launch');
+            launchBtn.disabled = false;
+            launchBtn.className = 'btn btn-launch-active';
+            launchBtn.innerHTML = '<i class="fa-solid fa-play"></i> LAUNCH ONLINE BATTLE';
           }
+        })
+        .withFailureHandler(err => {
+          statusDiv.innerText = 'Error: ' + err.message;
+          statusDiv.className = 'status-error';
         })
         .signIn(u, p);
     }
@@ -255,7 +275,7 @@
       const email = document.getElementById('reg-user').value;
       const statusDiv = document.getElementById('auth-status');
       statusDiv.className = '';
-      statusDiv.innerText = 'Sending verification code to Gmail...';
+      statusDiv.innerText = 'Sending verification code...';
 
       google.script.run
         .withSuccessHandler(res => {
@@ -265,6 +285,10 @@
             document.getElementById('reg-phase-1').style.display = 'none';
             document.getElementById('reg-phase-2').style.display = 'block';
           }
+        })
+        .withFailureHandler(err => {
+          statusDiv.innerText = 'Error: ' + err.message;
+          statusDiv.className = 'status-error';
         })
         .sendVerificationCode(email);
     }
@@ -277,7 +301,7 @@
       const statusDiv = document.getElementById('auth-status');
 
       statusDiv.className = '';
-      statusDiv.innerText = 'Verifying code...';
+      statusDiv.innerText = 'Creating account...';
 
       google.script.run
         .withSuccessHandler(res => {
@@ -289,41 +313,60 @@
             switchModalTab('login');
           }
         })
+        .withFailureHandler(err => {
+          statusDiv.innerText = 'Error: ' + err.message;
+          statusDiv.className = 'status-error';
+        })
         .completeRegistration(email, pass, name, code);
     }
 
-    function checkBothReady() {
-      const launchBtn = document.getElementById('btn-launch');
-      if (player1 && player2) {
-        launchBtn.disabled = false;
-        launchBtn.className = 'btn btn-launch-active';
-        launchBtn.innerHTML = '<i class="fa-solid fa-play"></i> LAUNCH BATTLE (P1 vs P2)';
-      }
-    }
-    // Replaces the entire page with Game.html instantly without reloading/redirecting
-  function loadGameView(p1Name, p2Name) {
-    const modal = document.getElementById('login-modal');
-    if (modal) modal.style.display = 'none';
-    document.body.innerHTML = `<div style="display:flex; justify-content:center;
-    align-items:center; height:100vh; background:#08090d; color:#00f0ff; font-family:sans-serif;"><h2>LOADING ARENA...</h2></div>`;
+    function requestResetCode() {
+      const email = document.getElementById('reset-user').value;
+      const statusDiv = document.getElementById('auth-status');
+      statusDiv.className = '';
+      statusDiv.innerText = 'Sending reset code...';
 
-    google.script.run
-      .withSuccessHandler(html => {
-        document.open();
-        document.write(html);
-        document.close();
-      })
-      .getGameContent(p1Name, p2Name);
-  }
-
-  function launchGuest() {
-    loadGameView('Guest 1', 'Guest 2');
-  }
-  function launchGame() {
-    if (player1 && player2) {
-      loadGameView(player1, player2);
+      google.script.run
+        .withSuccessHandler(res => {
+          statusDiv.innerText = res.message;
+          statusDiv.className = res.success ? 'status-success' : 'status-error';
+          if (res.success) {
+            document.getElementById('reset-phase-1').style.display = 'none';
+            document.getElementById('reset-phase-2').style.display = 'block';
+          }
+        })
+        .withFailureHandler(err => {
+          statusDiv.innerText = 'Error: ' + err.message;
+          statusDiv.className = 'status-error';
+        })
+        .sendResetCode(email);
     }
-  }
+
+    function submitPasswordReset() {
+      const email = document.getElementById('reset-user').value;
+      const code = document.getElementById('reset-code').value;
+      const newPass = document.getElementById('reset-new-pass').value;
+      const statusDiv = document.getElementById('auth-status');
+
+      statusDiv.className = '';
+      statusDiv.innerText = 'Resetting password...';
+
+      google.script.run
+        .withSuccessHandler(res => {
+          statusDiv.innerText = res.message;
+          statusDiv.className = res.success ? 'status-success' : 'status-error';
+          if (res.success) {
+            document.getElementById('reset-phase-1').style.display = 'block';
+            document.getElementById('reset-phase-2').style.display = 'none';
+            switchModalTab('login');
+          }
+        })
+        .withFailureHandler(err => {
+          statusDiv.innerText = 'Error: ' + err.message;
+          statusDiv.className = 'status-error';
+        })
+        .resetPassword(email, code, newPass);
+    }
   </script>
 </body>
 </html>
