@@ -4,7 +4,7 @@ function doGet() {
   return HtmlService.createTemplateFromFile('Index')
     .evaluate()
     .setTitle('巔峰對決 | Arena Terminal')
-    .setXframeOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
 }
 
@@ -31,8 +31,6 @@ function getSheet(sheetName) {
       sheet.appendRow(['Timestamp', 'Gmail', 'Code']);
     } else if (sheetName === 'Online players') {
       sheet.appendRow(['Player', 'Status', 'P1/P2?', 'Room ID']);
-    } else if (sheetName === 'Room Messages') {
-      sheet.appendRow(['Timestamp', 'Room ID', 'Sender', 'Message']);
     }
   }
   return sheet;
@@ -246,7 +244,6 @@ function updatePlayerStatus(player, status, peerId) {
     const data = sheet.getDataRange().getValues();
     const cleanPlayer = player.trim();
 
-    // REMOVE PLAYER IF OFFLINE
     if (status === 'wentOffLine') {
       for (let i = data.length - 1; i >= 1; i--) {
         if (data[i][0].toString().toLowerCase() === cleanPlayer.toLowerCase()) {
@@ -257,7 +254,6 @@ function updatePlayerStatus(player, status, peerId) {
     }
 
     if (status === 'wentOnline') {
-      // Clear existing records for player
       for (let i = data.length - 1; i >= 1; i--) {
         if (data[i][0].toString().toLowerCase() === cleanPlayer.toLowerCase()) {
           sheet.deleteRow(i + 1);
@@ -267,7 +263,6 @@ function updatePlayerStatus(player, status, peerId) {
       const currentData = sheet.getDataRange().getValues();
       let waitingP1RoomId = '';
 
-      // Check if any P1 is waiting
       for (let i = 1; i < currentData.length; i++) {
         if (currentData[i][1].toString() === 'waiting' && currentData[i][2].toString() === 'P1') {
           waitingP1RoomId = currentData[i][3].toString();
@@ -275,7 +270,6 @@ function updatePlayerStatus(player, status, peerId) {
         }
       }
 
-      // CASE A: No P1 waiting -> Become P1 (Room ID = P1's Peer ID)
       if (!waitingP1RoomId) {
         const roomId = peerId || ('ROOM_' + Date.now());
         sheet.appendRow([cleanPlayer, 'waiting', 'P1', roomId]);
@@ -286,9 +280,7 @@ function updatePlayerStatus(player, status, peerId) {
           roomId: roomId,
           p1PeerId: roomId
         };
-      } 
-      // CASE B: Waiting P1 exists -> Join as P2 under P1's Peer ID
-      else {
+      } else {
         sheet.appendRow([cleanPlayer, 'waiting', 'P2', waitingP1RoomId]);
         return {
           success: true,
@@ -308,7 +300,7 @@ function updatePlayerStatus(player, status, peerId) {
 
 /**
  * 2. Check Room Status
- * When both P1 and P2 exist in the sheet, sets statuses to 'playing' and returns P1's Peer ID to P2.
+ * Updates status to 'playing' when P1 and P2 are present, returning P1's Peer ID to P2.
  */
 function checkRoomStatus(player) {
   try {
@@ -324,7 +316,7 @@ function checkRoomStatus(player) {
           name: data[i][0].toString(),
           status: data[i][1].toString(),
           role: data[i][2].toString(),
-          roomId: data[i][3].toString() // P1's Peer ID
+          roomId: data[i][3].toString()
         };
         break;
       }
@@ -332,7 +324,6 @@ function checkRoomStatus(player) {
 
     if (!playerRow) return { status: 'offline' };
 
-    // If already playing
     if (playerRow.status === 'playing') {
       let opponent = '';
       for (let i = 1; i < data.length; i++) {
@@ -350,7 +341,6 @@ function checkRoomStatus(player) {
       };
     }
 
-    // Locate both P1 and P2 in the room
     let p1Index = -1, p2Index = -1;
     let p1Name = '', p2Name = '';
 
@@ -366,7 +356,6 @@ function checkRoomStatus(player) {
       }
     }
 
-    // Both players present -> Update state to 'playing'
     if (p1Index !== -1 && p2Index !== -1) {
       sheet.getRange(p1Index, 2).setValue('playing');
       sheet.getRange(p2Index, 2).setValue('playing');
@@ -393,47 +382,8 @@ function checkRoomStatus(player) {
 }
 
 /**
- * 3. Send Message to Sheet (Fallback channel)
+ * 3. Leave Room
  */
-function sendMessage(roomId, sender, message) {
-  try {
-    const sheet = getSheet('Room Messages');
-    const payload = (typeof message === 'object') ? JSON.stringify(message) : String(message);
-    
-    sheet.appendRow([new Date(), roomId.trim(), sender.trim(), payload]);
-    return { success: true, message: 'Message sent.' };
-  } catch (err) {
-    return { success: false, message: 'Error: ' + err.toString() };
-  }
-}
-
-/**
- * 4. Get Messages from Sheet
- */
-function getMessages(roomId, lastIndex) {
-  try {
-    const sheet = getSheet('Room Messages');
-    const data = sheet.getDataRange().getValues();
-    const messages = [];
-    const startIndex = (lastIndex && typeof lastIndex === 'number') ? lastIndex : 1;
-
-    for (let i = startIndex; i < data.length; i++) {
-      if (data[i][1].toString() === roomId.trim()) {
-        messages.push({
-          index: i + 1,
-          timestamp: data[i][0],
-          sender: data[i][2].toString(),
-          text: data[i][3].toString()
-        });
-      }
-    }
-
-    return { success: true, messages: messages, lastIndex: data.length };
-  } catch (err) {
-    return { success: false, message: 'Error: ' + err.toString() };
-  }
-}
-
 function leaveRoom(player) {
   try {
     const sheet = getSheet('Online players');
@@ -452,6 +402,9 @@ function leaveRoom(player) {
   }
 }
 
+/**
+ * 4. Get Online Lobby
+ */
 function getOnlineLobby() {
   try {
     const sheet = getSheet('Online players');
