@@ -4,7 +4,7 @@ function doGet() {
   return HtmlService.createTemplateFromFile('Index')
     .evaluate()
     .setTitle('巔峰對決 | Arena Terminal')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .setXframeOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
 }
 
@@ -232,28 +232,32 @@ function signIn(email, password) {
 }
 
 // ----------------------------------------------------
-// ONLINE MATCHMAKING & ROOM MANAGEMENT
+// PEERJS MATCHMAKING & SIGNALING SYSTEM
 // ----------------------------------------------------
 
 /**
- * 1. Register / Unregister player in Online players sheet
+ * 1. Register Player with PeerJS ID
+ * If no P1 is waiting, registers player as P1 using their peerId as Room ID.
+ * If P1 exists, registers player as P2 under P1's Room ID.
  */
-function updatePlayerStatus(player, status, customRoomId) {
+function updatePlayerStatus(player, status, peerId) {
   try {
     const sheet = getSheet('Online players');
     const data = sheet.getDataRange().getValues();
     const cleanPlayer = player.trim();
 
+    // REMOVE PLAYER IF OFFLINE
     if (status === 'wentOffLine') {
       for (let i = data.length - 1; i >= 1; i--) {
         if (data[i][0].toString().toLowerCase() === cleanPlayer.toLowerCase()) {
           sheet.deleteRow(i + 1);
         }
       }
-      return { success: true, status: 'offline', message: cleanPlayer + ' went offline.' };
+      return { success: true, status: 'offline' };
     }
 
     if (status === 'wentOnline') {
+      // Clear existing records for player
       for (let i = data.length - 1; i >= 1; i--) {
         if (data[i][0].toString().toLowerCase() === cleanPlayer.toLowerCase()) {
           sheet.deleteRow(i + 1);
@@ -261,33 +265,37 @@ function updatePlayerStatus(player, status, customRoomId) {
       }
 
       const currentData = sheet.getDataRange().getValues();
-      let waitingRoomId = '';
+      let waitingP1RoomId = '';
 
+      // Check if any P1 is waiting
       for (let i = 1; i < currentData.length; i++) {
         if (currentData[i][1].toString() === 'waiting' && currentData[i][2].toString() === 'P1') {
-          waitingRoomId = currentData[i][3].toString();
+          waitingP1RoomId = currentData[i][3].toString();
           break;
         }
       }
 
-      if (!waitingRoomId) {
-        const roomId = customRoomId || ('ROOM_' + Date.now() + '_' + Math.floor(Math.random() * 1000));
+      // CASE A: No P1 waiting -> Become P1 (Room ID = P1's Peer ID)
+      if (!waitingP1RoomId) {
+        const roomId = peerId || ('ROOM_' + Date.now());
         sheet.appendRow([cleanPlayer, 'waiting', 'P1', roomId]);
         return {
           success: true,
           role: 'P1',
           status: 'waiting',
           roomId: roomId,
-          message: 'Room created as P1.'
+          p1PeerId: roomId
         };
-      } else {
-        sheet.appendRow([cleanPlayer, 'waiting', 'P2', waitingRoomId]);
+      } 
+      // CASE B: Waiting P1 exists -> Join as P2 under P1's Peer ID
+      else {
+        sheet.appendRow([cleanPlayer, 'waiting', 'P2', waitingP1RoomId]);
         return {
           success: true,
           role: 'P2',
           status: 'waiting',
-          roomId: waitingRoomId,
-          message: 'Joined room as P2.'
+          roomId: waitingP1RoomId,
+          p1PeerId: waitingP1RoomId
         };
       }
     }
@@ -299,7 +307,8 @@ function updatePlayerStatus(player, status, customRoomId) {
 }
 
 /**
- * 2. Poll room state & transition to 'playing' when both P1 and P2 are registered
+ * 2. Check Room Status
+ * When both P1 and P2 exist in the sheet, sets statuses to 'playing' and returns P1's Peer ID to P2.
  */
 function checkRoomStatus(player) {
   try {
@@ -315,7 +324,7 @@ function checkRoomStatus(player) {
           name: data[i][0].toString(),
           status: data[i][1].toString(),
           role: data[i][2].toString(),
-          roomId: data[i][3].toString()
+          roomId: data[i][3].toString() // P1's Peer ID
         };
         break;
       }
@@ -323,6 +332,7 @@ function checkRoomStatus(player) {
 
     if (!playerRow) return { status: 'offline' };
 
+    // If already playing
     if (playerRow.status === 'playing') {
       let opponent = '';
       for (let i = 1; i < data.length; i++) {
@@ -331,40 +341,59 @@ function checkRoomStatus(player) {
           break;
         }
       }
-      return { status: 'playing', role: playerRow.role, roomId: playerRow.roomId, opponent: opponent };
+      return { 
+        status: 'playing', 
+        role: playerRow.role, 
+        roomId: playerRow.roomId, 
+        p1PeerId: playerRow.roomId,
+        opponent: opponent 
+      };
     }
 
-    let p1RowIndex = -1, p2RowIndex = -1;
+    // Locate both P1 and P2 in the room
+    let p1Index = -1, p2Index = -1;
     let p1Name = '', p2Name = '';
 
     for (let i = 1; i < data.length; i++) {
       if (data[i][3].toString() === playerRow.roomId) {
         if (data[i][2].toString() === 'P1') {
-          p1RowIndex = i + 1;
+          p1Index = i + 1;
           p1Name = data[i][0].toString();
         } else if (data[i][2].toString() === 'P2') {
-          p2RowIndex = i + 1;
+          p2Index = i + 1;
           p2Name = data[i][0].toString();
         }
       }
     }
 
-    if (p1RowIndex !== -1 && p2RowIndex !== -1) {
-      sheet.getRange(p1RowIndex, 2).setValue('playing');
-      sheet.getRange(p2RowIndex, 2).setValue('playing');
+    // Both players present -> Update state to 'playing'
+    if (p1Index !== -1 && p2Index !== -1) {
+      sheet.getRange(p1Index, 2).setValue('playing');
+      sheet.getRange(p2Index, 2).setValue('playing');
 
       const opponent = (playerRow.role === 'P1') ? p2Name : p1Name;
-      return { status: 'playing', role: playerRow.role, roomId: playerRow.roomId, opponent: opponent };
+      return {
+        status: 'playing',
+        role: playerRow.role,
+        roomId: playerRow.roomId,
+        p1PeerId: playerRow.roomId,
+        opponent: opponent
+      };
     }
 
-    return { status: 'waiting', role: playerRow.role, roomId: playerRow.roomId };
+    return { 
+      status: 'waiting', 
+      role: playerRow.role, 
+      roomId: playerRow.roomId, 
+      p1PeerId: playerRow.roomId 
+    };
   } catch (err) {
     return { status: 'error', message: err.toString() };
   }
 }
 
 /**
- * 3. Send message to Room Messages sheet
+ * 3. Send Message to Sheet (Fallback channel)
  */
 function sendMessage(roomId, sender, message) {
   try {
@@ -379,7 +408,7 @@ function sendMessage(roomId, sender, message) {
 }
 
 /**
- * 4. Retrieve messages for a room starting after lastIndex
+ * 4. Get Messages from Sheet
  */
 function getMessages(roomId, lastIndex) {
   try {
@@ -399,11 +428,7 @@ function getMessages(roomId, lastIndex) {
       }
     }
 
-    return { 
-      success: true, 
-      messages: messages, 
-      lastIndex: data.length 
-    };
+    return { success: true, messages: messages, lastIndex: data.length };
   } catch (err) {
     return { success: false, message: 'Error: ' + err.toString() };
   }
