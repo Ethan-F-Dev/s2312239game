@@ -733,53 +733,82 @@
             else { txt.innerText = k==='recover'?'復':(k==='s3'?'終':(k==='atk'?'攻':k.slice(1))); el.style.opacity = "1"; }
         });
     }
-    function bindButtons() {
-        const setupJoy = (id, joyId, stickId, touchObj) => {
-            const joy = document.getElementById(joyId), stick = document.getElementById(stickId);
-            const move = (e) => {
-                const t = e.targetTouches[0], rect = joy.getBoundingClientRect();
-                let dx = t.clientX - (rect.left + rect.width/2), dy = t.clientY - (rect.top + rect.height/2);
-                const dist = Math.min(55, Math.hypot(dx, dy)), angle = Math.atan2(id === 2 ? -dy : dy, id === 2 ? -dx : dx);
-                stick.style.transform = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px)`;
-                const la = Math.atan2(dy, dx); touchObj.joyX = Math.cos(la)*(dist/55); touchObj.joyY = Math.sin(la)*(dist/55);
-            };
-            joy.addEventListener('touchstart', (e) => { e.preventDefault(); move(e); });
-            joy.addEventListener('touchmove', (e) => { e.preventDefault(); move(e); });
-            joy.addEventListener('touchend', () => { stick.style.transform = `translate(0,0)`; touchObj.joyX = 0; touchObj.joyY = 0; });
+function bindButtons() {
+    const setupJoy = (id, joyId, stickId, touchObj) => {
+        const joy = document.getElementById(joyId);
+        const stick = document.getElementById(stickId);
+        
+        // Safety guard to prevent "null is not an object" crash
+        if (!joy || !stick) return;
+
+        const move = (e) => {
+            const t = e.targetTouches[0], rect = joy.getBoundingClientRect();
+            let dx = t.clientX - (rect.left + rect.width / 2);
+            let dy = t.clientY - (rect.top + rect.height / 2);
+            
+            const dist = Math.min(55, Math.hypot(dx, dy));
+            const angle = Math.atan2(id === 2 ? -dy : dy, id === 2 ? -dx : dx);
+            
+            stick.style.transform = `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px)`;
+            
+            const la = Math.atan2(dy, dx); 
+            touchObj.joyX = Math.cos(la) * (dist / 55); 
+            touchObj.joyY = Math.sin(la) * (dist / 55);
+
+            // Send movement input to opponent over WebRTC
+            sendGameMove({ type: 'INPUT', joyX: touchObj.joyX, joyY: touchObj.joyY });
         };
-        const setupBtn = (id, type) => {
-             const btn = document.getElementById(`p${id}-btn-${type}`); if(!btn) return;
-             btn.addEventListener('touchstart', (e) => { 
-                 e.preventDefault(); 
-                 const p = (id === 1) ? p1 : p2; 
-                 if (!p) return; 
-                 if(p.isCasting && !(p.charIdx === 1 && p.taiS1Active && type === 'atk')) return;
-                 if(type === 'atk'){
-                     astAtk(p);
-                     sendGameMove({ type: 'SKILL', skill: 'atk' });
-                     
-                 }
-                 else if(type === 's1'){
-                     castS1(p);
-                     sendGameMove({ type: 'SKILL', skill: 's1' });
-                 }
-                 else if(type === 's2'){
-                     castS2(p);
-                     sendGameMove({ type: 'SKILL', skill: 's2' });
-                 }
-                 else if(type === 's3'){
-                     castS3(p); 
-                     sendGameMove({ type: 'SKILL', skill: 's3' });
-                 }
-                 else if(type === 'recover'){
-                     castRecover(p);
-                     sendGameMove({ type: 'SKILL', skill: 'recover' });
-                 }
-             });
-        };
-        setupJoy(1, "p1-joy", "p1-stick", p1Touch); setupJoy(2, "p2-joy", "p2-stick", p2Touch);
-        ['atk', 's1', 's2', 's3', 'recover'].forEach(t => { setupBtn(1, t); setupBtn(2, t); });
-    }
+
+        joy.addEventListener('touchstart', (e) => { e.preventDefault(); move(e); });
+        joy.addEventListener('touchmove', (e) => { e.preventDefault(); move(e); });
+        joy.addEventListener('touchend', () => { 
+            stick.style.transform = `translate(0,0)`; 
+            touchObj.joyX = 0; 
+            touchObj.joyY = 0; 
+
+            // Send stop input to opponent
+            sendGameMove({ type: 'INPUT', joyX: 0, joyY: 0 });
+        });
+    };
+
+    const setupBtn = (id, type) => {
+        const btn = document.getElementById(`p${id}-btn-${type}`); 
+        if (!btn) return;
+
+        btn.addEventListener('touchstart', (e) => { 
+            e.preventDefault(); 
+            const p = p1; // Local player is always p1
+            if (!p) return; 
+
+            if (p.isCasting && !(p.charIdx === 1 && p.taiS1Active && type === 'atk')) return;
+
+            if (type === 'atk') {
+                castAtk(p);
+                sendGameMove({ type: 'SKILL', skill: 'atk' });
+            }
+            else if (type === 's1') {
+                castS1(p);
+                sendGameMove({ type: 'SKILL', skill: 's1' });
+            }
+            else if (type === 's2') {
+                castS2(p);
+                sendGameMove({ type: 'SKILL', skill: 's2' });
+            }
+            else if (type === 's3') {
+                castS3(p); 
+                sendGameMove({ type: 'SKILL', skill: 's3' });
+            }
+            else if (type === 'recover') {
+                castRecover(p);
+                sendGameMove({ type: 'SKILL', skill: 'recover' });
+            }
+        });
+    };
+
+    // Initialize local joystick and player 1 controls
+    setupJoy(1, "p1-joy", "p1-stick", p1Touch);
+    ['atk', 's1', 's2', 's3', 'recover'].forEach(t => setupBtn(1, t));
+}
     function setupJoy(joyId, stickId, touchObj) {
         const joy = document.getElementById(joyId), stick = document.getElementById(stickId);
         if (!joy || !stick) return;
@@ -7408,8 +7437,6 @@ if (p.charIdx === 31) {
         updateMenuTitle();
         renderMenu(1); 
         bindButtons();
-        setupJoy("p1-joy", "p1-stick", p1Touch);
-        
         const startBtn = document.getElementById('start-btn');
         if (startBtn) {
             const handleStart = (e) => {
