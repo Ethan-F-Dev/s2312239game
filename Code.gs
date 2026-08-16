@@ -30,7 +30,7 @@ function getSheet(sheetName) {
     } else if (sheetName === 'Verifications') {
       sheet.appendRow(['Timestamp', 'Gmail', 'Code']);
     } else if (sheetName === 'Online players') {
-      sheet.appendRow(['Player', 'Status', 'P1/P2?', 'Room ID']);
+      sheet.appendRow(['Player', 'Mode', 'Status', 'P1/P2?', 'Room ID']);
     }
   }
   return sheet;
@@ -230,19 +230,18 @@ function signIn(email, password) {
 }
 
 // ----------------------------------------------------
-// PEERJS MATCHMAKING & SIGNALING SYSTEM
+// PEERJS MATCHMAKING & SIGNALING SYSTEM (MODE SUPPORT)
 // ----------------------------------------------------
 
 /**
- * 1. Register Player with PeerJS ID
- * If no P1 is waiting, registers player as P1 using their peerId as Room ID.
- * If P1 exists, registers player as P2 under P1's Room ID.
+ * 1. Register Player with PeerJS ID and Mode filtering
  */
-function updatePlayerStatus(player, status, peerId) {
+function updatePlayerStatus(player, status, peerId, gameMode) {
   try {
     const sheet = getSheet('Online players');
     const data = sheet.getDataRange().getValues();
     const cleanPlayer = player.trim();
+    const activeMode = (gameMode || 'Standard').trim();
 
     if (status === 'wentOffLine') {
       for (let i = data.length - 1; i >= 1; i--) {
@@ -263,29 +262,39 @@ function updatePlayerStatus(player, status, peerId) {
       const currentData = sheet.getDataRange().getValues();
       let waitingP1RoomId = '';
 
+      // Check for a waiting P1 IN THE SAME GAME MODE
       for (let i = 1; i < currentData.length; i++) {
-        if (currentData[i][1].toString() === 'waiting' && currentData[i][2].toString() === 'P1') {
-          waitingP1RoomId = currentData[i][3].toString();
+        const rowMode = currentData[i][1].toString();
+        const rowStatus = currentData[i][2].toString();
+        const rowRole = currentData[i][3].toString();
+
+        if (rowMode.toLowerCase() === activeMode.toLowerCase() && rowStatus === 'waiting' && rowRole === 'P1') {
+          waitingP1RoomId = currentData[i][4].toString();
           break;
         }
       }
 
+      // If no P1 in this mode, create room as P1
       if (!waitingP1RoomId) {
         const roomId = peerId || ('ROOM_' + Date.now());
-        sheet.appendRow([cleanPlayer, 'waiting', 'P1', roomId]);
+        sheet.appendRow([cleanPlayer, activeMode, 'waiting', 'P1', roomId]);
         return {
           success: true,
           role: 'P1',
           status: 'waiting',
+          mode: activeMode,
           roomId: roomId,
           p1PeerId: roomId
         };
-      } else {
-        sheet.appendRow([cleanPlayer, 'waiting', 'P2', waitingP1RoomId]);
+      } 
+      // If P1 in same mode exists, join as P2
+      else {
+        sheet.appendRow([cleanPlayer, activeMode, 'waiting', 'P2', waitingP1RoomId]);
         return {
           success: true,
           role: 'P2',
           status: 'waiting',
+          mode: activeMode,
           roomId: waitingP1RoomId,
           p1PeerId: waitingP1RoomId
         };
@@ -300,7 +309,6 @@ function updatePlayerStatus(player, status, peerId) {
 
 /**
  * 2. Check Room Status
- * Updates status to 'playing' when P1 and P2 are present, returning P1's Peer ID to P2.
  */
 function checkRoomStatus(player) {
   try {
@@ -314,9 +322,10 @@ function checkRoomStatus(player) {
       if (data[i][0].toString().toLowerCase() === cleanPlayer) {
         playerRow = {
           name: data[i][0].toString(),
-          status: data[i][1].toString(),
-          role: data[i][2].toString(),
-          roomId: data[i][3].toString()
+          mode: data[i][1].toString(),
+          status: data[i][2].toString(),
+          role: data[i][3].toString(),
+          roomId: data[i][4].toString()
         };
         break;
       }
@@ -327,7 +336,7 @@ function checkRoomStatus(player) {
     if (playerRow.status === 'playing') {
       let opponent = '';
       for (let i = 1; i < data.length; i++) {
-        if (data[i][3].toString() === playerRow.roomId && data[i][0].toString().toLowerCase() !== cleanPlayer) {
+        if (data[i][4].toString() === playerRow.roomId && data[i][0].toString().toLowerCase() !== cleanPlayer) {
           opponent = data[i][0].toString();
           break;
         }
@@ -335,6 +344,7 @@ function checkRoomStatus(player) {
       return { 
         status: 'playing', 
         role: playerRow.role, 
+        mode: playerRow.mode,
         roomId: playerRow.roomId, 
         p1PeerId: playerRow.roomId,
         opponent: opponent 
@@ -345,11 +355,11 @@ function checkRoomStatus(player) {
     let p1Name = '', p2Name = '';
 
     for (let i = 1; i < data.length; i++) {
-      if (data[i][3].toString() === playerRow.roomId) {
-        if (data[i][2].toString() === 'P1') {
+      if (data[i][4].toString() === playerRow.roomId) {
+        if (data[i][3].toString() === 'P1') {
           p1Index = i + 1;
           p1Name = data[i][0].toString();
-        } else if (data[i][2].toString() === 'P2') {
+        } else if (data[i][3].toString() === 'P2') {
           p2Index = i + 1;
           p2Name = data[i][0].toString();
         }
@@ -357,13 +367,15 @@ function checkRoomStatus(player) {
     }
 
     if (p1Index !== -1 && p2Index !== -1) {
-      sheet.getRange(p1Index, 2).setValue('playing');
-      sheet.getRange(p2Index, 2).setValue('playing');
+      // Update Column 3 (Status) to 'playing'
+      sheet.getRange(p1Index, 3).setValue('playing');
+      sheet.getRange(p2Index, 3).setValue('playing');
 
       const opponent = (playerRow.role === 'P1') ? p2Name : p1Name;
       return {
         status: 'playing',
         role: playerRow.role,
+        mode: playerRow.mode,
         roomId: playerRow.roomId,
         p1PeerId: playerRow.roomId,
         opponent: opponent
@@ -373,6 +385,7 @@ function checkRoomStatus(player) {
     return { 
       status: 'waiting', 
       role: playerRow.role, 
+      mode: playerRow.mode,
       roomId: playerRow.roomId, 
       p1PeerId: playerRow.roomId 
     };
@@ -414,9 +427,10 @@ function getOnlineLobby() {
     for (let i = 1; i < data.length; i++) {
       players.push({
         player: data[i][0].toString(),
-        status: data[i][1].toString(),
-        role: data[i][2].toString(),
-        roomId: data[i][3].toString()
+        mode: data[i][1].toString(),
+        status: data[i][2].toString(),
+        role: data[i][3].toString(),
+        roomId: data[i][4].toString()
       });
     }
 
