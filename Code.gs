@@ -37,7 +37,7 @@ function getSheet(sheetName) {
 }
 
 function isValidGmail(email) {
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|googlemail\.com|ccsc\.edu\.hk)$/i;
+  const gmailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|googlemail\.com|ccsc\.edu\.hk)$/i;
   return gmailRegex.test(email.trim());
 }
 
