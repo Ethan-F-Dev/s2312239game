@@ -234,16 +234,15 @@ function signIn(email, password) {
 // ----------------------------------------------------
 
 /**
- * Change Player Status ('choosing', 'waiting', 'wentOffLine')
+ * Set Player Status ('choosing', 'waiting', 'wentOffLine')
  */
 function setPlayerStatus(player, newStatus, gameMode, peerId) {
   try {
     const sheet = getSheet('Online players');
     const data = sheet.getDataRange().getValues();
     const cleanPlayer = player.trim();
-    const activeMode = (gameMode || 'Standard').trim();
+    let activeMode = (gameMode || 'Standard').trim();
 
-    // Locate existing row index for player
     let rowIndex = -1;
     for (let i = 1; i < data.length; i++) {
       if (data[i][0].toString().toLowerCase() === cleanPlayer.toLowerCase()) {
@@ -252,7 +251,8 @@ function setPlayerStatus(player, newStatus, gameMode, peerId) {
       }
     }
 
-    // 1. STATUS: CHOOSING (Do not create or join rooms)
+    // 1. STATUS: CHOOSING / CHANGING MODE
+    // Clears Role (Col 4) and Room ID (Col 5). Does NOT generate any Room ID.
     if (newStatus === 'choosing') {
       if (rowIndex !== -1) {
         sheet.getRange(rowIndex, 2).setValue(activeMode);
@@ -265,12 +265,13 @@ function setPlayerStatus(player, newStatus, gameMode, peerId) {
       return { success: true, status: 'choosing', mode: activeMode };
     }
 
-    // 2. STATUS: WAITING (Enter Matchmaking Queue)
-    if (newStatus === 'waiting' || newStatus === 'wentOnline') {
+    // 2. STATUS: WAITING
+    // Room ID and P1/P2 roles are ONLY assigned when player enters waiting state.
+    if (newStatus === 'waiting') {
       const currentData = sheet.getDataRange().getValues();
       let waitingP1RoomId = '';
 
-      // Find available P1 in the same mode with 'waiting' status
+      // Find an available P1 in the same mode who is 'waiting'
       for (let i = 1; i < currentData.length; i++) {
         const rowPlayer = currentData[i][0].toString();
         const rowMode = currentData[i][1].toString();
@@ -327,13 +328,8 @@ function setPlayerStatus(player, newStatus, gameMode, peerId) {
   }
 }
 
-// Wrapper alias to maintain backward compatibility
-function updatePlayerStatus(player, status, peerId, gameMode) {
-  return setPlayerStatus(player, status, gameMode, peerId);
-}
-
 /**
- * Poll room state: Pair only when both players are in 'waiting' status
+ * Check Room Status (Ignores players who are still in 'choosing' state)
  */
 function checkRoomStatus(player) {
   try {
@@ -356,11 +352,8 @@ function checkRoomStatus(player) {
       }
     }
 
-    if (!playerRow) return { status: 'offline' };
-
-    // Ignore matchmaking checks if player is still choosing
-    if (playerRow.status === 'choosing') {
-      return { status: 'choosing', mode: playerRow.mode };
+    if (!playerRow || playerRow.status === 'choosing') {
+      return { status: playerRow ? playerRow.status : 'offline' };
     }
 
     if (playerRow.status === 'playing') {
@@ -399,7 +392,7 @@ function checkRoomStatus(player) {
       }
     }
 
-    // Both players must exist AND be in 'waiting' status to start playing
+    // Both players must be present AND in 'waiting' status
     if (p1Index !== -1 && p2Index !== -1 && p1Status === 'waiting' && p2Status === 'waiting') {
       sheet.getRange(p1Index, 3).setValue('playing');
       sheet.getRange(p2Index, 3).setValue('playing');
