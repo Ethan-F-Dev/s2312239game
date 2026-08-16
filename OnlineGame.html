@@ -322,54 +322,69 @@
         }
     }
 
-function bindPeerEvents() {
-    connection.on('open', () => {
-        console.log("[P2P] Connected.");
-        sendGameMove({ 
-            type: 'HANDSHAKE', 
-            player: playerName,
-            charIdx: p1CharIdx,
-            selChar: p1SelChar
-        });
-    });
-
-    connection.on('data', (data) => {
-        console.log("[P2P Received]:", data);
-
-        switch (data.type) {
-            case 'HANDSHAKE':
-                p2Name = String(data.player);
-                if (data.charIdx !== undefined) p2CharIdx = Number(data.charIdx);
-                if (data.selChar) p2SelChar = data.selChar;
-                startGame();
-                break;
-
-            case 'INPUT':
-                p2Touch.joyX = data.joyX;
-                p2Touch.joyY = data.joyY;
-                break;
-
-            case 'SKILL':
-                if (p2) {
-                    if (data.skill === 'atk') castAtk(p2);
-                    else if (data.skill === 's1') castS1(p2);
-                    else if (data.skill === 's2') castS2(p2);
-                    else if (data.skill === 's3') castS3(p2);
-                    else if (data.skill === 'recover') castRecover(p2);
-                }
-                break;
-
-            case 'DEATH':
-                if (p2) p2.hp = 0;
-                checkMatchEnd();
-                break;
+    function bindPeerEvents() {
+        // Function to transmit initial player data
+        const sendHandshake = () => {
+            console.log("[P2P] Sending HANDSHAKE...");
+            sendGameMove({ 
+                type: 'HANDSHAKE', 
+                player: playerName,
+                charIdx: p1CharIdx,
+                selChar: p1SelChar
+            });
+        };
+    
+        // If connection is already open, send immediately. Otherwise, wait for 'open'
+        if (connection.open) {
+            sendHandshake();
+        } else {
+            connection.on('open', () => {
+                sendHandshake();
+            });
         }
-    });
-
-    connection.on('close', () => {
-        console.log("[P2P] Opponent disconnected.");
-    });
-}
+    
+        // Attach data listener
+        connection.on('data', (data) => {
+            console.log("[P2P Received]:", data);
+    
+            switch (data.type) {
+                case 'HANDSHAKE':
+                    p2Name = String(data.player);
+                    if (data.charIdx !== undefined) p2CharIdx = Number(data.charIdx);
+                    if (data.selChar) p2SelChar = data.selChar;
+                    
+                    // Launch game only after receiving opponent's data
+                    if (!gameRunning) {
+                        startGame();
+                    }
+                    break;
+    
+                case 'INPUT':
+                    p2Touch.joyX = data.joyX;
+                    p2Touch.joyY = data.joyY;
+                    break;
+    
+                case 'SKILL':
+                    if (p2) {
+                        if (data.skill === 'atk') castAtk(p2);
+                        else if (data.skill === 's1') castS1(p2);
+                        else if (data.skill === 's2') castS2(p2);
+                        else if (data.skill === 's3') castS3(p2);
+                        else if (data.skill === 'recover') castRecover(p2);
+                    }
+                    break;
+    
+                case 'DEATH':
+                    if (p2) p2.hp = 0;
+                    checkMatchEnd();
+                    break;
+            }
+        });
+    
+        connection.on('close', () => {
+            console.log("[P2P] Opponent disconnected.");
+        });
+    }
 
 function sendGameMove(moveData) {
     if (connection && connection.open) {
