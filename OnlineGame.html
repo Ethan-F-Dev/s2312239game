@@ -323,7 +323,6 @@
     }
 
     function bindPeerEvents() {
-        // Function to transmit initial player data
         const sendHandshake = () => {
             console.log("[P2P] Sending HANDSHAKE...");
             sendGameMove({ 
@@ -334,16 +333,12 @@
             });
         };
     
-        // If connection is already open, send immediately. Otherwise, wait for 'open'
         if (connection.open) {
             sendHandshake();
         } else {
-            connection.on('open', () => {
-                sendHandshake();
-            });
+            connection.on('open', () => sendHandshake());
         }
     
-        // Attach data listener
         connection.on('data', (data) => {
             console.log("[P2P Received]:", data);
     
@@ -353,7 +348,6 @@
                     if (data.charIdx !== undefined) p2CharIdx = Number(data.charIdx);
                     if (data.selChar) p2SelChar = data.selChar;
                     
-                    // Launch game only after receiving opponent's data
                     if (!gameRunning) {
                         startGame();
                     }
@@ -378,35 +372,51 @@
                     if (p2) p2.hp = 0;
                     checkMatchEnd();
                     break;
+    
+                case 'OFFLINE':
+                    handleOpponentOffline();
+                    break;
             }
         });
     
         connection.on('close', () => {
-            console.log("[P2P] Opponent disconnected.");
+            console.log("[P2P] Opponent connection closed.");
+            handleOpponentOffline();
         });
     }
-
-function sendGameMove(moveData) {
-    if (connection && connection.open) {
-        connection.send(moveData);
-    }
-}
-
-function sendDeath() {
-    sendGameMove({ type: 'DEATH' });
-}
 
     function sendGameMove(moveData) {
         if (connection && connection.open) {
             connection.send(moveData);
         }
     }
-
-    window.onbeforeunload = function() {
+    
+    function sendDeath() {
+        sendGameMove({ type: 'DEATH' });
+    }
+    
+    function sendOffline() {
+        sendGameMove({ type: 'OFFLINE' });
+    }
+    
+    function handleOpponentOffline() {
+        if (!gameRunning) return;
+        gameRunning = false;
+        if (p2) p2.hp = 0;
+        
+        const winnerText = document.getElementById('winner-text');
+        if (winnerText) winnerText.innerText = "Opponent Offline - Victory!";
+        
+        const gameOverUI = document.getElementById('game-over');
+        if (gameOverUI) gameOverUI.style.display = 'flex';
+    }
+    // Automatically send OFFLINE packet before tab closes or reloads
+    window.addEventListener('beforeunload', () => {
+        sendOffline();
         if (typeof google !== 'undefined' && google.script && google.script.run) {
             google.script.run.leaveRoom(playerName);
         }
-    };
+    });
 
     // ==========================================
     // CANVAS & GAME STATE
@@ -7254,22 +7264,30 @@ if (p.charIdx === 31) {
             startBtn.onclick = handleStart;
             startBtn.addEventListener('touchstart', handleStart);
         }
-
-        const handleRestart = (e) => {
-            if (e) e.preventDefault();
-            backToModeSelection();
-        };
-        
+        const backModesBtn = document.getElementById('back-modes-btn');
+        if (backModesBtn) {
+            const handleRestart = (e) => {
+                if (e) e.preventDefault();
+                backToModeSelection();
+            };
+            backModesBtn.onclick = handleRestart;
+            backModesBtn.addEventListener('touchstart', handleRestart);
+        }
         const restartBtn = document.getElementById('restart-btn');
-        if (restartBtn) {
+        if(restartBtn) {
+            const handleRestart = (e) => {
+                if (e) e.preventDefault();
+                backToModeSelection();
+            };
+
             restartBtn.onclick = handleRestart;
             restartBtn.addEventListener('touchstart', handleRestart);
         }
-        
-        const backModesBtn = document.getElementById('back-modes-btn');
-        if (backModesBtn) {
-            backModesBtn.onclick = handleRestart;
-            backModesBtn.addEventListener('touchstart', handleRestart);
+        const rechooseCharbtn = document.getElementById('rechooseChar-btn');
+        if(rechooseCharbtn) {
+        }
+        const playAgainbtn = document.getElementById('playAgain-btn');
+        if(playAgainbtn) {
         }
         window.addEventListener('resize', resize);
     };
