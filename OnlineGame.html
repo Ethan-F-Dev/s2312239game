@@ -136,7 +136,6 @@
     let myRole = null;
     let pollInterval = null;
     let isWaiting = false;
-
     // ==========================================
     // FRONTEND STATE CONTROLLERS
     // ==========================================
@@ -479,7 +478,176 @@
             sendGameMove({ type: 'INPUT', joyX: 0, joyY: 0 });
         });
     }
+    function setGameInterval(cb, d) { const id=setInterval(cb,d); gameIntervals.push(id); return id; }
+    function setGameTimeout(cb, d) { const id=setTimeout(cb,d); gameTimeouts.push(id); return id; }
+    function clearGameTimers() { gameIntervals.forEach(clearInterval); gameTimeouts.forEach(clearTimeout); gameIntervals=[]; gameTimeouts=[]; }
+    // --- Game Logic ---
+    function checkMatchEnd() {
+        if((p1.hp <= 0 || p2.hp <= 0) && !gameOver) {
+            if(currentGameMode === "normal" || (p1.hp <= 0 && p1PlayProgress === 3 )||(p2.hp <= 0 && p2PlayProgress === 3)){
+                playSkillSound(9998, 's1')
+                gameOver = true;
+                p1SelProgress = [1,2,3];
+                p2SelProgress = [1,2,3];
+                p1PlayProgress = 1
+                p2PlayProgress = 1
+                setGameTimeout(() => { 
+                    document.getElementById('winner-text').innerText = (p1.hp > 0 ? "玩家 1" : "玩家 2") + " 獲勝！"; 
+                    document.getElementById('game-over').style.display = 'flex'; 
+                }, 2000);
+            }else{
+                projectiles = []; particles = []; floatTexts = [];
+                if(p1.hp <= 0 ){
+                    let x = p1.x;
+                    let y = p1.y;
+                    p1PlayProgress += 1;
+                    p1 = new Player(1, p1SelChar[p1PlayProgress], width/2, height - 200); 
+                    p1.x = x
+                    p1.y = y
+                }else{
+                    let x = p2.x;
+                    let y = p2.y;
+                    p2PlayProgress += 1;
+                    p2 = new Player(2, p2SelChar[p2PlayProgress], width/2, 200);
+                    p2.x = x;
+                    p2.y = y;
+                }
+                p1.target = p2; p2.target = p1; gameRunning = true; gameOver = false;
+            }
+        }
+    }
+    
+    function startGame() {
+        if(currentGameMode === "sf" && (p1SelChar[3] === undefined || p2SelChar[3] === undefined)){return}
+        document.getElementById('menu').style.display = 'none';
+        clearGameTimers(); resize();
+        if(currentGameMode === "sf"){
+            p1CharIdx = p1SelChar[p1PlayProgress]
+            p2CharIdx = p2SelChar[p2PlayProgress]
+        }
+        p1 = new Player(1, p1CharIdx, width/2, height - 200); p2 = new Player(2, p2CharIdx, width/2, 200);
+        p1.target = p2; p2.target = p1; gameRunning = true; gameOver = false; timeScale = 1.0; shakeAmount = 0; deathFocus = null;
+        projectiles = []; particles = []; floatTexts = [];
+        if((currentGameMode === " normal" || (p1PlayProgress === 1 && p2PlayProgress === 1)) && !playAgain){requestAnimationFrame(gameLoop);}
+    }
+    function backToMenu() {
+        gameRunning = false; playAgain = false;clearGameTimers();
+        document.getElementById('game-over').style.display = 'none'; document.getElementById('menu').style.display = 'flex';
+        renderMenu(1); renderMenu(2);
+    }
+    function gameLoop() {
+        if(!gameRunning){return};
+        const dt = 16.6; p1.update(dt); p2.update(dt);
+        [p1, p2].forEach(p => {
+             const t = p.id === 1 ? p1Touch : p2Touch;
+             if(!p.isLock && !p.isDying) { p.x += t.joyX * p.speed * p.buffs.speed; p.y += t.joyY * p.speed * p.buffs.speed; }
+             
+             // Forced movements (Taunt / Suction)
+             if (!p.isUntouchable) {
+                 if(p.status.taunted > 0 && p.tauntTarget) { 
+                     let ang = Math.atan2(p.tauntTarget.y - p.y, p.tauntTarget.x - p.x); 
+                     p.x += Math.cos(ang) * p.speed * 0.5; p.y += Math.sin(ang) * p.speed * 0.5; 
+                 }
+                 if(p.target.charIdx === 1 && p.target.taiS1Active && dist(p, p.target) < 300) {
+                     p.x += (p.target.x - p.x) * 0.1; p.y += (p.target.y - p.y) * 0.3; // Suction 0.3
+                 }
+                 if(p.target?.charIdx === 12 && p.target?.skills?.s2?.active){}
+             }
+             
+             // Mars S3 Flight
+            if(p.charIdx === 11 && p.isMarsFlying) {
+                p.applyStatus("stunned", 500);
+                let distToTarget = dist(p, {x: p.ultTargetX, y: p.ultTargetY});
+                let step = 20 * timeScale;
+            
+                if(distToTarget > step) {
+                    let ang = Math.atan2(p.ultTargetY - p.y, p.ultTargetX - p.x);
+                    p.x += Math.cos(ang) * step; 
+                    p.y += Math.sin(ang) * step; 
+                    particles.push(new Particle(p.x, p.y, "red", "normal", "", 0.5)); 
+                } else {
+                    // --- 1. Snap to target position and unlock Mars IMMEDIATELY ---
+                    p.x = p.ultTargetX; 
+                    p.y = p.ultTargetY;
+                    p.isMarsFlying = false; 
+                    p.isCasting = false;        // Fixed: Unlocks movement & abilities
+                    p.isUntouchable = false;
+                    p.activeWarning = null;
+            
+                    // Visual effects & buff
+                    shakeAmount = 40; 
+                    for(let i = 0; i < 180; i++) particles.push(new Particle(p.x, p.y, "orange", "normal", "🔥", 3.0)); 
+                    p.marsBuffTimer = 5000; 
+            
+                    // --- 2. Calculate Damage & Check Achievement ---
+                    let dmg = 300 + (p.energyConsumed / 100) * 85;
+                    
+                    if(dist(p, p.target) < 250) { 
+                        p.target.takeDamage(dmg, 11); 
+                        p.target.applyStatus('stunned', 1000); 
+            
+                        // Trigger "天外來星" on full-energy kill
+                        if (p.energyConsumed >= 1000 && p.target.hp <= 0) {
+                            showAchievement("天外來星", "255, 69, 0", "#ffffff");
+                        }
+                    }
+                }
+            }
+             if(p.charIdx === 10 && p.activeWarning && p.activeWarning.type === 'circle') { p.activeWarning.x = p.x; p.activeWarning.y = p.y; }
+             
+             p.x = Math.max(p.radius, Math.min(width - p.radius, p.x)); p.y = Math.max(p.radius, Math.min(height - p.radius, p.y));
+        });
+        projectiles.forEach(p => p.update()); projectiles = projectiles.filter(p => p.life > 0);
+        particles.forEach(p => p.update()); particles = particles.filter(p => p.life > 0);
+        floatTexts.forEach(t => t.update()); floatTexts = floatTexts.filter(t => t.life > 0);
+        if(shakeAmount > 0) shakeAmount *= 0.85;
+        draw(); updateButtonCD(p1, "p1"); updateButtonCD(p2, "p2");
+        requestAnimationFrame(gameLoop);
+    }
+    function draw() {}
+    // --- Classes ---
+    class Particle {}
+    class Projectile {}
+    class FloatText {}
+    class Player {}
 
+
+
+// ------------------------------ 平A -----------------------------------------
+
+
+
+    function castAtk(p) {}
+
+
+
+// ------------------------------ 一技能 -----------------------------------------
+
+
+
+    function castS1(p) {}
+
+
+
+// ------------------------------ 二技能 -----------------------------------------
+
+
+
+    function castS2(p) {}
+
+
+
+// ------------------------------ 大技能 -----------------------------------------
+
+
+
+    function castS3(p) {}
+    function castRecover(p) { if(p.cd.recover > 0 || p.hp <= 0) return; playSkillSound(8888, "s1"); p.cd.recover = 45000; p.heal(p.maxHp * 0.05); }
+    // 1. 音效管理系統 (新增)
+    // ==========================================
+    const audioCache = {}; // 音效快取池
+    function playSkillSound(charId, skillName) {}
+    function drawImage(url, x, y, w, h, angle = null, flip = null){}
     // ==========================================
     // INITIALIZATION & EVENT BINDING
     // ==========================================
@@ -527,13 +695,12 @@
             restartBtn.onclick = handleRestart;
             restartBtn.addEventListener('touchstart', handleRestart);
         }
-
+        
         const backModesBtn = document.getElementById('back-modes-btn');
         if (backModesBtn) {
             backModesBtn.onclick = handleRestart;
             backModesBtn.addEventListener('touchstart', handleRestart);
         }
-
         window.addEventListener('resize', resize);
     };
 </script>
