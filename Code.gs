@@ -230,75 +230,95 @@ function signIn(email, password) {
 }
 
 // ----------------------------------------------------
-// PEERJS MATCHMAKING & SIGNALING SYSTEM (MODE SUPPORT)
+// PEERJS MATCHMAKING & SIGNALING SYSTEM
 // ----------------------------------------------------
 
 /**
- * 1. Register Player with PeerJS ID and Mode filtering
+ * Change Player Status ('choosing', 'waiting', 'wentOffLine')
  */
-function updatePlayerStatus(player, status, peerId, gameMode) {
+function setPlayerStatus(player, newStatus, gameMode, peerId) {
   try {
     const sheet = getSheet('Online players');
     const data = sheet.getDataRange().getValues();
     const cleanPlayer = player.trim();
     const activeMode = (gameMode || 'Standard').trim();
 
-    if (status === 'wentOffLine') {
-      for (let i = data.length - 1; i >= 1; i--) {
-        if (data[i][0].toString().toLowerCase() === cleanPlayer.toLowerCase()) {
-          sheet.deleteRow(i + 1);
-        }
+    // Locate existing row index for player
+    let rowIndex = -1;
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0].toString().toLowerCase() === cleanPlayer.toLowerCase()) {
+        rowIndex = i + 1;
+        break;
       }
-      return { success: true, status: 'offline' };
     }
 
-    if (status === 'wentOnline') {
-      for (let i = data.length - 1; i >= 1; i--) {
-        if (data[i][0].toString().toLowerCase() === cleanPlayer.toLowerCase()) {
-          sheet.deleteRow(i + 1);
-        }
+    // 1. STATUS: CHOOSING (Do not create or join rooms)
+    if (newStatus === 'choosing') {
+      if (rowIndex !== -1) {
+        sheet.getRange(rowIndex, 2).setValue(activeMode);
+        sheet.getRange(rowIndex, 3).setValue('choosing');
+        sheet.getRange(rowIndex, 4).setValue('');
+        sheet.getRange(rowIndex, 5).setValue('');
+      } else {
+        sheet.appendRow([cleanPlayer, activeMode, 'choosing', '', '']);
       }
+      return { success: true, status: 'choosing', mode: activeMode };
+    }
 
+    // 2. STATUS: WAITING (Enter Matchmaking Queue)
+    if (newStatus === 'waiting' || newStatus === 'wentOnline') {
       const currentData = sheet.getDataRange().getValues();
       let waitingP1RoomId = '';
 
-      // Check for a waiting P1 IN THE SAME GAME MODE
+      // Find available P1 in the same mode with 'waiting' status
       for (let i = 1; i < currentData.length; i++) {
+        const rowPlayer = currentData[i][0].toString();
         const rowMode = currentData[i][1].toString();
         const rowStatus = currentData[i][2].toString();
         const rowRole = currentData[i][3].toString();
 
-        if (rowMode.toLowerCase() === activeMode.toLowerCase() && rowStatus === 'waiting' && rowRole === 'P1') {
+        if (rowPlayer.toLowerCase() !== cleanPlayer.toLowerCase() &&
+            rowMode.toLowerCase() === activeMode.toLowerCase() &&
+            rowStatus === 'waiting' &&
+            rowRole === 'P1') {
           waitingP1RoomId = currentData[i][4].toString();
           break;
         }
       }
 
-      // If no P1 in this mode, create room as P1
-      if (!waitingP1RoomId) {
-        const roomId = peerId || ('ROOM_' + Date.now());
-        sheet.appendRow([cleanPlayer, activeMode, 'waiting', 'P1', roomId]);
-        return {
-          success: true,
-          role: 'P1',
-          status: 'waiting',
-          mode: activeMode,
-          roomId: roomId,
-          p1PeerId: roomId
-        };
-      } 
-      // If P1 in same mode exists, join as P2
-      else {
-        sheet.appendRow([cleanPlayer, activeMode, 'waiting', 'P2', waitingP1RoomId]);
-        return {
-          success: true,
-          role: 'P2',
-          status: 'waiting',
-          mode: activeMode,
-          roomId: waitingP1RoomId,
-          p1PeerId: waitingP1RoomId
-        };
+      let role = 'P1';
+      let roomId = peerId || ('ROOM_' + Date.now());
+
+      if (waitingP1RoomId) {
+        role = 'P2';
+        roomId = waitingP1RoomId;
       }
+
+      if (rowIndex !== -1) {
+        sheet.getRange(rowIndex, 2).setValue(activeMode);
+        sheet.getRange(rowIndex, 3).setValue('waiting');
+        sheet.getRange(rowIndex, 4).setValue(role);
+        sheet.getRange(rowIndex, 5).setValue(roomId);
+      } else {
+        sheet.appendRow([cleanPlayer, activeMode, 'waiting', role, roomId]);
+      }
+
+      return {
+        success: true,
+        role: role,
+        status: 'waiting',
+        mode: activeMode,
+        roomId: roomId,
+        p1PeerId: roomId
+      };
+    }
+
+    // 3. STATUS: OFFLINE
+    if (newStatus === 'wentOffLine') {
+      if (rowIndex !== -1) {
+        sheet.deleteRow(rowIndex);
+      }
+      return { success: true, status: 'offline' };
     }
 
     return { success: false, message: 'Invalid status parameter.' };
@@ -307,8 +327,13 @@ function updatePlayerStatus(player, status, peerId, gameMode) {
   }
 }
 
+// Wrapper alias to maintain backward compatibility
+function updatePlayerStatus(player, status, peerId, gameMode) {
+  return setPlayerStatus(player, status, gameMode, peerId);
+}
+
 /**
- * 2. Check Room Status
+ * Poll room state: Pair only when both players are in 'waiting' status
  */
 function checkRoomStatus(player) {
   try {
@@ -333,6 +358,11 @@ function checkRoomStatus(player) {
 
     if (!playerRow) return { status: 'offline' };
 
+    // Ignore matchmaking checks if player is still choosing
+    if (playerRow.status === 'choosing') {
+      return { status: 'choosing', mode: playerRow.mode };
+    }
+
     if (playerRow.status === 'playing') {
       let opponent = '';
       for (let i = 1; i < data.length; i++) {
@@ -353,21 +383,24 @@ function checkRoomStatus(player) {
 
     let p1Index = -1, p2Index = -1;
     let p1Name = '', p2Name = '';
+    let p1Status = '', p2Status = '';
 
     for (let i = 1; i < data.length; i++) {
-      if (data[i][4].toString() === playerRow.roomId) {
+      if (data[i][4].toString() === playerRow.roomId && playerRow.roomId !== '') {
         if (data[i][3].toString() === 'P1') {
           p1Index = i + 1;
           p1Name = data[i][0].toString();
+          p1Status = data[i][2].toString();
         } else if (data[i][3].toString() === 'P2') {
           p2Index = i + 1;
           p2Name = data[i][0].toString();
+          p2Status = data[i][2].toString();
         }
       }
     }
 
-    if (p1Index !== -1 && p2Index !== -1) {
-      // Update Column 3 (Status) to 'playing'
+    // Both players must exist AND be in 'waiting' status to start playing
+    if (p1Index !== -1 && p2Index !== -1 && p1Status === 'waiting' && p2Status === 'waiting') {
       sheet.getRange(p1Index, 3).setValue('playing');
       sheet.getRange(p2Index, 3).setValue('playing');
 
@@ -394,9 +427,6 @@ function checkRoomStatus(player) {
   }
 }
 
-/**
- * 3. Leave Room
- */
 function leaveRoom(player) {
   try {
     const sheet = getSheet('Online players');
@@ -415,9 +445,6 @@ function leaveRoom(player) {
   }
 }
 
-/**
- * 4. Get Online Lobby
- */
 function getOnlineLobby() {
   try {
     const sheet = getSheet('Online players');
