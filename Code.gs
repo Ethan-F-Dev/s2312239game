@@ -12,11 +12,11 @@ function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
-function getGameContent(playerName, mode) {
-  const templateName = (mode === 'Online') ? 'OnlineGame' : 'ClassicGame';
+function getGameContent(playerName, view) {
+  // 'view' determines which template to open, not the in-game mode
+  const templateName = (view === 'Online') ? 'OnlineGame' : 'ClassicGame';
   const template = HtmlService.createTemplateFromFile(templateName);
   template.playerName = playerName;
-  template.mode = mode;
   return template.evaluate().getContent();
 }
 
