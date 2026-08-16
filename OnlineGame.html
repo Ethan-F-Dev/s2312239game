@@ -322,10 +322,43 @@
         }
     }
 
+    // Retry state and deduplication tracking
+    const activeRetries = {};
+    const processedMsgs = new Set();
+    
+    function sendGameMove(moveData) {
+        if (connection && connection.open) {
+            connection.send(moveData);
+        }
+    }
+    
+    function sendReliableMove(moveData) {
+        if (!connection || !connection.open) return;
+    
+        // Assign a unique ID to require an ACK response
+        const msgId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+        moveData.msgId = msgId;
+    
+        connection.send(moveData);
+    
+        // Keep resending every 250ms until ACK clears the timer
+        const timer = setInterval(() => {
+            if (connection && connection.open && activeRetries[msgId]) {
+                console.log(`[P2P Retry] Resending ${moveData.type} (${msgId})...`);
+                connection.send(moveData);
+            } else {
+                clearInterval(timer);
+                delete activeRetries[msgId];
+            }
+        }, 250);
+    
+        activeRetries[msgId] = timer;
+    }
+    
     function bindPeerEvents() {
         const sendHandshake = () => {
-            console.log("[P2P] Sending HANDSHAKE...");
-            sendGameMove({ 
+            console.log("[P2P] Sending Reliable HANDSHAKE...");
+            sendReliableMove({ 
                 type: 'HANDSHAKE', 
                 player: playerName,
                 charIdx: p1CharIdx,
@@ -333,6 +366,7 @@
             });
         };
     
+        // Immediate send if already connected, otherwise wait for open event
         if (connection.open) {
             sendHandshake();
         } else {
@@ -342,67 +376,82 @@
         connection.on('data', (data) => {
             console.log("[P2P Received]:", data);
     
-            switch (data.type) {
-                case 'HANDSHAKE':
-                    p2Name = String(data.player);
-                    if (data.charIdx !== undefined) p2CharIdx = Number(data.charIdx);
-                    if (data.selChar) p2SelChar = data.selChar;
-                    
-                    if (!gameRunning) {
-                        startGame();
+            // 1. Process confirmation ACK from opponent
+            if (data.type === 'ACK' && data.ackId) {
+                if (activeRetries[data.ackId]) {
+                    clearInterval(activeRetries[data.ackId]);
+                    delete activeRetries[data.ackId];
+                    console.log(`[P2P Confirmed] Packet ${data.ackId} received.`);
+                }
+                return;
+            }
+    
+            // 2. Return ACK for reliable packets and drop late duplicate receives
+            if (data.msgId) {
+                sendGameMove({ type: 'ACK', ackId: data.msgId });
+                if (processedMsgs.has(data.msgId)) return;
+                processedMsgs.add(data.msgId);
+            }
+    
+            // 3. Process events
+            if (data.type === 'HANDSHAKE' || data.type === 'CHAR_SELECT') {
+                if (data.player !== undefined) p2Name = String(data.player);
+                if (data.charIdx !== undefined) p2CharIdx = Number(data.charIdx);
+    
+                if (data.selChar !== undefined) {
+                    const rawDict = typeof data.selChar === 'string' ? JSON.parse(data.selChar) : data.selChar;
+                    p2SelChar = {};
+                    for (let key in rawDict) {
+                        if (Object.prototype.hasOwnProperty.call(rawDict, key)) {
+                            p2SelChar[Number(key)] = Number(rawDict[key]);
+                        }
                     }
-                    break;
+                }
     
-                case 'INPUT':
-                    p2Touch.joyX = data.joyX;
-                    p2Touch.joyY = data.joyY;
-                    break;
-    
-                case 'SKILL':
-                    if (p2) {
-                        if (data.skill === 'atk') castAtk(p2);
-                        else if (data.skill === 's1') castS1(p2);
-                        else if (data.skill === 's2') castS2(p2);
-                        else if (data.skill === 's3') castS3(p2);
-                        else if (data.skill === 'recover') castRecover(p2);
-                    }
-                    break;
-    
-                case 'DEATH':
-                    if (p2) p2.hp = 0;
-                    checkMatchEnd();
-                    break;
-    
-                case 'OFFLINE':
-                    handleOpponentOffline();
-                    break;
+                if (data.type === 'HANDSHAKE' && !gameRunning) {
+                    startGame();
+                }
+            } 
+            else if (data.type === 'INPUT') {
+                p2Touch.joyX = data.joyX;
+                p2Touch.joyY = data.joyY;
+            } 
+            else if (data.type === 'SKILL') {
+                if (typeof p2 !== 'undefined' && p2) {
+                    if (data.skill === 'atk') castAtk(p2);
+                    else if (data.skill === 's1') castS1(p2);
+                    else if (data.skill === 's2') castS2(p2);
+                    else if (data.skill === 's3') castS3(p2);
+                    else if (data.skill === 'recover') castRecover(p2);
+                }
+            } 
+            else if (data.type === 'DEATH') {
+                if (typeof p2 !== 'undefined' && p2) p2.hp = 0;
+                checkMatchEnd();
+            } 
+            else if (data.type === 'OFFLINE') {
+                handleOpponentOffline();
             }
         });
     
         connection.on('close', () => {
-            console.log("[P2P] Opponent connection closed.");
+            console.log("[P2P] Connection closed.");
             handleOpponentOffline();
         });
     }
-
-    function sendGameMove(moveData) {
-        if (connection && connection.open) {
-            connection.send(moveData);
-        }
-    }
     
     function sendDeath() {
-        sendGameMove({ type: 'DEATH' });
+        sendReliableMove({ type: 'DEATH' });
     }
     
     function sendOffline() {
-        sendGameMove({ type: 'OFFLINE' });
+        sendReliableMove({ type: 'OFFLINE' });
     }
     
     function handleOpponentOffline() {
         if (!gameRunning) return;
         gameRunning = false;
-        if (p2) p2.hp = 0;
+        if (typeof p2 !== 'undefined' && p2) p2.hp = 0;
         
         const winnerText = document.getElementById('winner-text');
         if (winnerText) winnerText.innerText = "Opponent Offline - Victory!";
@@ -410,14 +459,13 @@
         const gameOverUI = document.getElementById('game-over');
         if (gameOverUI) gameOverUI.style.display = 'flex';
     }
-    // Automatically send OFFLINE packet before tab closes or reloads
+    
     window.addEventListener('beforeunload', () => {
         sendOffline();
         if (typeof google !== 'undefined' && google.script && google.script.run) {
             google.script.run.leaveRoom(playerName);
         }
     });
-
     // ==========================================
     // CANVAS & GAME STATE
     // ==========================================
