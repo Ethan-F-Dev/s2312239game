@@ -322,29 +322,64 @@
         }
     }
 
-    function bindPeerEvents() {
-        connection.on('open', () => {
-            console.log("[P2P] WebRTC connection established with opponent.");
-            sendGameMove({ type: 'HANDSHAKE', player: playerName });
+function bindPeerEvents() {
+    connection.on('open', () => {
+        console.log("[P2P] Connected.");
+        sendGameMove({ 
+            type: 'HANDSHAKE', 
+            player: playerName,
+            charIdx: p1CharIdx,
+            selChar: p1SelChar
         });
+    });
 
-        connection.on('data', (data) => {
-            console.log("[P2P Received]:", data);
-            if (data.type === 'INPUT') {
-                if (myRole === 'P1') {
-                    p2Touch.joyX = data.joyX;
-                    p2Touch.joyY = data.joyY;
-                } else {
-                    p1Touch.joyX = data.joyX;
-                    p1Touch.joyY = data.joyY;
+    connection.on('data', (data) => {
+        console.log("[P2P Received]:", data);
+
+        switch (data.type) {
+            case 'HANDSHAKE':
+                p2Name = String(data.player);
+                if (data.charIdx !== undefined) p2CharIdx = Number(data.charIdx);
+                if (data.selChar) p2SelChar = data.selChar;
+                startGame();
+                break;
+
+            case 'INPUT':
+                p2Touch.joyX = data.joyX;
+                p2Touch.joyY = data.joyY;
+                break;
+
+            case 'SKILL':
+                if (p2) {
+                    if (data.skill === 'atk') castAtk(p2);
+                    else if (data.skill === 's1') castS1(p2);
+                    else if (data.skill === 's2') castS2(p2);
+                    else if (data.skill === 's3') castS3(p2);
+                    else if (data.skill === 'recover') castRecover(p2);
                 }
-            }
-        });
+                break;
 
-        connection.on('close', () => {
-            console.log("[P2P] Opponent disconnected.");
-        });
+            case 'DEATH':
+                if (p2) p2.hp = 0;
+                checkMatchEnd();
+                break;
+        }
+    });
+
+    connection.on('close', () => {
+        console.log("[P2P] Opponent disconnected.");
+    });
+}
+
+function sendGameMove(moveData) {
+    if (connection && connection.open) {
+        connection.send(moveData);
     }
+}
+
+function sendDeath() {
+    sendGameMove({ type: 'DEATH' });
+}
 
     function sendGameMove(moveData) {
         if (connection && connection.open) {
