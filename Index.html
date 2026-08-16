@@ -158,13 +158,13 @@
   <script>
     let authenticatedPlayer = null;
 
-    function loadGameView(playerName, mode) {
+    function loadGameView(playerName, viewName) {
       const modal = document.getElementById('login-modal');
       if (modal) modal.style.display = 'none';
 
       document.body.innerHTML = `
         <div style="display:flex; justify-content:center; align-items:center; height:100vh; background:#08090d; color:#00f0ff; font-family:sans-serif;">
-          <h2>LOADING ARENA (${mode.toUpperCase()})...</h2>
+          <h2>LOADING ARENA (${viewName.toUpperCase()})...</h2>
         </div>`;
 
       google.script.run
@@ -173,10 +173,9 @@
           document.write(html);
           document.close();
         })
-        .getGameContent(playerName, mode);
+        .getGameContent(playerName, viewName);
     }
 
-    // Classic mode immediately loads ClassicGame.html directly with no login required
     function launchClassicMode() {
       loadGameView('Guest', 'Classic');
     }
@@ -196,7 +195,6 @@
       document.getElementById('login-modal').style.display = 'none';
     }
 
-    // Check if the user's active Google Account is already registered in the sheet
     function checkCurrentGoogleAccount() {
       const badgeLabel = document.getElementById('p-label');
       google.script.run
