@@ -127,6 +127,9 @@
 <canvas id="gameCanvas"></canvas>
 
 <script>
+    //---------------------- Peer JS communciation-----------------------
+    
+    
     // Global Session Variables
     const playerName = "<?= playerName ?>";
     let currentSelectedMode = null; 
@@ -466,9 +469,9 @@
             google.script.run.leaveRoom(playerName);
         }
     });
-    // ==========================================
-    // CANVAS & GAME STATE
-    // ==========================================
+//------------------------------Game UI----------------------------
+
+
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     
@@ -548,96 +551,92 @@
 
 
     ]);
-    function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+
     function resize() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
-    function setGameInterval(cb, d) { const id=setInterval(cb,d); gameIntervals.push(id); return id; }
-    function setGameTimeout(cb, d) { const id=setTimeout(cb,d); gameTimeouts.push(id); return id; }
-    function clearGameTimers() { gameIntervals.forEach(clearInterval); gameTimeouts.forEach(clearTimeout); gameIntervals=[]; gameTimeouts=[]; }
     function updateMenuTitle() {
         const titleEl = document.getElementById('char-select-title');
         if (titleEl) {
             titleEl.innerText = currentSelectedMode === 'sf' ? 'Choose Three Characters' : 'Choose a Character';
         }
     }
-
-function renderMenu(pid) {
-    const container = document.getElementById(pid === 1 ? 'p1-char-container' : 'p2-char-container');
-    const pIdx = pid === 1 ? p1Page : p2Page;
-    const sel = pid === 1 ? p1CharIdx : p2CharIdx;
-    const selDict = pid === 1 ? p1SelChar : p2SelChar;
-    container.innerHTML = '';
-
-    const start = pIdx * PAGE_SIZE;
-    const end = Math.min(start + PAGE_SIZE, CHAR_DATA.length);
-
-    // Loop through the full PAGE_SIZE capacity to maintain consistent UI grid slots
-    for (let i = start; i < start + PAGE_SIZE; i++) {
-        if (i < end) {
-            let name = "char-btn";
-            let charSelected = Object.values(selDict).includes(i);
-            let charChoosenOrder = Object.keys(selDict).find(key => selDict[key] === i);
-
-            if (currentGameMode === "sf") {
-                if (charSelected) {
-                    name += " selected" + String(charChoosenOrder);
+    function renderMenu(pid) {
+        const container = document.getElementById(pid === 1 ? 'p1-char-container' : 'p2-char-container');
+        const pIdx = pid === 1 ? p1Page : p2Page;
+        const sel = pid === 1 ? p1CharIdx : p2CharIdx;
+        const selDict = pid === 1 ? p1SelChar : p2SelChar;
+        container.innerHTML = '';
+    
+        const start = pIdx * PAGE_SIZE;
+        const end = Math.min(start + PAGE_SIZE, CHAR_DATA.length);
+    
+        // Loop through the full PAGE_SIZE capacity to maintain consistent UI grid slots
+        for (let i = start; i < start + PAGE_SIZE; i++) {
+            if (i < end) {
+                let name = "char-btn";
+                let charSelected = Object.values(selDict).includes(i);
+                let charChoosenOrder = Object.keys(selDict).find(key => selDict[key] === i);
+    
+                if (currentGameMode === "sf") {
+                    if (charSelected) {
+                        name += " selected" + String(charChoosenOrder);
+                    }
+                } else {
+                    if (i === sel) {
+                        name += " selected";
+                    }
                 }
-            } else {
-                if (i === sel) {
-                    name += " selected";
+    
+                const btn = document.createElement('div'); 
+                btn.className = name;
+                btn.innerHTML = CHAR_DATA[i].name;
+    
+                if (!charSelected) {
+                    btn.onclick = () => selectChar(pid === 1 ? 0 : 1, i);
+                } else {
+                    btn.onclick = () => selectChar(pid === 1 ? 0 : 1, i, true, charChoosenOrder);
                 }
-            }
-
-            const btn = document.createElement('div'); 
-            btn.className = name;
-            btn.innerHTML = CHAR_DATA[i].name;
-
-            if (!charSelected) {
-                btn.onclick = () => selectChar(pid === 1 ? 0 : 1, i);
+                container.appendChild(btn);
             } else {
-                btn.onclick = () => selectChar(pid === 1 ? 0 : 1, i, true, charChoosenOrder);
+                // Create invisible placeholder elements for missing slots on incomplete pages
+                const placeholder = document.createElement('div');
+                placeholder.className = 'char-btn placeholder';
+                placeholder.style.visibility = 'hidden';
+                container.appendChild(placeholder);
             }
-            container.appendChild(btn);
-        } else {
-            // Create invisible placeholder elements for missing slots on incomplete pages
-            const placeholder = document.createElement('div');
-            placeholder.className = 'char-btn placeholder';
-            placeholder.style.visibility = 'hidden';
-            container.appendChild(placeholder);
         }
+    
+        // Prev Page Button
+        const pb = document.createElement('div'); 
+        pb.className = 'prev-page-btn'; 
+        pb.innerHTML = '◀';
+        pb.onclick = (e) => { 
+            e.stopPropagation(); 
+            if (pid === 1) { 
+                p1Page = p1Page - 1 >= 0 ? p1Page - 1 : Math.floor((CHAR_DATA.length - 1) / PAGE_SIZE); 
+                renderMenu(1); 
+            } else { 
+                p2Page = p2Page - 1 >= 0 ? p2Page - 1 : Math.floor((CHAR_DATA.length - 1) / PAGE_SIZE); 
+                renderMenu(2); 
+            } 
+        };
+        container.appendChild(pb);
+    
+        // Next Page Button
+        const nb = document.createElement('div'); 
+        nb.className = 'next-page-btn'; 
+        nb.innerHTML = '▶';
+        nb.onclick = (e) => { 
+            e.stopPropagation(); 
+            if (pid === 1) { 
+                p1Page = (p1Page + 1) * PAGE_SIZE < CHAR_DATA.length ? p1Page + 1 : 0; 
+                renderMenu(1); 
+            } else { 
+                p2Page = (p2Page + 1) * PAGE_SIZE < CHAR_DATA.length ? p2Page + 1 : 0; 
+                renderMenu(2); 
+            } 
+        };
+        container.appendChild(nb);
     }
-
-    // Prev Page Button
-    const pb = document.createElement('div'); 
-    pb.className = 'prev-page-btn'; 
-    pb.innerHTML = '◀';
-    pb.onclick = (e) => { 
-        e.stopPropagation(); 
-        if (pid === 1) { 
-            p1Page = p1Page - 1 >= 0 ? p1Page - 1 : Math.floor((CHAR_DATA.length - 1) / PAGE_SIZE); 
-            renderMenu(1); 
-        } else { 
-            p2Page = p2Page - 1 >= 0 ? p2Page - 1 : Math.floor((CHAR_DATA.length - 1) / PAGE_SIZE); 
-            renderMenu(2); 
-        } 
-    };
-    container.appendChild(pb);
-
-    // Next Page Button
-    const nb = document.createElement('div'); 
-    nb.className = 'next-page-btn'; 
-    nb.innerHTML = '▶';
-    nb.onclick = (e) => { 
-        e.stopPropagation(); 
-        if (pid === 1) { 
-            p1Page = (p1Page + 1) * PAGE_SIZE < CHAR_DATA.length ? p1Page + 1 : 0; 
-            renderMenu(1); 
-        } else { 
-            p2Page = (p2Page + 1) * PAGE_SIZE < CHAR_DATA.length ? p2Page + 1 : 0; 
-            renderMenu(2); 
-        } 
-    };
-    container.appendChild(nb);
-}
 
     function selectChar(pIdx, charIdx, choosed = false, order = null) {
         if (isWaiting) return;
@@ -668,7 +667,119 @@ function renderMenu(pid) {
         document.getElementById('game-over').style.display = 'none';
         updateMenuTitle();
     }
-
+    /**
+     * Triggers an achievement banner overlay mid-game, centered on screen.
+     * @param {string} text - The achievement text to display.
+     * @param {string} [bannerRGB="255, 215, 0"] - RGB values for banner (e.g., "255, 0, 0" for Red, "0, 200, 255" for Cyan).
+     * @param {string} [textColor="#ffffff"] - Hex or CSS color for text (e.g., "#fff", "#ffff00").
+     */
+    function showAchievement(text, bannerRGB = "255, 215, 0", textColor = "#ffffff") {
+        if(currentGameMode === "normal"){return}
+        const uiLayer = document.getElementById('ui-layer');
+        if (!uiLayer) return;
+        if (uiLayer.dataset.achievementPlaying === "true") return;
+        let overlay = uiLayer.querySelector('.achievement-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.className = 'achievement-overlay';
+            const topBanner = document.createElement('div');
+            topBanner.className = 'achievement-banner p2';
+            const bottomBanner = document.createElement('div');
+            bottomBanner.className = 'achievement-banner p1';
+            overlay.appendChild(topBanner);
+            overlay.appendChild(bottomBanner);
+            uiLayer.appendChild(overlay);
+        }
+        const topBanner = overlay.querySelector('.achievement-banner.p2');
+        const bottomBanner = overlay.querySelector('.achievement-banner.p1');
+        uiLayer.dataset.achievementPlaying = "true";
+        [topBanner, bottomBanner].forEach(banner => {
+            banner.style.setProperty('--banner-color', bannerRGB);
+            banner.style.setProperty('--text-color', textColor);
+            banner.textContent = text;
+        });
+        setTimeout(() => {
+            topBanner.classList.add('show');
+            bottomBanner.classList.add('show');
+        }, 20);
+        setTimeout(() => {
+            topBanner.classList.remove('show');
+            bottomBanner.classList.remove('show');
+            uiLayer.dataset.achievementPlaying = "false";
+        }, 1500);
+    }
+//------------------------------Game Logic----------------------------//
+    function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+    function setGameInterval(cb, d) { const id=setInterval(cb,d); gameIntervals.push(id); return id; }
+    function setGameTimeout(cb, d) { const id=setTimeout(cb,d); gameTimeouts.push(id); return id; }
+    function clearGameTimers() { gameIntervals.forEach(clearInterval); gameTimeouts.forEach(clearTimeout); gameIntervals=[]; gameTimeouts=[]; }
+    function updateButtonCD(p, prefix) {
+        ['s1', 's2', 's3', 'recover', 'atk'].forEach(k => {
+            const el = document.getElementById(`${prefix}-btn-${k}`); if(!el) return;
+            const txt = el.querySelector('.cd-text');
+            
+            let disabled = p.status.stunned > 0 || p.status.taunted > 0 || p.status.frozen > 0 || p.status.bound > 0 || (p.status.disarmed > 0 && k !== 'recover' && k !== 'atk') || (p.status.losegrip > 0 && k !== 'recover' && k !== 's1' && k !== 's2'  && k !== 's3');
+            if (p.isCasting) {
+                if (p.charIdx === 1 && p.taiS1Active && k === 'atk') disabled = false;
+                else disabled = true;
+            }
+            if(p.charIdx === 3 && k === 's3' && (p.status.stunned > 0 || p.isLock)) disabled = true; 
+            if(p.charIdx === 11 && k === 's3' && p.energy < 500) { disabled = true; txt.innerText = "❌"; }
+            if(p.charIdx === 17 && k === 's3' && p.cd.s1 < 1 && p.cd.s2 < 1 && p.hp > 1440) { disabled = true; txt.innerText = "❌"; }
+            if(p.charIdx === 27 && k === 'atk' && p.hp < 1000) disabled = true; // 康絲特斯血量低於1000無法普攻
+            
+            if (disabled) el.classList.add('disabled'); else el.classList.remove('disabled');
+            if(p.cd[k] > 0) { txt.innerText = Math.ceil(p.cd[k]/1000); el.style.opacity = "0.4"; }
+            else { txt.innerText = k==='recover'?'復':(k==='s3'?'終':(k==='atk'?'攻':k.slice(1))); el.style.opacity = "1"; }
+        });
+    }
+    function bindButtons() {
+        const setupJoy = (id, joyId, stickId, touchObj) => {
+            const joy = document.getElementById(joyId), stick = document.getElementById(stickId);
+            const move = (e) => {
+                const t = e.targetTouches[0], rect = joy.getBoundingClientRect();
+                let dx = t.clientX - (rect.left + rect.width/2), dy = t.clientY - (rect.top + rect.height/2);
+                const dist = Math.min(55, Math.hypot(dx, dy)), angle = Math.atan2(id === 2 ? -dy : dy, id === 2 ? -dx : dx);
+                stick.style.transform = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px)`;
+                const la = Math.atan2(dy, dx); touchObj.joyX = Math.cos(la)*(dist/55); touchObj.joyY = Math.sin(la)*(dist/55);
+            };
+            joy.addEventListener('touchstart', (e) => { e.preventDefault(); move(e); });
+            joy.addEventListener('touchmove', (e) => { e.preventDefault(); move(e); });
+            joy.addEventListener('touchend', () => { stick.style.transform = `translate(0,0)`; touchObj.joyX = 0; touchObj.joyY = 0; });
+        };
+        const setupBtn = (id, type) => {
+             const btn = document.getElementById(`p${id}-btn-${type}`); if(!btn) return;
+             btn.addEventListener('touchstart', (e) => { 
+                 e.preventDefault(); 
+                 const p = (id === 1) ? p1 : p2; 
+                 if (!p) return; 
+                 if(p.isCasting && !(p.charIdx === 1 && p.taiS1Active && type === 'atk')) return;
+                 if(type === 'atk'){
+                     astAtk(p);
+                     sendGameMove({ type: 'SKILL', skill: 'atk' });
+                     
+                 }
+                 else if(type === 's1'){
+                     castS1(p);
+                     sendGameMove({ type: 'SKILL', skill: 's1' });
+                 }
+                 else if(type === 's2'){
+                     castS2(p);
+                     sendGameMove({ type: 'SKILL', skill: 's2' });
+                 }
+                 else if(type === 's3'){
+                     castS3(p); 
+                     sendGameMove({ type: 'SKILL', skill: 's3' });
+                 }
+                 else if(type === 'recover'){
+                     castRecover(p);
+                     sendGameMove({ type: 'SKILL', skill: 'recover' });
+                 }
+             });
+        };
+        setupJoy(1, "p1-joy", "p1-stick", p1Touch); setupJoy(2, "p2-joy", "p2-stick", p2Touch);
+        ['atk', 's1', 's2', 's3', 'recover'].forEach(t => { setupBtn(1, t); setupBtn(2, t); });
+    }
     function setupJoy(joyId, stickId, touchObj) {
         const joy = document.getElementById(joyId), stick = document.getElementById(stickId);
         if (!joy || !stick) return;
@@ -691,7 +802,6 @@ function renderMenu(pid) {
             sendGameMove({ type: 'INPUT', joyX: 0, joyY: 0 });
         });
     }
-    // --- Game Logic ---
     function checkMatchEnd() {
         if((p1.hp <= 0 || p2.hp <= 0) && !gameOver) {
             if(currentGameMode === "normal" || (p1.hp <= 0 && p1PlayProgress === 3 )||(p2.hp <= 0 && p2PlayProgress === 3)){
