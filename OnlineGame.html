@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="media-src * data: blob:;">
+    <title>巔峰對決 - 浪潮者</title>
+    <!-- PeerJS Library CDN -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        :root { --p1-ui: #3498db; --p2-ui: #e74c3c; --font-main: 'Noto Sans TC', sans-serif; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; user-select: none; 
+            -webkit-user-select: none; touch-action: none; font-family: var(--font-main); }
+        canvas { display: block; }
+        
+        #game-mode { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; gap: 24px; z-index: 20000; pointer-events: auto; backdrop-filter: blur(4px); }
+        .mode-btn { width: 320px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            background: #1e1e1e; border: 2px solid #444; color: #ffffff; border-radius: 12px; font-size: 20px; font-weight: 800; 
+            letter-spacing: 1.5px; cursor: pointer; user-select: none; transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); position: relative; }
+        .mode-btn:hover { background: #2a2a2a; border-color: #888; transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7); }
+        .mode-btn:active { transform: translateY(1px) scale(0.98); }
+        .mode-btn.selected { border-color: #ffd700; background: rgba(255, 215, 0, 0.15); color: #ffd700; 
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.35), inset 0 0 15px rgba(255, 215, 0, 0.15); text-shadow: 0 0 8px rgba(255, 215, 0, 0.6); }
+        .mode-title-desc { font-size: 11px; color: #aaa; margin-top: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; transition: color 0.25s ease; }
+        
+        #ui-layer { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
+        .achievement-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; z-index: 100; overflow: hidden; }
+        .achievement-banner { width: 100%; height: 60px; margin-top: 10px; --banner-color: 255, 215, 0; --text-color: #ffffff; 
+            background: linear-gradient(90deg, rgba(var(--banner-color), 0) 0%, rgba(var(--banner-color), 0.1) 15%, rgba(var(--banner-color), 0.5) 50%, 
+            rgba(var(--banner-color), 0.1) 85%, rgba(var(--banner-color), 0) 100%);
+            border-top: 3px solid rgba(var(--banner-color), 0.6); 
+            border-bottom: 3px solid rgba(var(--banner-color), 0.6); 
+            box-shadow: 0 0 25px rgba(var(--banner-color), 0.4), inset 0 0 15px rgba(var(--banner-color), 0.3); backdrop-filter: blur(6px);
+            display: flex; align-items: center; justify-content: center; color: var(--text-color); font-family: 'Impact', 'Noto Sans TC', sans-serif; font-size: 24px; font-weight: 900;
+            letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 5px rgba(255, 255, 255, 0.8), 0 0 12px rgba(var(--banner-color), 1), 
+            2px 2px 4px rgba(0, 0, 0, 0.9); clip-path: inset(0 100% 0 0); opacity: 0; transition: clip-path 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease; }
+        .achievement-banner.p2 { transform: rotate(180deg); }
+        .achievement-banner.show { opacity: 1; clip-path: inset(0 0% 0 0); }
+        
+        #menu { position: absolute; inset: 0; background: radial-gradient(circle, #222, #000); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; pointer-events: auto; }
+        #char-select-title { color: #ffd700; font-size: 22px; font-weight: bold; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+        .split-half { width: 100%; max-width: 600px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; justify-items: center; align-content: center; padding: 20px; position: relative; }
+        
+        .p2-menu { display: none !important; }
+        .p2-ui { display: none !important; }
+
+        .char-btn { width: 100%; height: 70px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border: 2px solid #555; color: #eee; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; user-select: none; transition: 0.1s; position: relative; }
+        .char-btn:active { transform: scale(0.95); }
+        .char-btn.selected { border-color: gold; background: rgba(255,215,0,0.25); box-shadow: 0 0 15px gold; }
+        .char-btn.disabled { border-color: #555; background: rgba(50,50,50,0.8); }
+        .char-btn.disabled .cd-text { color: #888; display: none; }
+        .char-btn.disabled::after { content: '❌'; font-size: 60px; position: absolute; } 
+        .char-btn.selected1 { border-color: red; background: rgba(184, 15, 10, 0.25); box-shadow: 0 0 15px rgba(255, 0, 0, 0.8); }
+        .char-btn.selected1::after { content: '1️⃣'; font-size: 50px; position: absolute; } 
+        .char-btn.selected2 { border-color: yellow; background: rgba(255, 215, 0, 0.25); box-shadow: 0 0 15px rgba(255, 215, 0, 0.8); }
+        .char-btn.selected2::after { content: '2️⃣'; font-size: 50px; position: absolute; } 
+        .char-btn.selected3 { border-color: blue; background: rgba(0, 0, 255, 0.25); box-shadow: 0 0 15px rgba(0, 0, 255, 0.8); }
+        .char-btn.selected3::after { content: '3️⃣'; font-size: 50px; position: absolute; } 
+        
+        .next-page-btn { position: absolute; bottom: 10px; right: 10px; width: 40px; height: 40px; background: #444; border: 2px solid #777; color: white; border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto; z-index: 10000; }
+        .next-page-btn:active { background: #666; }
+        .prev-page-btn { position: absolute; bottom: 10px; left: 10px; width: 40px; height: 40px; background: #444; border: 2px solid #777; color: white; border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto; z-index: 10000; }
+        .prev-page-btn:active { background: #666; }
+        
+        .menu-btn-container { display: flex; gap: 20px; align-items: center; margin-top: 20px; z-index: 10000; }
+        #start-btn { width: 90px; height: 90px; border-radius: 50%; background: #e74c3c; border: 5px solid #fff; color: white; font-weight: bold; font-size: 22px; cursor: pointer; transition: all 0.3s ease; }
+        #start-btn.waiting { background: #8e44ad; font-size: 18px; }
+        #back-modes-btn { width: 90px; height: 90px; border-radius: 50%; background: #3498db; border: 5px solid #fff; color: white; font-weight: bold; font-size: 15px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.2; }
+        #back-modes-btn:active { transform: scale(0.95); }
+        
+        .controls-container { position: absolute; width: 320px; height: 320px; pointer-events: none; }
+        #p1-controls { bottom: 20px; right: 20px; }
+        
+        .game-btn { position: absolute; border-radius: 50%; background: rgba(0,0,0,0.7); border: 3px solid rgba(255,255,255,0.4); color: white; display: flex; align-items: center; justify-content: center; pointer-events: auto; touch-action: manipulation; transition: 0.1s; cursor: pointer; }
+        .game-btn:active { transform: scale(0.9); }
+        .game-btn.special-active { border-color: #ff0000; box-shadow: 0 0 15px #ff0000; }
+        .game-btn.disabled { border-color: #555; background: rgba(50,50,50,0.8); }
+        .game-btn.disabled .cd-text { color: #888; display: none; }
+        .game-btn.disabled::after { content: '❌'; font-size: 30px; position: absolute; }
+        .cd-text { font-weight: bold; font-size: 20px; color: #ffeb3b; }
+        .btn-atk { width: 120px; height: 120px; bottom: 0; right: 0; background: rgba(180,20,20,0.4); }
+        .btn-s1 { width: 85px; height: 85px; bottom: 15px; right: 135px; }
+        .btn-s2 { width: 85px; height: 85px; bottom: 110px; right: 110px; }
+        .btn-s3 { width: 95px; height: 95px; bottom: 150px; right: 15px; border-color: gold; }
+        .btn-rec { width: 65px; height: 65px; bottom: 15px; right: 240px; border-color: #2ecc71; }
+        .joystick { position: absolute; width: 140px; height: 140px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; pointer-events: auto; bottom: 50px; left: 50px; }
+        .stick { position: absolute; width: 60px; height: 60px; background: rgba(255,255,255,0.3); border-radius: 50%; left: 40px; top: 40px; }
+        
+        #game-over { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: none; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 10001; pointer-events: auto; }
+        .btn-container { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .btn { padding: 12px 24px; font-size: 16px; font-weight: 600; border-radius: 10px; border: none; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); outline: none; user-select: none; }
+        .btn-secondary { background-color: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
+        .btn-secondary:hover { background-color: #e5e7eb; color: #111827; transform: translateY(-2px); }
+        .btn-secondary:active { transform: translateY(0); }
+        .btn-primary { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #ffffff; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35); }
+        .btn-primary:hover { background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); box-shadow: 0 6px 16px rgba(79, 70, 229, 0.45); transform: translateY(-2px); }
+        .btn-primary:active { transform: translateY(0); box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3); }
+    </style>
+</head>
+<body>
+
+<div id="game-mode">
+    <button class="mode-btn" id="btn-mode-normal">
+        NORMAL MODE
+        <span class="mode-title-desc">Single Round Duel</span>
+    </button>
+    <button class="mode-btn" id="btn-mode-sf">
+        STREET FIGHTER MODE
+        <span class="mode-title-desc">3 Rounds consecutive</span>
+    </button>
+</div>
+
+<div id="menu">
+    <div id="char-select-title">choose a character</div>
+    <div class="split-half p2-menu" id="p2-char-container"></div>
+    <div class="split-half p1-menu" id="p1-char-container"></div>
+    <div class="menu-btn-container">
+        <button id="back-modes-btn">模式</button>
+        <button id="start-btn">VS</button>
+    </div>
+</div>
+
+<div id="ui-layer">
+    <div class="joystick" id="p1-joy"><div class="stick" id="p1-stick"></div></div>
+    <div class="controls-container" id="p1-controls">
+        <div class="game-btn btn-rec" id="p1-btn-recover"><span class="cd-text">復</span></div>
+        <div class="game-btn btn-s1" id="p1-btn-s1"><span class="cd-text">1</span></div>
+        <div class="game-btn btn-s2" id="p1-btn-s2"><span class="cd-text">2</span></div>
+        <div class="game-btn btn-s3" id="p1-btn-s3"><span class="cd-text">終</span></div>
+        <div class="game-btn btn-atk" id="p1-btn-atk"><span class="cd-text">攻</span></div>
+    </div>
+    <div class="p2-ui">
+        <div class="joystick" id="p2-joy"><div class="stick" id="p2-stick"></div></div>
+        <div class="controls-container" id="p2-controls">
+            <div class="game-btn btn-rec" id="p2-btn-recover"><span class="cd-text">復</span></div>
+            <div class="game-btn btn-s1" id="p2-btn-s1"><span class="cd-text">1</span></div>
+            <div class="game-btn btn-s2" id="p2-btn-s2"><span class="cd-text">2</span></div>
+            <div class="game-btn btn-s3" id="p2-btn-s3"><span class="cd-text">終</span></div>
+            <div class="game-btn btn-atk" id="p2-btn-atk"><span class="cd-text">攻</span></div>
+        </div>
+    </div>
+</div>
+
+<div id="game-over">
+    <h2 id="winner-text"></h2>
+    <div class="btn-container">
+        <button id="restart-btn" class="btn btn-secondary">重新選擇模式</button>
+        <button id="rechooseChar-btn" class="btn btn-secondary">重新選擇角色</button>
+        <button id="playAgain-btn" class="btn btn-primary">再來一局</button>
+    </div>
+</div>
+
+<canvas id="gameCanvas"></canvas>
+
+<script>
+(function() {
+    "use strict";
+
+    // ==========================================
+    // 1. GLOBAL STATE & NETWORKING CONFIG
+    // ==========================================
+    const playerName = "<?= playerName ?>";
+    let selectedMode = null;
+    let peer = null;
+    let connection = null;
+    let myPeerId = null;
+    let myRole = null;
+    let pollTimer = null;
+    let isWaiting = false;
+
+    // ==========================================
+    // 2. STATE TRANSITION ACTIONS
+    // ==========================================
+
+    // Action 1: Select / Change Mode
+    function selectGameMode(modeName) {
+        selectedMode = modeName;
+        currentGameMode = modeName;
+        updateMenuTitle();
+        renderMenu(1);
+        renderMenu(2);
+
+        const gameModeOverlay = document.getElementById('game-mode');
+        if (gameModeOverlay) {
+            gameModeOverlay.style.opacity = "0";
+            gameModeOverlay.style.visibility = "hidden";
+            setTimeout(() => { gameModeOverlay.style.display = "none"; }, 400); 
+        }
+
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+            google.script.run
+                .withSuccessHandler(res => {
+                    console.log(`Mode set to: ${res.mode}. Player is in 'choosing' state.`);
+                })
+                .setPlayerStatus(playerName, 'choosing', selectedMode);
+        }
+    }
+
+    // Action 2: Back to Mode Selection
+    function backToModeSelection() {
+        stopPolling();
+        closePeer();
+        selectedMode = null;
+        isWaiting = false;
+
+        p1SelChar = {}; p2SelChar = {};
+        const startBtn = document.getElementById('start-btn');
+        if (startBtn) {
+            startBtn.innerText = "VS";
+            startBtn.classList.remove('waiting');
+        }
+
+        const gameModeOverlay = document.getElementById('game-mode');
+        if (gameModeOverlay) {
+            gameModeOverlay.style.display = "flex";
+            setTimeout(() => {
+                gameModeOverlay.style.opacity = "1";
+                gameModeOverlay.style.visibility = "visible";
+            }, 10);
+        }
+
+        backToMenu();
+
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+            google.script.run
+                .withSuccessHandler(res => {
+                    console.log("Reset mode selection.");
+                })
+                .setPlayerStatus(playerName, 'choosing', 'Unselected');
+        }
+    }
+
+    // Action 3: Click "Ready" / Find Match
+    function clickReady() {
+        if (!selectedMode) {
+            alert("Please select a game mode first!");
+            return;
+        }
+
+        isWaiting = true;
+        const startBtn = document.getElementById('start-btn');
+        const titleEl = document.getElementById('char-select-title');
+        if (titleEl) titleEl.innerText = "waiting for an opponent";
+        if (startBtn) {
+            startBtn.innerText = "Back";
+            startBtn.classList.add('waiting');
+        }
+
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+            google.script.run
+                .withSuccessHandler(res => {
+                    myRole = res.role;
+                    console.log(`Searching for match... Role: ${res.role} | Room ID: ${res.roomId}`);
+
+                    if (res.role === 'P1') {
+                        peer.on('connection', (conn) => {
+                            connection = conn;
+                            bindPeerEvents();
+                        });
+                    }
+
+                    startPolling();
+                })
+                .setPlayerStatus(playerName, 'waiting', selectedMode, myPeerId);
+        }
+    }
+
+    // Action 4: Cancel Search & Return to Choosing
+    function cancelSearchAndBackToChoosing() {
+        stopPolling();
+        closePeer();
+        myRole = null;
+        isWaiting = false;
+
+        const startBtn = document.getElementById('start-btn');
+        if (startBtn) {
+            startBtn.innerText = "VS";
+            startBtn.classList.remove('waiting');
+        }
+        updateMenuTitle();
+
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+            google.script.run
+                .withSuccessHandler(res => {
+                    console.log("Cancelled matchmaking. Returned to choosing state.");
+                })
+                .setPlayerStatus(playerName, 'choosing', selectedMode);
+        }
+    }
+
+    // ==========================================
+    // 3. MATCH POLLING & PEERJS CONNECTION HANDLERS
+    // ==========================================
+    function startPolling() {
+        stopPolling();
+        pollTimer = setInterval(() => {
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+                google.script.run
+                    .withSuccessHandler(res => {
+                        if (res.status === 'playing') {
+                            stopPolling();
+                            console.log(`Match starting! Opponent: ${res.opponent}`);
+
+                            if (myRole === 'P2' && !connection) {
+                                connection = peer.connect(res.p1PeerId);
+                                bindPeerEvents();
+                            }
+                        }
+                    })
+                    .checkRoomStatus(playerName);
+            }
+        }, 1500);
+    }
+
+    function stopPolling() {
+        if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+        }
+    }
+
+    function closePeer() {
+        if (connection) {
+            connection.close();
+            connection = null;
+        }
+    }
+
+    function bindPeerEvents() {
+        connection.on('open', () => {
+            console.log("P2P Network connected directly to opponent!");
+            sendData({ type: 'CHAT', text: `${playerName} connected!` });
+        });
+
+        connection.on('data', (data) => {
+            console.log("Game Action Received:", data);
+            if (data.type === 'INPUT') {
+                if (myRole === 'P1') {
+                    p2Touch.joyX = data.joyX;
+                    p2Touch.joyY = data.joyY;
+                } else {
+                    p1Touch.joyX = data.joyX;
+                    p1Touch.joyY = data.joyY;
+                }
+            }
+        });
+
+        connection.on('close', () => {
+            console.log("Opponent disconnected from session.");
+        });
+    }
+
+    function sendData(payload) {
+        if (connection && connection.open) {
+            connection.send(payload);
+        }
+    }
+
+    window.onbeforeunload = function() {
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+            google.script.run.leaveRoom(playerName);
+        }
+    };
+
+    // ==========================================
+    // 4. CANVAS & GAME STATE VARIABLES
+    // ==========================================
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let playAgain = false;
+    let currentGameMode = 'normal';
+    let p1SelProgress = [1,2,3];
+    let p2SelProgress = [1,2,3];
+    let p1SelChar = {};
+    let p2SelChar = {};
+    let p1PlayProgress = 1;
+    let p2PlayProgress = 1;
+    let width, height, gameRunning = false;
+    let p1CharIdx = 0, p2CharIdx = 0;
+    let p1Page = 0, p2Page = 0;
+    const PAGE_SIZE = 6;
+    let timeScale = 1.0, shakeAmount = 0;
+    let p1, p2, particles = [], floatTexts = [], projectiles = [];
+    let gameOver = false, deathFocus = null;
+    const p1Touch = { joyX:0, joyY:0 }, p2Touch = { joyX:0, joyY:0 };
+
+    // ==========================================
+    // 5. CHARACTER DATABASE
+    // ==========================================
+    const CHAR_DATA = Object.freeze([
+        { name: "駭爪", hp: 3050, atk: 95, speed: 4.0, color: "#9b59b6", s1Cd: 6000, s2Cd: 8000, s3Cd: 30000, atkInt: 1000 },
+        { name: "泰", hp: 3400, atk: 100, speed: 3.0, color: "#e67e22", s1Cd: 9000, s2Cd: 10000, s3Cd: 35000, atkInt: 600 },
+        { name: "聖昭者", hp: 3450, atk: 94, speed: 3.1, color: "#f1c40f", s1Cd: 8000, s2Cd: 11000, s3Cd: 15000, atkInt: 900 },
+        { name: "柳銅逸", hp: 4000, atk: 145, speed: 2.4, color: "#c0392b", s1Cd: 7000, s2Cd: 10500, s3Cd: 35000, atkInt: 900 },
+        { name: "劍客", hp: 2500, atk: 9, speed: 3.68, color: "#00bfff", s1Cd: 4000, s2Cd: 12000, s3Cd: 40000, atkInt: 500 },
+        { name: "急鳴", hp: 2650, atk: 66, speed: 4.5, color: "#FFFF00", s1Cd: 4500, s2Cd: 8500, s3Cd: 25000, atkInt: 800 },
+        { name: "統帥", hp: 3900, atk: 300, speed: 3.2, color: "#4b0082", s1Cd: 4000, s2Cd: 6000, s3Cd: 40000, atkInt: 800 },
+        { name: "麥卡", hp: 4650, atk: 170, speed: 3.3, color: "#ffd700", s1Cd: 8000, s2Cd: 9000, s3Cd: 30000, atkInt: 800 }
+    ]);
+
+    function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+    function resize() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
+
+    // ==========================================
+    // 6. UI & SELECTION MENU HANDLERS
+    // ==========================================
+    function updateMenuTitle() {
+        const titleEl = document.getElementById('char-select-title');
+        if (titleEl) {
+            titleEl.innerText = currentGameMode === 'sf' ? 'choose three characters' : 'choose a character';
+        }
+    }
+
+    function renderMenu(pid) {
+        let container = document.getElementById(pid === 1 ? 'p1-char-container' : 'p2-char-container');
+        if(!container) return;
+        
+        const pIdx = pid === 1 ? p1Page : p2Page;
+        const sel = pid === 1 ? p1CharIdx : p2CharIdx;
+        const selDict = pid === 1 ? p1SelChar : p2SelChar;
+        container.innerHTML = '';
+        const start = pIdx * PAGE_SIZE, end = Math.min(start + PAGE_SIZE, CHAR_DATA.length);
+        
+        for (let i = start; i < end; i++) {
+            let name = "char-btn";
+            let charSelected = Object.values(selDict).includes(i);
+            let charChoosenOrder = Object.keys(selDict).find(order => selDict[order] === i);
+            
+            if(currentGameMode === "sf"){
+                if(charSelected){
+                    name += " selected selected" + String(charChoosenOrder);
+                }
+            } else {
+                if(i === sel){
+                    name += " selected";
+                }
+            }
+            
+            const btn = document.createElement('div'); 
+            btn.className = name;
+            btn.innerHTML = CHAR_DATA[i].name;
+            if(!charSelected){
+                btn.onclick = () => selectChar(pid === 1 ? 0 : 1, i);
+            } else {
+                btn.onclick = () => selectChar(pid === 1 ? 0 : 1, i, true, charChoosenOrder);
+            }
+            container.appendChild(btn);
+        }
+    }
+
+    function selectChar(pIdx, charIdx, choosed = false, order = null) {
+        if (isWaiting) return;
+        if(currentGameMode === "sf"){
+            if(!choosed){
+                if (pIdx === 0) {
+                    if(p1SelProgress.length === 0) return;
+                    p1SelChar[p1SelProgress[0]] = charIdx;
+                    p1SelProgress.shift();
+                    renderMenu(1);
+                }
+            } else {
+                if (pIdx === 0) {
+                    delete p1SelChar[order];
+                    p1SelProgress.push(order);
+                    p1SelProgress.sort();
+                    renderMenu(1);
+                }
+            }
+        } else {
+            if (pIdx === 0) p1CharIdx = charIdx; else p2CharIdx = charIdx; 
+            renderMenu(pIdx === 0 ? 1 : 2); 
+        }
+    }
+
+    function handleStartClick(e) {
+        if (e) e.preventDefault();
+        if (!isWaiting) {
+            clickReady();
+        } else {
+            cancelSearchAndBackToChoosing();
+        }
+    }
+
+    function backToMenu() {
+        document.getElementById('menu').style.display = 'flex';
+        document.getElementById('game-over').style.display = 'none';
+        updateMenuTitle();
+    }
+
+    // ==========================================
+    // 7. INPUT BINDINGS & CONTROLS
+    // ==========================================
+    function bindButtons() {
+        const setupJoy = (id, joyId, stickId, touchObj) => {
+            const joy = document.getElementById(joyId), stick = document.getElementById(stickId);
+            if(!joy || !stick) return;
+            const move = (e) => {
+                const t = e.targetTouches[0], rect = joy.getBoundingClientRect();
+                let dx = t.clientX - (rect.left + rect.width/2), dy = t.clientY - (rect.top + rect.height/2);
+                const d = Math.min(55, Math.hypot(dx, dy)), angle = Math.atan2(dy, dx);
+                stick.style.transform = `translate(${Math.cos(angle)*d}px, ${Math.sin(angle)*d}px)`;
+                touchObj.joyX = Math.cos(angle)*(d/55); touchObj.joyY = Math.sin(angle)*(d/55);
+                sendData({ type: 'INPUT', joyX: touchObj.joyX, joyY: touchObj.joyY });
+            };
+            joy.addEventListener('touchstart', (e) => { e.preventDefault(); move(e); });
+            joy.addEventListener('touchmove', (e) => { e.preventDefault(); move(e); });
+            joy.addEventListener('touchend', () => { 
+                stick.style.transform = `translate(0,0)`; 
+                touchObj.joyX = 0; touchObj.joyY = 0; 
+                sendData({ type: 'INPUT', joyX: 0, joyY: 0 });
+            });
+        };
+
+        setupJoy(1, "p1-joy", "p1-stick", p1Touch); 
+        setupJoy(2, "p2-joy", "p2-stick", p2Touch);
+    }
+
+    // ==========================================
+    // 8. INITIALIZATION & LIFECYCLE
+    // ==========================================
+    window.onload = function() {
+        peer = new Peer();
+
+        peer.on('open', (id) => {
+            myPeerId = id;
+            console.log("Connected to PeerJS server. ID:", myPeerId);
+        });
+
+        const modeButtons = document.querySelectorAll('.mode-btn');
+        const gameModeOverlay = document.getElementById('game-mode');
+        
+        if (gameModeOverlay) {
+            gameModeOverlay.style.display = "flex";
+            gameModeOverlay.style.opacity = "1";
+            gameModeOverlay.style.visibility = "visible";
+        }
+
+        modeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                modeButtons.forEach(btn => btn.classList.remove('selected'));
+                button.classList.add('selected');
+                const modeName = button.id === 'btn-mode-sf' ? 'sf' : 'normal';
+                selectGameMode(modeName);
+            });
+        });
+
+        resize();
+        updateMenuTitle();
+        renderMenu(1); 
+        renderMenu(2);
+        bindButtons();
+        
+        const startBtn = document.getElementById('start-btn');
+        if(startBtn) {
+            startBtn.onclick = handleStartClick;
+            startBtn.addEventListener('touchstart', handleStartClick);
+        }
+
+        const handleRestart = (e) => {
+            if (e) e.preventDefault();
+            backToModeSelection();
+        };
+        
+        const restartBtn = document.getElementById('restart-btn');
+        if(restartBtn) {
+            restartBtn.onclick = handleRestart;
+            restartBtn.addEventListener('touchstart', handleRestart);
+        }
+
+        const backModesBtn = document.getElementById('back-modes-btn');
+        if(backModesBtn) {
+            backModesBtn.onclick = handleRestart;
+            backModesBtn.addEventListener('touchstart', handleRestart);
+        }
+
+        window.addEventListener('resize', resize);
+    };
+})();
+</script>
+</body>
+</html>
