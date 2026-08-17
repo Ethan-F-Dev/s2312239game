@@ -361,6 +361,8 @@
         activeRetries[msgId] = timer;
     }
     
+let syncInterval = null;
+
     function bindPeerEvents() {
         const sendHandshake = () => {
             console.log("[P2P] Sending Reliable HANDSHAKE...");
@@ -372,7 +374,6 @@
             });
         };
     
-        // Immediate send if already connected, otherwise wait for open event
         if (connection.open) {
             sendHandshake();
         } else {
@@ -382,7 +383,6 @@
         connection.on('data', (data) => {
             console.log("[P2P Received]:", data);
     
-            // 1. Process confirmation ACK from opponent
             if (data.type === 'ACK' && data.ackId) {
                 if (activeRetries[data.ackId]) {
                     clearInterval(activeRetries[data.ackId]);
@@ -392,14 +392,12 @@
                 return;
             }
     
-            // 2. Return ACK for reliable packets and drop late duplicate receives
             if (data.msgId) {
                 sendGameMove({ type: 'ACK', ackId: data.msgId });
                 if (processedMsgs.has(data.msgId)) return;
                 processedMsgs.add(data.msgId);
             }
     
-            // 3. Process events
             if (data.type === 'HANDSHAKE' || data.type === 'CHAR_SELECT') {
                 if (data.player !== undefined) p2Name = String(data.player);
                 if (data.charIdx !== undefined) p2CharIdx = Number(data.charIdx);
@@ -422,6 +420,20 @@
                 p2Touch.joyX = data.joyX;
                 p2Touch.joyY = data.joyY;
             } 
+            else if (data.type === 'COORD') {
+                if (typeof p2 !== 'undefined' && p2) {
+                    p2.x = data.x;
+                    p2.y = data.y;
+                }
+            }
+            else if (data.type === 'HP') {
+                if (typeof p2 !== 'undefined' && p2) {
+                    p2.hp = data.hp;
+                    if(p2.hp <= 0){
+                        p2.triggerDeath
+                    }
+                }
+            }
             else if (data.type === 'SKILL') {
                 if (typeof p2 !== 'undefined' && p2) {
                     if (data.skill === 'atk') castAtk(p2);
@@ -446,6 +458,24 @@
             console.log("[P2P] Connection closed.");
             handleOpponentOffline();
         });
+    }
+
+    function startStateSync() {
+        stopStateSync();
+        syncInterval = setInterval(() => {
+            if (gameRunning && typeof p1 !== 'undefined' && p1 && connection && connection.open) {
+                // Unreliable send to avoid queue buildup and latency
+                sendGameMove({ type: 'COORD', x: p1.x, y: p1.y });
+                sendGameMove({ type: 'HP', hp: p1.hp });
+            }
+        }, 50); // Runs 20 times per second
+    }
+
+    function stopStateSync() {
+        if (syncInterval) {
+            clearInterval(syncInterval);
+            syncInterval = null;
+        }
     }
     
     function sendDeath() {
@@ -882,6 +912,7 @@
         p1 = new Player(1, p1CharIdx, width/2, height - 200); p2 = new Player(2, p2CharIdx, width/2, 200);
         p1.target = p2; p2.target = p1; gameRunning = true; gameOver = false; timeScale = 1.0; shakeAmount = 0; deathFocus = null;
         projectiles = []; particles = []; floatTexts = [];
+        startStateSync(); //Sync hp and x,y
         if((currentGameMode === " normal" || (p1PlayProgress === 1 && p2PlayProgress === 1)) && !playAgain){requestAnimationFrame(gameLoop);}
     }
     function backToMenu() {
@@ -3601,6 +3632,7 @@ if (this.charIdx === 31) {
         addStoneS3Circle(){if(this.stoneS3 == true) {ctx.strokeStyle = "gray"; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(0,0, this.radius + 10, 0, Math.PI*2); ctx.stroke();}}
         triggerDeath(attackerCharIdx) {
             this.isDying = true;
+            stopStateSync();
             setGameTimeout(checkMatchEnd, 2000);
             if(currentGameMode ==! "sf" || (p1PlayProgress === 3 && p1.hp <= 0) || (p2PlayProgress === 3 && p2.hp <= 0)){
                 this.isDying = true; timeScale = 0.2; deathFocus = this; for(let i=0; i<50; i++) particles.push(new Particle(this.x, this.y, "#888", "ash")); 
