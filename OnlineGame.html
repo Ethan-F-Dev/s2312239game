@@ -7416,7 +7416,7 @@ if (p.charIdx === 31) {
     // ==========================================
     const audioCache = {}; // 音效快取池
     function playSkillSound(charId, skillName) {
-        const soundUrl = "https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239AudioDatabase@main/sounds/char"+String(charId)+"_"+skillName+".mp3"
+        const soundUrl = "https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/sounds/char"+String(charId)+"_"+skillName+".mp3"
         if (!audioCache[soundUrl]) {
             audioCache[soundUrl] = new Audio(soundUrl);
             if(skillName === "s3"){
