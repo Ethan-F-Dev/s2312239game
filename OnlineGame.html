@@ -3633,9 +3633,10 @@ if (this.charIdx === 31) {
         addStoneS3Circle(){if(this.stoneS3 == true) {ctx.strokeStyle = "gray"; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(0,0, this.radius + 10, 0, Math.PI*2); ctx.stroke();}}
         triggerDeath(attackerCharIdx) {
             this.isDying = true;
-            stopStateSync();
             setGameTimeout(checkMatchEnd, 2000);
             if(currentGameMode ==! "sf" || (p1PlayProgress === 3 && p1.hp <= 0) || (p2PlayProgress === 3 && p2.hp <= 0)){
+                stopStateSync();
+                sendDeath();
                 this.isDying = true; timeScale = 0.2; deathFocus = this; for(let i=0; i<50; i++) particles.push(new Particle(this.x, this.y, "#888", "ash")); 
             }
         }
