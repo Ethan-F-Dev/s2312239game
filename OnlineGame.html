@@ -429,8 +429,10 @@
                 }
             } 
             else if (data.type === 'DEATH') {
-                if (typeof p2 !== 'undefined' && p2) p2.hp = 0;
-                checkMatchEnd();
+                if (typeof p2 !== 'undefined' && p2){
+                    p2.hp = 0;
+                    p2triggerDeath(p1.charIdx);
+                }
             } 
             else if (data.type === 'OFFLINE') {
                 handleOpponentOffline();
@@ -733,82 +735,82 @@
             else { txt.innerText = k==='recover'?'復':(k==='s3'?'終':(k==='atk'?'攻':k.slice(1))); el.style.opacity = "1"; }
         });
     }
-function bindButtons() {
-    const setupJoy = (id, joyId, stickId, touchObj) => {
-        const joy = document.getElementById(joyId);
-        const stick = document.getElementById(stickId);
-        
-        // Safety guard to prevent "null is not an object" crash
-        if (!joy || !stick) return;
-
-        const move = (e) => {
-            const t = e.targetTouches[0], rect = joy.getBoundingClientRect();
-            let dx = t.clientX - (rect.left + rect.width / 2);
-            let dy = t.clientY - (rect.top + rect.height / 2);
+    function bindButtons() {
+        const setupJoy = (id, joyId, stickId, touchObj) => {
+            const joy = document.getElementById(joyId);
+            const stick = document.getElementById(stickId);
             
-            const dist = Math.min(55, Math.hypot(dx, dy));
-            const angle = Math.atan2(id === 2 ? -dy : dy, id === 2 ? -dx : dx);
-            
-            stick.style.transform = `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px)`;
-            
-            const la = Math.atan2(dy, dx); 
-            touchObj.joyX = Math.cos(la) * (dist / 55); 
-            touchObj.joyY = Math.sin(la) * (dist / 55);
-
-            // Send movement input to opponent over WebRTC
-            sendGameMove({ type: 'INPUT', joyX: touchObj.joyX, joyY: touchObj.joyY });
+            // Safety guard to prevent "null is not an object" crash
+            if (!joy || !stick) return;
+    
+            const move = (e) => {
+                const t = e.targetTouches[0], rect = joy.getBoundingClientRect();
+                let dx = t.clientX - (rect.left + rect.width / 2);
+                let dy = t.clientY - (rect.top + rect.height / 2);
+                
+                const dist = Math.min(55, Math.hypot(dx, dy));
+                const angle = Math.atan2(id === 2 ? -dy : dy, id === 2 ? -dx : dx);
+                
+                stick.style.transform = `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px)`;
+                
+                const la = Math.atan2(dy, dx); 
+                touchObj.joyX = Math.cos(la) * (dist / 55); 
+                touchObj.joyY = Math.sin(la) * (dist / 55);
+    
+                // Send movement input to opponent over WebRTC
+                sendGameMove({ type: 'INPUT', joyX: touchObj.joyX, joyY: touchObj.joyY });
+            };
+    
+            joy.addEventListener('touchstart', (e) => { e.preventDefault(); move(e); });
+            joy.addEventListener('touchmove', (e) => { e.preventDefault(); move(e); });
+            joy.addEventListener('touchend', () => { 
+                stick.style.transform = `translate(0,0)`; 
+                touchObj.joyX = 0; 
+                touchObj.joyY = 0; 
+    
+                // Send stop input to opponent
+                sendGameMove({ type: 'INPUT', joyX: 0, joyY: 0 });
+            });
         };
-
-        joy.addEventListener('touchstart', (e) => { e.preventDefault(); move(e); });
-        joy.addEventListener('touchmove', (e) => { e.preventDefault(); move(e); });
-        joy.addEventListener('touchend', () => { 
-            stick.style.transform = `translate(0,0)`; 
-            touchObj.joyX = 0; 
-            touchObj.joyY = 0; 
-
-            // Send stop input to opponent
-            sendGameMove({ type: 'INPUT', joyX: 0, joyY: 0 });
-        });
-    };
-
-    const setupBtn = (id, type) => {
-        const btn = document.getElementById(`p${id}-btn-${type}`); 
-        if (!btn) return;
-
-        btn.addEventListener('touchstart', (e) => { 
-            e.preventDefault(); 
-            const p = p1; // Local player is always p1
-            if (!p) return; 
-
-            if (p.isCasting && !(p.charIdx === 1 && p.taiS1Active && type === 'atk')) return;
-
-            if (type === 'atk') {
-                castAtk(p);
-                sendGameMove({ type: 'SKILL', skill: 'atk' });
-            }
-            else if (type === 's1') {
-                castS1(p);
-                sendGameMove({ type: 'SKILL', skill: 's1' });
-            }
-            else if (type === 's2') {
-                castS2(p);
-                sendGameMove({ type: 'SKILL', skill: 's2' });
-            }
-            else if (type === 's3') {
-                castS3(p); 
-                sendGameMove({ type: 'SKILL', skill: 's3' });
-            }
-            else if (type === 'recover') {
-                castRecover(p);
-                sendGameMove({ type: 'SKILL', skill: 'recover' });
-            }
-        });
-    };
-
-    // Initialize local joystick and player 1 controls
-    setupJoy(1, "p1-joy", "p1-stick", p1Touch);
-    ['atk', 's1', 's2', 's3', 'recover'].forEach(t => setupBtn(1, t));
-}
+    
+        const setupBtn = (id, type) => {
+            const btn = document.getElementById(`p${id}-btn-${type}`); 
+            if (!btn) return;
+    
+            btn.addEventListener('touchstart', (e) => { 
+                e.preventDefault(); 
+                const p = p1; // Local player is always p1
+                if (!p) return; 
+    
+                if (p.isCasting && !(p.charIdx === 1 && p.taiS1Active && type === 'atk')) return;
+    
+                if (type === 'atk') {
+                    castAtk(p);
+                    sendGameMove({ type: 'SKILL', skill: 'atk' });
+                }
+                else if (type === 's1') {
+                    castS1(p);
+                    sendGameMove({ type: 'SKILL', skill: 's1' });
+                }
+                else if (type === 's2') {
+                    castS2(p);
+                    sendGameMove({ type: 'SKILL', skill: 's2' });
+                }
+                else if (type === 's3') {
+                    castS3(p); 
+                    sendGameMove({ type: 'SKILL', skill: 's3' });
+                }
+                else if (type === 'recover') {
+                    castRecover(p);
+                    sendGameMove({ type: 'SKILL', skill: 'recover' });
+                }
+            });
+        };
+    
+        // Initialize local joystick and player 1 controls
+        setupJoy(1, "p1-joy", "p1-stick", p1Touch);
+        ['atk', 's1', 's2', 's3', 'recover'].forEach(t => setupBtn(1, t));
+    }
     function setupJoy(joyId, stickId, touchObj) {
         const joy = document.getElementById(joyId), stick = document.getElementById(stickId);
         if (!joy || !stick) return;
@@ -3560,7 +3562,9 @@ if (this.charIdx === 31) {
                     this.hp = Math.max(1, this.hp); // 給 1 滴血保底，確保沒死
                     return { hpDmg, shieldDmg }; 
                 }
-                this.triggerDeath(attackerCharIdx);
+                if(this.id === 1){ // 只有在自己那邊死了才算
+                    this.triggerDeath(attackerCharIdx);
+                }
             }
             return { hpDmg, shieldDmg }; 
         }
