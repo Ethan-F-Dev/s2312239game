@@ -152,6 +152,7 @@
      */
     function selectMode(modeKey) {
         currentSelectedMode = modeKey;
+        currentGameMode = modeKey;
 
         // Update UI Mode Display Indicator
         const modeLabel = document.getElementById('current-mode-label');
@@ -610,7 +611,6 @@ let syncInterval = null;
                 let name = "char-btn";
                 let charSelected = Object.values(selDict).includes(i);
                 let charChoosenOrder = Object.keys(selDict).find(key => selDict[key] === i);
-    
                 if (currentGameMode === "sf") {
                     if (charSelected) {
                         name += " selected" + String(charChoosenOrder);
