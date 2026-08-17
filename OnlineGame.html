@@ -446,7 +446,7 @@ let syncInterval = null;
             else if (data.type === 'DEATH') {
                 if (typeof p2 !== 'undefined' && p2){
                     p2.hp = 0;
-                    p2triggerDeath(p1.charIdx);
+                    p2.triggerDeath(p1.charIdx);
                 }
             } 
             else if (data.type === 'OFFLINE') {
