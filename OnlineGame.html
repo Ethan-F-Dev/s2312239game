@@ -876,7 +876,7 @@ let syncInterval = null;
                 p1PlayProgress = 1
                 p2PlayProgress = 1
                 setGameTimeout(() => { 
-                    document.getElementById('winner-text').innerText = (p1.hp > 0 ? "玩家 1" : "玩家 2") + " 獲勝！"; 
+                    document.getElementById('winner-text').innerText = (p1.hp > 0 ? "Victory" : "Lost"); 
                     document.getElementById('game-over').style.display = 'flex'; 
                 }, 2000);
             }else{
@@ -3598,6 +3598,7 @@ if (this.charIdx === 31) {
                 }
                 if(this.id === 1){ // 只有在自己那邊死了才算
                     this.triggerDeath(attackerCharIdx);
+                    sendDeath();
                 }
             }
             return { hpDmg, shieldDmg }; 
