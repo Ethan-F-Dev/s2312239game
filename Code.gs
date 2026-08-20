@@ -1,69 +1,247 @@
-// ==========================================
-// 1. GITHUB DYNAMIC HTML LOADER
-// ==========================================
-const GITHUB_BASE_URL = "https://raw.githubusercontent.com/s2312239-sketch/s2312239game/main/";
-
-function fetchGithubFile(fileName) {
-  try {
-    const url = GITHUB_BASE_URL + fileName;
-    const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
-    if (response.getResponseCode() === 200) {
-      return response.getContentText();
-    } else {
-      throw new Error(`Failed to load ${fileName} from GitHub (HTTP ${response.getResponseCode()})`);
-    }
-  } catch (err) {
-    return `<div style="color:red; font-family:sans-serif; padding:20px;">
-              <h3>GitHub Fetch Error</h3>
-              <p>${err.toString()}</p>
-            </div>`;
-  }
-}
+const SPREADSHEET_ID = '13Cq3iTSu0ijhUt-H_GxrBcTYEvBiCUFTTW1ihQa9uXI';
 
 function doGet() {
-  let indexHtml = fetchGithubFile('Index.html');
-  const stylesheetHtml = fetchGithubFile('Stylesheet.html');
-
-  // Replace inclusion tag with raw CSS from GitHub
-  indexHtml = indexHtml.replace(/<\?!=\s*include\(['"]Stylesheet['"]\);\s*\?>/gi, stylesheetHtml);
-
-  return HtmlService.createHtmlOutput(indexHtml)
-    .setTitle('巔峰對決')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  return HtmlService.createTemplateFromFile('Index')
+    .evaluate()
+    .setTitle('巔峰對決 | Arena Terminal')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
 }
 
-function getGameContent(playerName, viewName) {
-  const fileName = (viewName === 'Classic') ? 'ClassicGame.html' : 'OnlineGame.html';
-  let gameHtml = fetchGithubFile(fileName);
-  const stylesheetHtml = fetchGithubFile('Stylesheet.html');
-
-  gameHtml = gameHtml.replace(/<\?!=\s*include\(['"]Stylesheet['"]\);\s*\?>/gi, stylesheetHtml);
-  gameHtml = gameHtml.replace(/<\?=\s*playerName\s*\?>/g, playerName);
-
-  return gameHtml;
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
-// Helper to access spreadsheet
+function getGameContent(playerName, view) {
+  // 'view' determines which template to open, not the in-game mode
+  const templateName = (view === 'Online') ? 'OnlineGame' : 'ClassicGame';
+  const template = HtmlService.createTemplateFromFile(templateName);
+  template.playerName = playerName;
+  return template.evaluate().getContent();
+}
+
 function getSheet(sheetName) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet = ss.getSheetByName(sheetName);
   if (!sheet) {
     sheet = ss.insertSheet(sheetName);
+    if (sheetName === 'Users') {
+      sheet.appendRow(['Timestamp', 'Gmail', 'Password', 'PlayerName']);
+    } else if (sheetName === 'Verifications') {
+      sheet.appendRow(['Timestamp', 'Gmail', 'Code']);
+    } else if (sheetName === 'Online players') {
+      sheet.appendRow(['Player', 'Mode', 'Status', 'P1/P2?', 'Room ID']);
+    }
   }
   return sheet;
 }
 
+function isValidGmail(email) {
+  const gmailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|googlemail\.com|ccsc\.edu\.hk)$/i;
+  return gmailRegex.test(email.trim());
+}
 
-// ==========================================
-// 2. MATCHMAKING & STATUS ENGINE
-// ==========================================
+// ----------------------------------------------------
+// AUTHENTICATION & ACCOUNT SYSTEM
+// ----------------------------------------------------
 
+function checkActiveGoogleAccount() {
+  try {
+    const activeEmail = Session.getActiveUser().getEmail();
+    if (!activeEmail) return { exists: false, email: '' };
+
+    const usersSheet = getSheet('Users');
+    const data = usersSheet.getDataRange().getValues();
+
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][1].toString().toLowerCase() === activeEmail.toLowerCase()) {
+        const playerName = data[i][3] ? data[i][3].toString() : activeEmail.split('@')[0];
+        return { exists: true, email: activeEmail, playerName: playerName };
+      }
+    }
+    return { exists: false, email: activeEmail };
+  } catch (err) {
+    return { exists: false, email: '' };
+  }
+}
+
+function sendVerificationCode(email) {
+  try {
+    if (!isValidGmail(email)) {
+      return { success: false, message: 'Must be a valid @gmail.com address.' };
+    }
+    
+    const cleanEmail = email.trim().toLowerCase();
+    const usersSheet = getSheet('Users');
+    const userData = usersSheet.getDataRange().getValues();
+    
+    for (let i = 1; i < userData.length; i++) {
+      if (userData[i][1].toString().toLowerCase() === cleanEmail) {
+        return { success: false, message: 'This Gmail address is already registered!' };
+      }
+    }
+    
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const verifySheet = getSheet('Verifications');
+    verifySheet.appendRow([new Date(), cleanEmail, code]);
+    
+    MailApp.sendEmail({
+      to: cleanEmail,
+      subject: '巔峰對決 - Account Verification Code',
+      htmlBody: `
+        <div style="font-family: Arial, sans-serif; padding: 24px; background: #0a0c10; color: #fff; border-radius: 12px; border: 1px solid #232938;">
+          <h2 style="color: #00f0ff; margin-top: 0;">巔峰對決 Verification Code</h2>
+          <p style="color: #8b94a0;">Your security code for account verification is:</p>
+          <h1 style="color: #ffd700; letter-spacing: 6px; font-size: 36px; margin: 15px 0;">${code}</h1>
+        </div>
+      `
+    });
+    
+    return { success: true, message: 'Code sent to ' + cleanEmail + '!' };
+  } catch (err) {
+    return { success: false, message: 'Error: ' + err.toString() };
+  }
+}
+
+function completeRegistration(email, password, playerName, code) {
+  try {
+    const cleanEmail = email.trim().toLowerCase();
+    const verifySheet = getSheet('Verifications');
+    const vData = verifySheet.getDataRange().getValues();
+    
+    let isCodeValid = false;
+    for (let i = vData.length - 1; i >= 1; i--) {
+      if (vData[i][1].toString().toLowerCase() === cleanEmail && vData[i][2].toString() === code.trim()) {
+        isCodeValid = true;
+        break;
+      }
+    }
+    
+    if (!isCodeValid) {
+      return { success: false, message: 'Invalid or expired verification code!' };
+    }
+    
+    const usersSheet = getSheet('Users');
+    usersSheet.appendRow([new Date(), cleanEmail, password, playerName.trim()]);
+    
+    return { success: true, message: 'Account created! Please log in.' };
+  } catch (err) {
+    return { success: false, message: 'Error: ' + err.toString() };
+  }
+}
+
+function sendResetCode(email) {
+  try {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!isValidGmail(cleanEmail)) {
+      return { success: false, message: 'Must be a valid @gmail.com address.' };
+    }
+    
+    const usersSheet = getSheet('Users');
+    const data = usersSheet.getDataRange().getValues();
+    let exists = false;
+
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][1].toString().toLowerCase() === cleanEmail) {
+        exists = true;
+        break;
+      }
+    }
+
+    if (!exists) {
+      return { success: false, message: 'No account found registered under this Gmail address.' };
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const verifySheet = getSheet('Verifications');
+    verifySheet.appendRow([new Date(), cleanEmail, code]);
+
+    MailApp.sendEmail({
+      to: cleanEmail,
+      subject: '巔峰對決 - Password Reset Verification Code',
+      htmlBody: `
+        <div style="font-family: Arial, sans-serif; padding: 24px; background: #0a0c10; color: #fff; border-radius: 12px; border: 1px solid #232938;">
+          <h2 style="color: #ff2a5f; margin-top: 0;">巔峰對決 Password Reset</h2>
+          <p style="color: #8b94a0;">Your reset security code is:</p>
+          <h1 style="color: #ffd700; letter-spacing: 6px; font-size: 36px; margin: 15px 0;">${code}</h1>
+        </div>
+      `
+    });
+
+    return { success: true, message: 'Reset code sent to ' + cleanEmail + '!' };
+  } catch (err) {
+    return { success: false, message: 'Error: ' + err.toString() };
+  }
+}
+
+function resetPassword(email, code, newPassword) {
+  try {
+    const cleanEmail = email.trim().toLowerCase();
+    const verifySheet = getSheet('Verifications');
+    const vData = verifySheet.getDataRange().getValues();
+
+    let isCodeValid = false;
+    for (let i = vData.length - 1; i >= 1; i--) {
+      if (vData[i][1].toString().toLowerCase() === cleanEmail && vData[i][2].toString() === code.trim()) {
+        isCodeValid = true;
+        break;
+      }
+    }
+
+    if (!isCodeValid) {
+      return { success: false, message: 'Invalid or expired reset code!' };
+    }
+
+    const usersSheet = getSheet('Users');
+    const data = usersSheet.getDataRange().getValues();
+
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][1].toString().toLowerCase() === cleanEmail) {
+        usersSheet.getRange(i + 1, 3).setValue(newPassword.trim());
+        return { success: true, message: 'Password reset successful! You can now sign in.' };
+      }
+    }
+    return { success: false, message: 'Account not found.' };
+  } catch (err) {
+    return { success: false, message: 'Error: ' + err.toString() };
+  }
+}
+
+function signIn(email, password) {
+  try {
+    if (!isValidGmail(email)) {
+      return { success: false, message: 'Must be a valid @gmail.com address.' };
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const usersSheet = getSheet('Users');
+    const data = usersSheet.getDataRange().getValues();
+    
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][1].toString().toLowerCase() === cleanEmail && data[i][2].toString() === password) {
+        const nameOnSheet = data[i][3] ? data[i][3].toString() : cleanEmail.split('@')[0];
+        return { success: true, message: 'Authenticated!', playerName: nameOnSheet };
+      }
+    }
+    return { success: false, message: 'Incorrect email or password.' };
+  } catch (err) {
+    return { success: false, message: 'Error: ' + err.toString() };
+  }
+}
+
+// ----------------------------------------------------
+// PEERJS MATCHMAKING & SIGNALING SYSTEM
+// ----------------------------------------------------
+
+/**
+ * Set Player Status ('choosing', 'waiting', 'wentOffLine')
+ */
 function setPlayerStatus(player, newStatus, gameMode, peerId) {
   try {
     const sheet = getSheet('Online players');
     const data = sheet.getDataRange().getValues();
     const cleanPlayer = player.trim();
-    const activeMode = (gameMode || 'Unselected').trim();
+    let activeMode = (gameMode || 'Standard').trim();
 
     let rowIndex = -1;
     for (let i = 1; i < data.length; i++) {
@@ -73,6 +251,8 @@ function setPlayerStatus(player, newStatus, gameMode, peerId) {
       }
     }
 
+    // 1. STATUS: CHOOSING / CHANGING MODE
+    // Clears Role (Col 4) and Room ID (Col 5). Does NOT generate any Room ID.
     if (newStatus === 'choosing') {
       if (rowIndex !== -1) {
         sheet.getRange(rowIndex, 2).setValue(activeMode);
@@ -85,10 +265,13 @@ function setPlayerStatus(player, newStatus, gameMode, peerId) {
       return { success: true, status: 'choosing', mode: activeMode };
     }
 
+    // 2. STATUS: WAITING
+    // Room ID and P1/P2 roles are ONLY assigned when player enters waiting state.
     if (newStatus === 'waiting') {
       const currentData = sheet.getDataRange().getValues();
       let waitingP1RoomId = '';
 
+      // Find an available P1 in the same mode who is 'waiting'
       for (let i = 1; i < currentData.length; i++) {
         const rowPlayer = currentData[i][0].toString();
         const rowMode = currentData[i][1].toString();
@@ -131,6 +314,7 @@ function setPlayerStatus(player, newStatus, gameMode, peerId) {
       };
     }
 
+    // 3. STATUS: OFFLINE
     if (newStatus === 'wentOffLine') {
       if (rowIndex !== -1) {
         sheet.deleteRow(rowIndex);
@@ -138,12 +322,15 @@ function setPlayerStatus(player, newStatus, gameMode, peerId) {
       return { success: true, status: 'offline' };
     }
 
-    return { success: false, message: 'Invalid status.' };
+    return { success: false, message: 'Invalid status parameter.' };
   } catch (err) {
-    return { success: false, message: err.toString() };
+    return { success: false, message: 'Error: ' + err.toString() };
   }
 }
 
+/**
+ * Check Room Status (Ignores players who are still in 'choosing' state)
+ */
 function checkRoomStatus(player) {
   try {
     const sheet = getSheet('Online players');
@@ -205,6 +392,7 @@ function checkRoomStatus(player) {
       }
     }
 
+    // Both players must be present AND in 'waiting' status
     if (p1Index !== -1 && p2Index !== -1 && p1Status === 'waiting' && p2Status === 'waiting') {
       sheet.getRange(p1Index, 3).setValue('playing');
       sheet.getRange(p2Index, 3).setValue('playing');
@@ -241,15 +429,40 @@ function leaveRoom(player) {
     for (let i = data.length - 1; i >= 1; i--) {
       if (data[i][0].toString().toLowerCase() === cleanPlayer) {
         sheet.deleteRow(i + 1);
-        return { success: true, message: 'Left room.' };
+        return { success: true, message: 'Successfully left room.' };
       }
     }
     return { success: false, message: 'Player not found.' };
   } catch (err) {
-    return { success: false, message: err.toString() };
+    return { success: false, message: 'Error: ' + err.toString() };
   }
 }
 
+function getOnlineLobby() {
+  try {
+    const sheet = getSheet('Online players');
+    const data = sheet.getDataRange().getValues();
+    const players = [];
+
+    for (let i = 1; i < data.length; i++) {
+      players.push({
+        player: data[i][0].toString(),
+        mode: data[i][1].toString(),
+        status: data[i][2].toString(),
+        role: data[i][3].toString(),
+        roomId: data[i][4].toString()
+      });
+    }
+
+    return { success: true, players: players };
+  } catch (err) {
+    return { success: false, message: 'Error: ' + err.toString() };
+  }
+}
+/**
+ * Fetches real-time counts of online, waiting, and playing players.
+ * Add this function to Code.gs
+ */
 function getOnlineStats() {
   try {
     const sheet = getSheet('Online players');
@@ -261,9 +474,13 @@ function getOnlineStats() {
 
     for (let i = 1; i < data.length; i++) {
       const status = data[i][2] ? data[i][2].toString().toLowerCase().trim() : '';
-      if (status === 'waiting') waitingCount++;
-      else if (status === 'playing') playingCount++;
-      else if (status === 'choosing') choosingCount++;
+      if (status === 'waiting') {
+        waitingCount++;
+      } else if (status === 'playing') {
+        playingCount++;
+      } else if (status === 'choosing') {
+        choosingCount++;
+      }
     }
 
     return {
@@ -274,137 +491,13 @@ function getOnlineStats() {
       choosingCount: choosingCount
     };
   } catch (err) {
-    return { success: false, totalOnline: 0, waitingCount: 0, playingCount: 0, choosingCount: 0 };
-  }
-}
-
-
-// ==========================================
-// 3. AUTHENTICATION & GOOGLE ACCOUNTS
-// ==========================================
-
-function checkActiveGoogleAccount() {
-  try {
-    const activeEmail = Session.getActiveUser().getEmail();
-    if (!activeEmail) return { exists: false, email: '' };
-
-    const sheet = getSheet('Accounts');
-    const data = sheet.getDataRange().getValues();
-
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][0].toString().toLowerCase() === activeEmail.toLowerCase()) {
-        return { exists: true, email: activeEmail, playerName: data[i][2].toString() };
-      }
-    }
-    return { exists: false, email: activeEmail };
-  } catch (err) {
-    return { exists: false, email: '' };
-  }
-}
-
-function signIn(email, password) {
-  try {
-    const sheet = getSheet('Accounts');
-    const data = sheet.getDataRange().getValues();
-    const cleanEmail = email.trim().toLowerCase();
-
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][0].toString().toLowerCase() === cleanEmail) {
-        if (data[i][1].toString() === password) {
-          return { success: true, message: 'Login successful!', playerName: data[i][2].toString() };
-        } else {
-          return { success: false, message: 'Invalid password.' };
-        }
-      }
-    }
-    return { success: false, message: 'Email not registered.' };
-  } catch (err) {
-    return { success: false, message: err.toString() };
-  }
-}
-
-function sendVerificationCode(email) {
-  try {
-    const cleanEmail = email.trim().toLowerCase();
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    
-    const cache = CacheService.getScriptCache();
-    cache.put('REG_' + cleanEmail, code, 600); // Code valid for 10 minutes
-
-    MailApp.sendEmail({
-      to: cleanEmail,
-      subject: '巔峰對決 - Registration Verification Code',
-      body: `Your verification code is: ${code}`
-    });
-
-    return { success: true, message: 'Verification code sent to Gmail.' };
-  } catch (err) {
-    return { success: false, message: 'Failed to send email: ' + err.toString() };
-  }
-}
-
-function completeRegistration(email, password, playerName, code) {
-  try {
-    const cleanEmail = email.trim().toLowerCase();
-    const cache = CacheService.getScriptCache();
-    const cachedCode = cache.get('REG_' + cleanEmail);
-
-    if (!cachedCode || cachedCode !== code.trim()) {
-      return { success: false, message: 'Invalid or expired verification code.' };
-    }
-
-    const sheet = getSheet('Accounts');
-    sheet.appendRow([cleanEmail, password, playerName.trim(), new Date()]);
-    cache.remove('REG_' + cleanEmail);
-
-    return { success: true, message: 'Account created! Please sign in.' };
-  } catch (err) {
-    return { success: false, message: err.toString() };
-  }
-}
-
-function sendResetCode(email) {
-  try {
-    const cleanEmail = email.trim().toLowerCase();
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    
-    const cache = CacheService.getScriptCache();
-    cache.put('RESET_' + cleanEmail, code, 600);
-
-    MailApp.sendEmail({
-      to: cleanEmail,
-      subject: '巔峰對決 - Password Reset Code',
-      body: `Your password reset code is: ${code}`
-    });
-
-    return { success: true, message: 'Reset code sent to Gmail.' };
-  } catch (err) {
-    return { success: false, message: 'Failed to send email: ' + err.toString() };
-  }
-}
-
-function resetPassword(email, code, newPassword) {
-  try {
-    const cleanEmail = email.trim().toLowerCase();
-    const cache = CacheService.getScriptCache();
-    const cachedCode = cache.get('RESET_' + cleanEmail);
-
-    if (!cachedCode || cachedCode !== code.trim()) {
-      return { success: false, message: 'Invalid or expired reset code.' };
-    }
-
-    const sheet = getSheet('Accounts');
-    const data = sheet.getDataRange().getValues();
-
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][0].toString().toLowerCase() === cleanEmail) {
-        sheet.getRange(i + 1, 2).setValue(newPassword);
-        cache.remove('RESET_' + cleanEmail);
-        return { success: true, message: 'Password updated! Please sign in.' };
-      }
-    }
-    return { success: false, message: 'Account not found.' };
-  } catch (err) {
-    return { success: false, message: err.toString() };
+    return {
+      success: false,
+      message: err.toString(),
+      totalOnline: 0,
+      waitingCount: 0,
+      playingCount: 0,
+      choosingCount: 0
+    };
   }
 }
