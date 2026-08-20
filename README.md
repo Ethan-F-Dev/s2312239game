@@ -1,3 +1,4 @@
 # s2312239game
+Commit in our own branch, merge the two branches’ code in testing place first then to main.
 
-Please commit in your own branch. I will merge them once per a week or two.
+Main code is automatically updated to the website 
