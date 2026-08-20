@@ -459,3 +459,45 @@ function getOnlineLobby() {
     return { success: false, message: 'Error: ' + err.toString() };
   }
 }
+/**
+ * Fetches real-time counts of online, waiting, and playing players.
+ * Add this function to Code.gs
+ */
+function getOnlineStats() {
+  try {
+    const sheet = getSheet('Online players');
+    const data = sheet.getDataRange().getValues();
+
+    let waitingCount = 0;
+    let playingCount = 0;
+    let choosingCount = 0;
+
+    for (let i = 1; i < data.length; i++) {
+      const status = data[i][2] ? data[i][2].toString().toLowerCase().trim() : '';
+      if (status === 'waiting') {
+        waitingCount++;
+      } else if (status === 'playing') {
+        playingCount++;
+      } else if (status === 'choosing') {
+        choosingCount++;
+      }
+    }
+
+    return {
+      success: true,
+      totalOnline: waitingCount + playingCount + choosingCount,
+      waitingCount: waitingCount,
+      playingCount: playingCount,
+      choosingCount: choosingCount
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: err.toString(),
+      totalOnline: 0,
+      waitingCount: 0,
+      playingCount: 0,
+      choosingCount: 0
+    };
+  }
+}
