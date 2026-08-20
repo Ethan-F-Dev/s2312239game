@@ -650,6 +650,27 @@
     window.addEventListener('load', () => {
         startStatsPolling();
     });
+    function sendHeartbeat() {
+        if (playerName) return;
+        google.script.run
+        .withSuccessHandler(res => {
+            // Timestamp updated successfully
+            })
+        .withFailureHandler(err => {
+            console.warn("Heartbeat ping failed:", err);
+            
+        })
+        .updateTimeStamp(playerName);
+        // Ping every 5000 ms (5 seconds)
+        setTimeout(() => { 
+            sendHeartbeat(); 
+        }, 5000);
+    }
+    
+      window.addEventListener('load', () => {
+        sendHeartbeat();
+      });
+    
 //------------------------------Game UI----------------------------
 
 
