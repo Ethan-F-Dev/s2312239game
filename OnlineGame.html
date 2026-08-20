@@ -12,7 +12,48 @@
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; user-select: none; 
             -webkit-user-select: none; touch-action: none; font-family: var(--font-main); }
         canvas { display: block; }
+        #orientation-warning {
+            position: fixed;
+            inset: 0;
+            background: #000000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 999999;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
         
+        #orientation-warning h2 {
+            color: #ffd700;
+            margin: 12px 0 6px 0;
+            font-size: 22px;
+        }
+        
+        #orientation-warning p {
+            color: #aaa;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .rotate-icon {
+            font-size: 54px;
+            animation: rotatePrompt 2s infinite ease-in-out;
+        }
+        
+        @keyframes rotatePrompt {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(-90deg); }
+        }
+        
+        /* Force show overlay in portrait mode */
+        @media (orientation: portrait) {
+            #orientation-warning {
+                display: flex !important;
+            }
+        }        
         #game-mode { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); display: flex; flex-direction: column; 
             justify-content: center; align-items: center; gap: 24px; z-index: 20000; pointer-events: auto; backdrop-filter: blur(4px); }
         .mode-btn { width: 320px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
@@ -121,6 +162,12 @@
     </style>
 </head>
 <body>
+    
+<div id="orientation-warning">
+    <div class="rotate-icon">🔄</div>
+    <h2>請旋轉螢幕至橫向</h2>
+    <p>Please rotate your device to landscape mode</p>
+</div>
 
 <!-- MODE SELECTION OVERLAY WITH INLINE ONCLICK -->
 <div id="game-mode">
@@ -686,7 +733,28 @@
 
     ]);
 
-    function resize() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
+    width = window.innerWidth;
+    height = window.innerHeight;
+
+    function resize() {
+        const isPortrait = window.innerHeight > window.innerWidth;
+        const warning = document.getElementById('orientation-warning');
+    
+        if (warning) {
+            warning.style.display = isPortrait ? 'flex' : 'none';
+        }
+    
+        // Only update canvas dimensions when in landscape mode
+        if (!isPortrait) {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+    }
+    
+    window.addEventListener('resize', resize);
+    window.addEventListener('orientationchange', resize);
     function updateMenuTitle() {
         const titleEl = document.getElementById('char-select-title');
         if (titleEl) {
