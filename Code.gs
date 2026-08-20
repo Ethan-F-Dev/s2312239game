@@ -255,14 +255,15 @@ function signIn(email, password) {
 // ----------------------------------------------------
 
 /**
- * Set Player Status ('choosing', 'waiting', 'wentOffLine')
+ * Updates player status, mode, room info, and active timestamp (Column 6).
  */
 function setPlayerStatus(player, newStatus, gameMode, peerId) {
   try {
     const sheet = getSheet('Online players');
     const data = sheet.getDataRange().getValues();
     const cleanPlayer = player.trim();
-    let activeMode = (gameMode || 'Standard').trim();
+    const activeMode = (gameMode || 'Unselected').trim();
+    const now = Date.now();
 
     let rowIndex = -1;
     for (let i = 1; i < data.length; i++) {
@@ -272,27 +273,23 @@ function setPlayerStatus(player, newStatus, gameMode, peerId) {
       }
     }
 
-    // 1. STATUS: CHOOSING / CHANGING MODE
-    // Clears Role (Col 4) and Room ID (Col 5). Does NOT generate any Room ID.
     if (newStatus === 'choosing') {
       if (rowIndex !== -1) {
         sheet.getRange(rowIndex, 2).setValue(activeMode);
         sheet.getRange(rowIndex, 3).setValue('choosing');
         sheet.getRange(rowIndex, 4).setValue('');
         sheet.getRange(rowIndex, 5).setValue('');
+        sheet.getRange(rowIndex, 6).setValue(now);
       } else {
-        sheet.appendRow([cleanPlayer, activeMode, 'choosing', '', '']);
+        sheet.appendRow([cleanPlayer, activeMode, 'choosing', '', '', now]);
       }
       return { success: true, status: 'choosing', mode: activeMode };
     }
 
-    // 2. STATUS: WAITING
-    // Room ID and P1/P2 roles are ONLY assigned when player enters waiting state.
     if (newStatus === 'waiting') {
       const currentData = sheet.getDataRange().getValues();
       let waitingP1RoomId = '';
 
-      // Find an available P1 in the same mode who is 'waiting'
       for (let i = 1; i < currentData.length; i++) {
         const rowPlayer = currentData[i][0].toString();
         const rowMode = currentData[i][1].toString();
@@ -321,8 +318,9 @@ function setPlayerStatus(player, newStatus, gameMode, peerId) {
         sheet.getRange(rowIndex, 3).setValue('waiting');
         sheet.getRange(rowIndex, 4).setValue(role);
         sheet.getRange(rowIndex, 5).setValue(roomId);
+        sheet.getRange(rowIndex, 6).setValue(now);
       } else {
-        sheet.appendRow([cleanPlayer, activeMode, 'waiting', role, roomId]);
+        sheet.appendRow([cleanPlayer, activeMode, 'waiting', role, roomId, now]);
       }
 
       return {
@@ -335,7 +333,6 @@ function setPlayerStatus(player, newStatus, gameMode, peerId) {
       };
     }
 
-    // 3. STATUS: OFFLINE
     if (newStatus === 'wentOffLine') {
       if (rowIndex !== -1) {
         sheet.deleteRow(rowIndex);
@@ -345,29 +342,43 @@ function setPlayerStatus(player, newStatus, gameMode, peerId) {
 
     return { success: false, message: 'Invalid status parameter.' };
   } catch (err) {
-    return { success: false, message: 'Error: ' + err.toString() };
+    return { success: false, message: err.toString() };
   }
 }
 
 /**
- * Check Room Status (Ignores players who are still in 'choosing' state)
+ * Cleans up stale users (>15s inactivity), updates caller timestamp, and checks match state.
  */
 function checkRoomStatus(player) {
   try {
     const sheet = getSheet('Online players');
     const data = sheet.getDataRange().getValues();
     const cleanPlayer = player.trim().toLowerCase();
+    const now = Date.now();
+    const TIMEOUT_MS = 15000; // 15 seconds threshold
 
+    // 1. Cleanup inactive players (bottom-to-top to avoid index shifting)
+    for (let i = data.length - 1; i >= 1; i--) {
+      const lastActive = Number(data[i][5]);
+      if (lastActive && (now - lastActive > TIMEOUT_MS)) {
+        sheet.deleteRow(i + 1);
+      }
+    }
+
+    // Refresh data after cleanup
+    const refreshedData = sheet.getDataRange().getValues();
     let playerRow = null;
+    let playerRowIndex = -1;
 
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][0].toString().toLowerCase() === cleanPlayer) {
+    for (let i = 1; i < refreshedData.length; i++) {
+      if (refreshedData[i][0].toString().toLowerCase() === cleanPlayer) {
+        playerRowIndex = i + 1;
         playerRow = {
-          name: data[i][0].toString(),
-          mode: data[i][1].toString(),
-          status: data[i][2].toString(),
-          role: data[i][3].toString(),
-          roomId: data[i][4].toString()
+          name: refreshedData[i][0].toString(),
+          mode: refreshedData[i][1].toString(),
+          status: refreshedData[i][2].toString(),
+          role: refreshedData[i][3].toString(),
+          roomId: refreshedData[i][4].toString()
         };
         break;
       }
@@ -377,11 +388,14 @@ function checkRoomStatus(player) {
       return { status: playerRow ? playerRow.status : 'offline' };
     }
 
+    // 2. Refresh current polling player's timestamp
+    sheet.getRange(playerRowIndex, 6).setValue(now);
+
     if (playerRow.status === 'playing') {
       let opponent = '';
-      for (let i = 1; i < data.length; i++) {
-        if (data[i][4].toString() === playerRow.roomId && data[i][0].toString().toLowerCase() !== cleanPlayer) {
-          opponent = data[i][0].toString();
+      for (let i = 1; i < refreshedData.length; i++) {
+        if (refreshedData[i][4].toString() === playerRow.roomId && refreshedData[i][0].toString().toLowerCase() !== cleanPlayer) {
+          opponent = refreshedData[i][0].toString();
           break;
         }
       }
@@ -399,21 +413,20 @@ function checkRoomStatus(player) {
     let p1Name = '', p2Name = '';
     let p1Status = '', p2Status = '';
 
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][4].toString() === playerRow.roomId && playerRow.roomId !== '') {
-        if (data[i][3].toString() === 'P1') {
+    for (let i = 1; i < refreshedData.length; i++) {
+      if (refreshedData[i][4].toString() === playerRow.roomId && playerRow.roomId !== '') {
+        if (refreshedData[i][3].toString() === 'P1') {
           p1Index = i + 1;
-          p1Name = data[i][0].toString();
-          p1Status = data[i][2].toString();
-        } else if (data[i][3].toString() === 'P2') {
+          p1Name = refreshedData[i][0].toString();
+          p1Status = refreshedData[i][2].toString();
+        } else if (refreshedData[i][3].toString() === 'P2') {
           p2Index = i + 1;
-          p2Name = data[i][0].toString();
-          p2Status = data[i][2].toString();
+          p2Name = refreshedData[i][0].toString();
+          p2Status = refreshedData[i][2].toString();
         }
       }
     }
 
-    // Both players must be present AND in 'waiting' status
     if (p1Index !== -1 && p2Index !== -1 && p1Status === 'waiting' && p2Status === 'waiting') {
       sheet.getRange(p1Index, 3).setValue('playing');
       sheet.getRange(p2Index, 3).setValue('playing');
@@ -440,7 +453,6 @@ function checkRoomStatus(player) {
     return { status: 'error', message: err.toString() };
   }
 }
-
 function leaveRoom(player) {
   try {
     const sheet = getSheet('Online players');
@@ -478,6 +490,27 @@ function getOnlineLobby() {
     return { success: true, players: players };
   } catch (err) {
     return { success: false, message: 'Error: ' + err.toString() };
+  }
+}
+/**
+ * Updates player's last active timestamp in Column 6.
+ */
+function updateTimeStamp(player) {
+  try {
+    const sheet = getSheet('Online players');
+    const data = sheet.getDataRange().getValues();
+    const cleanPlayer = player.trim().toLowerCase();
+    const now = Date.now();
+
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0].toString().toLowerCase() === cleanPlayer) {
+        sheet.getRange(i + 1, 6).setValue(now);
+        return { success: true, timestamp: now };
+      }
+    }
+    return { success: false, message: 'Player not found online.' };
+  } catch (err) {
+    return { success: false, message: err.toString() };
   }
 }
 /**
