@@ -1431,11 +1431,13 @@
                 }
                 const bw = 100; ctx.fillStyle = "#333"; ctx.fillRect(p.x - bw/2, p.y - 65, bw, 10); ctx.fillStyle = "#2ecc71"; ctx.fillRect(p.x - bw/2, p.y - 65, bw * (p.hp/p.maxHp), 10);
                 if(p.shield > 0) { ctx.fillStyle = "white"; ctx.fillRect(p.x - bw/2, p.y - 67, Math.min(bw, bw * p.shield/p.maxHp), 4); }
+                if(p.charIdx === 3) { ctx.fillStyle = "red"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.rage/3), 5); }
                 if(p.charIdx === 18) { ctx.fillStyle = "white"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.ammo/4), 5); ctx.fillStyle = "black"; ctx.fillRect(p.x, p.y-75, 1, 5); }
                 if(p.charIdx === 7) { ctx.fillStyle = "gold"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.funds/100), 5); ctx.fillStyle = "black"; ctx.fillRect(p.x, p.y-75, 1, 5); }
                 if(p.charIdx === 19) {ctx.fillStyle = "gray"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.leoEnAtk/3),5);}
                 if(p.charIdx === 24) {ctx.fillStyle = "red"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.blood/3),5);}
                 if(p.charIdx === 19) {ctx.fillStyle = "brown"; ctx.fillRect(p.x - bw/2, p.y + 35, bw * (p.soundAmount/500),5);}
+                if(p.charIdx === 3) {ctx.fillStyle = "purple"; ctx.fillRect(p.x - bw/2, p.y + 55, bw * (p.rageEnhTimer/5000),5);}
                 if(p.charIdx === 44) {ctx.fillStyle = "blue"; ctx.fillRect(p.x - bw/2, p.y + 35, bw * (p.yCombo/8),5);}
                 if(p.charIdx === 20) {ctx.fillStyle = "blue"; ctx.fillRect(p.x - bw/2, p.y + 35, bw * (p.jlauPerformance/5),5);ctx.fillStyle = "black"; ctx.fillRect(p.x-30, p.y+35, 1, 5);ctx.fillRect(p.x-10, p.y+35, 1, 5);ctx.fillRect(p.x+10, p.y+35, 1, 5);ctx.fillRect(p.x+30, p.y+35, 1, 5);}
                 if(p.charIdx === 10) { ctx.fillStyle = "pink"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.capacity/2500), 5); }
@@ -1590,7 +1592,7 @@
             this.cd = { s1:0, s2:0, s3:0, atk:0, recover:0 }; this.isCasting = false; this.isVisible = true; this.isUntouchable = false; this.isDying = false; this.activeWarning = null;
             this.buffs = { speed: 1.0, atk: 1.0, slow: 1.0 };
             this.status = { stunned: 0, divineMark: 0, disarmed: 0, chill: 0, superArmor: 0, intimidated: 0, taunted: 0, frozen: 0, bound: 0, losegrip: 0 };
-            this.heartBroken = 0; this.rage = 0; this.isRageMode = false; this.rageTimer = 0; this.healTickTimer = 0; 
+            this.heartBroken = 0; this.rage = 0; this.isRageMode = false; this.rageTimer = 0; this.rageEnh = 0; this.isRageEnh = false; this.rageEnhTimer = 0; this.healTickTimer = 0; 
             this.enhancedAtk = false; this.stateTimer = 0; this.critStacks = 0; this.isChargingUlt = false; this.showShush = false; this.missBuffTimer = 0;
             this.comboCount = 0; this.comboTimer = 0; this.damageTakenAccumulator = 0;
             // Jiming
@@ -3148,7 +3150,10 @@ if (this.charIdx === 31) {
             }
             if(this.charIdx === 3) {
                 if(!this.isRageMode && this.rage >= 3) { this.isRageMode = true; this.rageTimer = 10000; this.buffs.atk = 1.2; }
-                if(this.isRageMode) { this.rageTimer -= dt * timeScale; this.healTickTimer += dt * timeScale; if(this.healTickTimer >= 1000) { this.heal(120); this.healTickTimer = 0; } if(this.rageTimer <= 0) { this.isRageMode = false; this.rage = 0; this.buffs.atk = 1.0; } }
+                if(this.isRageMode) { this.rageTimer -= dt * timeScale; this.healTickTimer += dt * timeScale; if(this.healTickTimer >= 1000) { this.heal(90); this.healTickTimer = 0; } if(this.rageTimer <= 0) { this.isRageMode = false; this.rage = 0; this.buffs.atk = 1.0; } }
+
+                if(!this.isRageEnh && this.rageEnh == 1) { this.isRageEnh = true; this.rageEnhTimer = 5000;}
+                if(this.isRageEnh) { this.rageEnhTimer -= dt * timeScale; if(this.rageEnhTimer <= 0) { this.isRageEnh = false; this.rageEnh = 0;} }
             }
             
             // Commander (6)
@@ -3694,10 +3699,7 @@ if (this.charIdx === 31) {
                     this.hp = Math.max(1, this.hp); // 給 1 滴血保底，確保沒死
                     return { hpDmg, shieldDmg }; 
                 }
-                if(this.id === 1){ // 只有在自己那邊死了才算
-                    this.triggerDeath(attackerCharIdx);
-                    sendDeath();
-                }
+                this.triggerDeath(attackerCharIdx);
             }
             return { hpDmg, shieldDmg }; 
         }
@@ -3733,8 +3735,6 @@ if (this.charIdx === 31) {
             this.isDying = true;
             setGameTimeout(checkMatchEnd, 2000);
             if(currentGameMode ==! "sf" || (p1PlayProgress === 3 && p1.hp <= 0) || (p2PlayProgress === 3 && p2.hp <= 0)){
-                stopStateSync();
-                sendDeath();
                 this.isDying = true; timeScale = 0.2; deathFocus = this; for(let i=0; i<50; i++) particles.push(new Particle(this.x, this.y, "#888", "ash")); 
             }
         }
@@ -4543,7 +4543,7 @@ if (this.charIdx === 31) {
         else if(p.charIdx === 1) { p.activeWarning = { type:'rect', l: 180, h: 60}; setGameTimeout(() => { if(dist(p, enemy) < 180) { enemy.takeDamage(100 * p.buffs.atk, 1); p.flame += 2; shakeAmount=5; if(p.shiliLifelineActive) p.heal(100*0.8); } p.activeWarning = null; }, 100); }
         else if(p.charIdx === 21){if(p.divineEnh < 1){p.activeWarning = { type:'rect', l: 100, h: 60, color: 'yellow'}; setGameTimeout(() => { if(dist(p, enemy) < 100) {for(let i=0; i<15; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "☀️", 10.0)); enemy.takeDamage(80 * p.divineAtk , 1); shakeAmount=5; if(p.shiliLifelineActive) p.heal(100*0.8); if(p.divineSpd < 65){p.divineSpd += 1; p.speed = 5;};if(p.divineAtk < 1.65){p.divineAtk += 0.01;}} p.activeWarning = null; }, 100); } else {if(!Math.abs(joy.joyX) < 0.1 && !Math.abs(joy.joyY) < 0.1){p.cd.s1 -= 500; p.cd.s2 -= 500; p.cd.s3 -= 500; p.divineDash = true; p.activeWarning = { type:'rect', l: 120, h: 60, color: 'red'}; setGameTimeout(() => { if(dist(p, enemy) < 120) {for(let i=0; i<15; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "🌟", 10.0)); enemy.takeDamage(85 * p.divineAtk , 1); p.heal(99); shakeAmount=5; if(p.shiliLifelineActive) p.heal(100*0.8); if(p.divineSpd < 65){p.divineSpd += 1; p.speed = 5;};if(p.divineAtk < 1.65){p.divineAtk += 0.01;}} p.activeWarning = null; p.cd.atk = 100; p.divineEnh -= 1;}, 100);let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*150, ty = p.y + Math.sin(aimAngle)*150; let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2; }, 16); setGameTimeout(() => {clearInterval(sInt);p.divineDash = false}, 150);}else{p.cd.atk = 0; floatTexts.push(new FloatText(p.x, p.y-80, "無法使用", "gray"));}}}
         else if(p.charIdx === 2) { projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "yellow", 156 * p.buffs.atk, p, "☀️", 1.05, null, null, 5)); if(p.shiliLifelineActive) p.heal(156*0.8); }
-        else if(p.charIdx === 3) { p.activeWarning = { type:'rect', l: 140, h: 50 }; setGameTimeout(() => { if(dist(p, enemy) < 140) { enemy.takeDamage(145 * p.buffs.atk, 3); shakeAmount=5; if(p.shiliLifelineActive) p.heal(145*0.8); } p.activeWarning = null; }, 100); }
+        else if(p.charIdx === 3) { p.activeWarning = { type:'rect', l: 140, h: 50 }; setGameTimeout(() => { if(dist(p, enemy) < 140) {if(p.isRageEnh == false){enemy.takeDamage(120 * p.buffs.atk, 3); shakeAmount=5; if(p.shiliLifelineActive) p.heal(145*0.8); } else { if(p.target.hp * 0.08 >= 120){enemy.takeDamage((p.target.hp * 0.08) * p.buffs.atk, 3); shakeAmount=5; if(p.shiliLifelineActive) p.heal(145*0.8); } else { enemy.takeDamage(120 * p.buffs.atk, 3); shakeAmount=5; if(p.shiliLifelineActive) p.heal(145*0.8); }}} p.activeWarning = null; }, 100); }
         else if(p.charIdx === 7) { p.activeWarning = { type:'sector', r: 180, ap: Math.PI/2, color: 'rgba(0,0,255,0.5)' }; setGameTimeout(() => { p.activeWarning = null; if(dist(p, enemy) < 180) { let ang = Math.atan2(enemy.y-p.y, enemy.x-p.x); let diff = Math.abs(ang - p.angle); if(diff > Math.PI) diff = 2*Math.PI - diff; if(diff < Math.PI/4) { let dmg = 170 * (p.micahEnhanced ? 1.3 : 1.0); enemy.takeDamage(dmg, 7); if(p.shiliLifelineActive) p.heal(dmg*0.8); } }  }, 200); }
         else if(p.charIdx === 8) { if(enemy.wounds > 0) { enemy.wounds--; p.heal(100); } p.activeWarning = { type:'sector', r: 180, ap: Math.PI/3, color: 'rgba(139,0,0,0.6)' }; setGameTimeout(() => { p.activeWarning = null; if(dist(p, enemy) < 180) { enemy.takeDamage(130, 8); if(Math.random()<0.5) { enemy.wounds = (enemy.wounds||0)+1; enemy.woundTimer = 10000; } if(p.shiliLifelineActive) p.heal(150*0.8); } }, 100); }
         else if(p.charIdx === 15) { 
@@ -5460,7 +5460,20 @@ if (this.charIdx === 31) {
         else if(p.charIdx === 17) {if(dist(p, enemy) < 100){enemy.takeDamage(100)}; let aimAngle = p.angle; if(Math.abs(joy.joyX)>0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); let startX = p.x, startY = p.y; p.x += Math.cos(aimAngle)*200; p.y += Math.sin(aimAngle)*200; for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "💨")); } if(dist(p.target, {x:(startX+p.x)/2, y:(startY+p.y)/2}) < 100); p.applyStatus('chill', 2000);shakeAmount = 15;p.addShield(200); setGameTimeout(() => { if(dist(p, enemy) < 105) {enemy.takeDamage(180, 1);p.addShield(80)} p.activeWarning = null;}, 200);}
         else if(p.charIdx === 0) { p.dash("hand", 200, 200, 200, 50, 'rgba(255,0,255,0.6)', "on");p.enhanceAtk(); }
         else if(p.charIdx === 2) { projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gold", 162, p, "✨", 2.0, 500, (t) => { if(t) { t.applyStatus('stunned', 630); t.applyStatus('slow', 3000); t.buffs.slow = 0.6; } }, 60, false, true)); }
-         else if(p.charIdx === 3) { projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "red", 325, p, "👊", 2, 250, (t) => { if(!p.isRageMode && p.rage < 3) p.rage++; if(t) { t.applyStatus('stunned', 1000); t.applyStatus('slow', 3000); t.buffs.slow = 0.5; } })); }
+        
+        else if(p.charIdx === 3) {
+             p.activeWarning = {type:'rect', l: 180, h: 90, color: 'red' }
+             p.applyStatus("disarmed", 600);
+             if(p.isRageEnh == false){
+                setGameTimeout(()=> {projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "red", 300, p, "👊", 2, 250, (t) => { if(!p.isRageMode && p.rage < 3) p.rage++; if(t) {p.rageEnh += 1; t.applyStatus('stunned', 1000); t.applyStatus('slow', 3000); t.buffs.slow = 0.5; p.activeWarning = null;} })); }, 600)
+             } else {
+                if(p.target.hp * 0.2 >= 300){setGameTimeout(()=> {projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "red", p.target.hp * 0.2, p, "👊", 2, 250, (t) => { if(!p.isRageMode && p.rage < 3) p.rage++; if(t) {p.rageEnh += 1; t.applyStatus('stunned', 1000); t.applyStatus('slow', 3000); t.buffs.slow = 0.5; p.activeWarning = null;} })); }, 600)
+                } else {
+                 setGameTimeout(()=> {projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "red", 300, p, "👊", 2, 250, (t) => { if(!p.isRageMode && p.rage < 3) p.rage++; if(t) {p.rageEnh += 1; t.applyStatus('stunned', 1000); t.applyStatus('slow', 3000); t.buffs.slow = 0.5; p.activeWarning = null;} })); }, 600)
+                }
+             }
+             }
+
         else if(p.charIdx === 6) { let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; p.addShield(100); let dashSteps = 0; let maxSteps = 20; p.applyStatus('superArmor', 500); p.isCasting = true; let si = setGameInterval(() => { p.x += Math.cos(aimAngle) * 12; p.y += Math.sin(aimAngle) * 12; dashSteps++; if(p.commanderMode) { p.soldiers.forEach(s => { s.x += Math.cos(aimAngle)*12; s.y += Math.sin(aimAngle)*12; }); if(dist(p, p.target) < 80) { p.target.x += Math.cos(aimAngle)*15; p.target.y += Math.sin(aimAngle)*15; } } if(dashSteps >= maxSteps) { clearInterval(si); p.isCasting = false; if(p.commanderMode) { p.superEnhancedAtk = true; shakeAmount = 10; floatTexts.push(new FloatText(p.x, p.y-80, "Ready!", "purple")); } } }, 16); }
         else if(p.charIdx === 7) { let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); let steps = 0; let dashInt = setGameInterval(() => { p.x += Math.cos(aimAngle) * 20; p.y += Math.sin(aimAngle) * 20; steps++; if(steps > 8) clearInterval(dashInt); }, 16); p.enhancedAtk = true; p.funds = Math.max(0, p.funds - 10); }
         else if(p.charIdx === 8) { p.isUntouchable = false; p.applyStatus('superArmor', 3000); p.isTransparent = true; p.shiliS1Lock = true; let count = 0; let si = setGameInterval(() => { p.heal(25); p.activeWarning = { type:'circle', r: 50, x: p.x, y: p.y, color: 'rgba(139,0,0,0.5)' }; if(dist(p, p.target) < 50) { p.target.takeDamage(30, 8); p.cd.s2 = Math.max(0, p.cd.s2-250); p.cd.s3 = Math.max(0, p.cd.s3-250); } count++; if(count > 12) { clearInterval(si); p.activeWarning = null; p.isTransparent = false; p.shiliS1Lock = false; } }, 250); }
@@ -6297,8 +6310,7 @@ if (p.charIdx === 31) {
                  for(let i=0; i<10; i++) particles.push(new Particle(p.x, p.y, "gold", "normal", "☀️", 1.5));
              }, 1200);
         } else if(p.charIdx === 3) { // Liu S2 Fix: Rage + CD reset
-             shakeAmount = 25; p.target.buffs.slow = 0.2; setGameTimeout(() => p.target.buffs.slow = 1.0, 3000); p.addShield(280); 
-             p.rage++; floatTexts.push(new FloatText(p.x, p.y-80, "+Rage", "red"));
+             shakeAmount = 25; p.target.buffs.slow = 0.2; setGameTimeout(() => p.target.buffs.slow = 1.0, 3000); p.addShield(150); 
              p.cd.s1 = 0; floatTexts.push(new FloatText(p.x, p.y-100, "S1 Ready!", "orange"));
         } else if(p.charIdx === 6) { // Commander S2 (Revised)
              if(p.commanderMode) {
@@ -7299,7 +7311,7 @@ if (p.charIdx === 31) {
         else if(p.charIdx === 1) { if(!p.taiS1Active){p.isUntouchable = true; p.isCasting = true; p.buffs.speed = 4.0; p.activeWarning = { type:'circle', r:120, color:'rgba(255,165,0,0.4)' }; let c = 0; let iInt = setGameInterval(() => { c++; p.x += (p.id===1?p1Touch.joyX:p2Touch.joyX)*p.speed*4; p.y += (p.id===1?p1Touch.joyY:p2Touch.joyY)*p.speed*4; if(c%30===0 && dist(p, p.target)<120) {p.target.takeDamage(80, 1);p.flame += 10} if(c > 200) { clearInterval(iInt); p.isUntouchable = false; p.isCasting = false; p.stateTimer = 8000; p.buffs.atk = 1.2; p.taiUltActive = true; p.cd.s1 = 0; p.cd.s2 = 0; floatTexts.push(new FloatText(p.x, p.y-100, "Refreshed!", "gold")); } }, 16); }else{p.cd.s3 = 0;}}
         else if(p.charIdx === 2) { const tx = p.target.x, ty = p.target.y; p.activeWarning = { type:'circle', r:120, x: tx, y: ty, color: 'rgba(255,255,0,0.6)' }; setGameTimeout(() => { for(let i=0; i<15; i++) particles.push(new Particle(tx, ty, "gold", "normal", "⚡", 1.0, 2.0)); if(dist({x: tx, y: ty}, p.target) < 120) { p.target.takeDamage(600, 2); p.applySlow(0.4); p.cd.s1 = 0; p.cd.s2 = 0; shakeAmount = 20; floatTexts.push(new FloatText(p.x, p.y-80, "Refreshed!", "gold")); } p.activeWarning = null; }, 1000); }
         else if(p.charIdx === 3) {
-            let rageUsed = p.isRageMode ? 3 : p.rage; const targetX = p.target.x, targetY = p.target.y; p.isCasting = true; 
+            let rageUsed = p.isRageMode ? 3 : p.rage; const targetX = p.target.x, targetY = p.target.y; p.isCasting = true;
             p.activeWarning = { type:'circle', r:252, x: targetX, y: targetY, color:'rgba(255,0,0,0.7)' }; 
             p.isUntouchable = true; p.applyStatus('superArmor', 2000); 
             setGameTimeout(() => { 
@@ -7308,10 +7320,12 @@ if (p.charIdx === 31) {
                     p.x = targetX; p.y = targetY; 
                     p.isVisible = true; p.isCasting = false; 
                     p.isUntouchable = false; p.activeWarning = null; 
-                    shakeAmount = 60; p.addShield(p.rage*250); p.rage = 0; 
+                    if(p.isRageEnh == true){p.addShield(p.rage*150 + 150);} else { p.addShield(p.rage*150);}
+                    shakeAmount = 60; p.rage = 0; 
                     p.isRageMode = false; p.buffs.atk = 1.0;
                     if(dist(p, p.target) < 252) { 
-                        p.target.takeDamage(960 * (1 + rageUsed * 0.4), 3); 
+                        if(p.isRageEnh == false){p.target.takeDamage(800 * (1 + rageUsed * 0.375), 3); }
+                        else {p.target.takeDamage(1100 * (1 + rageUsed * 0.375), 3); }
                         p.target.applyStatus('stunned', 1500); p.target.applyStatus('slow', 3000); 
                         p.target.buffs.slow = 0.4;
                         if (rageUsed >= 3 && p.target.hp <= 0) {
