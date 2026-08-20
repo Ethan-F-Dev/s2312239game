@@ -28,7 +28,46 @@
         #ui-layer { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
         
         #menu { position: absolute; inset: 0; background: radial-gradient(circle, #222, #000); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; pointer-events: auto; }
+        #online-stats-box {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(15, 15, 20, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 10px 16px;
+            color: #eee;
+            font-size: 13px;
+            z-index: 10001;
+            pointer-events: none;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+            min-width: 140px;
+        }
         
+        .stat-title {
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 6px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            padding-bottom: 4px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            line-height: 1.6;
+        }
+        
+        .stat-label { color: #aaa; font-weight: 500; }
+        .stat-val { font-weight: bold; color: #fff; }
+        .stat-val.highlight { color: #3498db; }
+        .stat-val.warning { color: #f1c40f; }
+        .stat-val.success { color: #2ecc71; }
         /* CURRENT MODE BADGE DISPLAY */
         #current-mode-badge { font-size: 13px; color: #3498db; background: rgba(52, 152, 219, 0.15); border: 1px solid #3498db; padding: 4px 14px; border-radius: 20px; margin-bottom: 8px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: bold; }
         
@@ -104,6 +143,26 @@
     <div class="menu-btn-container">
         <button id="back-modes-btn">模式</button>
         <button id="start-btn">VS</button>
+    </div>
+</div>
+
+<div id="online-stats-box">
+    <div class="stat-title">線上玩家狀態</div>
+    <div class="stat-row">
+        <span class="stat-label">在線總數:</span>
+        <span id="stat-total" class="stat-val highlight">0</span>
+    </div>
+    <div class="stat-row">
+        <span class="stat-label">選角中:</span>
+        <span id="stat-choosing" class="stat-val">0</span>
+    </div>
+    <div class="stat-row">
+        <span class="stat-label">匹配中:</span>
+        <span id="stat-waiting" class="stat-val warning">0</span>
+    </div>
+    <div class="stat-row">
+        <span class="stat-label">對戰中:</span>
+        <span id="stat-playing" class="stat-val success">0</span>
     </div>
 </div>
 
@@ -362,7 +421,7 @@
         activeRetries[msgId] = timer;
     }
     
-let syncInterval = null;
+    let syncInterval = null;
 
     function bindPeerEvents() {
         const sendHandshake = () => {
@@ -414,6 +473,7 @@ let syncInterval = null;
                 }
     
                 if (data.type === 'HANDSHAKE' && !gameRunning) {
+                    stopStatsPolling();
                     startGame();
                 }
             } 
@@ -504,6 +564,44 @@ let syncInterval = null;
         if (typeof google !== 'undefined' && google.script && google.script.run) {
             google.script.run.leaveRoom(playerName);
         }
+    });
+    let statsPollInterval = null;
+    
+    // Fetch and render counts from Code.gs
+    function fetchOnlineStats() {
+        if (typeof google !== 'undefined' && google?.script?.run) {
+            google.script.run
+                .withSuccessHandler(res => {
+                    if (res && res.success) {
+                        document.getElementById('stat-total').innerText    = res.totalOnline;
+                        document.getElementById('stat-choosing').innerText = res.choosingCount;
+                        document.getElementById('stat-waiting').innerText  = res.waitingCount;
+                        document.getElementById('stat-playing').innerText  = res.playingCount;
+                    }
+                })
+                .getOnlineStats();
+        }
+    }
+    
+    // Start polling every 4 seconds
+    function startStatsPolling() {
+        fetchOnlineStats();
+        if (!statsPollInterval) {
+            statsPollInterval = setInterval(fetchOnlineStats, 4000);
+        }
+    }
+    
+    // Stop polling when entering game match loop
+    function stopStatsPolling() {
+        if (statsPollInterval) {
+            clearInterval(statsPollInterval);
+            statsPollInterval = null;
+        }
+    }
+    
+    // Call inside window.onload
+    window.addEventListener('load', () => {
+        startStatsPolling();
     });
 //------------------------------Game UI----------------------------
 
@@ -7491,19 +7589,11 @@ if (p.charIdx === 31) {
             startBtn.onclick = handleStart;
             startBtn.addEventListener('touchstart', handleStart);
         }
-        const backModesBtn = document.getElementById('back-modes-btn');
-        if (backModesBtn) {
-            const handleRestart = (e) => {
-                if (e) e.preventDefault();
-                backToModeSelection();
-            };
-            backModesBtn.onclick = handleRestart;
-            backModesBtn.addEventListener('touchstart', handleRestart);
-        }
         const restartBtn = document.getElementById('restart-btn');
         if(restartBtn) {
             const handleRestart = (e) => {
                 if (e) e.preventDefault();
+                startStatsPolling();
                 backToModeSelection();
             };
 

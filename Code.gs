@@ -1,23 +1,44 @@
 const SPREADSHEET_ID = '13Cq3iTSu0ijhUt-H_GxrBcTYEvBiCUFTTW1ihQa9uXI';
 
+const GITHUB_BASE_URL = "https://raw.githubusercontent.com/s2312239-sketch/s2312239game/main/";
+
+function fetchGithubFile(fileName) {
+  try {
+    const url = GITHUB_BASE_URL + fileName;
+    const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+    if (response.getResponseCode() === 200) {
+      return response.getContentText();
+    } else {
+      throw new Error(`Failed to load ${fileName} from GitHub (HTTP ${response.getResponseCode()})`);
+    }
+  } catch (err) {
+    return `<div style="color:red; font-family:sans-serif; padding:20px;">
+              <h3>GitHub Fetch Error</h3>
+              <p>${err.toString()}</p>
+            </div>`;
+  }
+}
+
 function doGet() {
-  return HtmlService.createTemplateFromFile('Index')
-    .evaluate()
-    .setTitle('巔峰對決 | Arena Terminal')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
+  let indexHtml = fetchGithubFile('Index.html');
+  const stylesheetHtml = fetchGithubFile('Stylesheet.html');
+
+  indexHtml = indexHtml.replace(/<\?!=\s*include\(['"]Stylesheet['"]\);\s*\?>/gi, stylesheetHtml);
+
+  return HtmlService.createHtmlOutput(indexHtml)
+    .setTitle('巔峰對決')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
-function include(filename) {
-  return HtmlService.createHtmlOutputFromFile(filename).getContent();
-}
+function getGameContent(playerName, viewName) {
+  const fileName = (viewName === 'Classic') ? 'ClassicGame.html' : 'OnlineGame.html';
+  let gameHtml = fetchGithubFile(fileName);
+  const stylesheetHtml = fetchGithubFile('Stylesheet.html');
 
-function getGameContent(playerName, view) {
-  // 'view' determines which template to open, not the in-game mode
-  const templateName = (view === 'Online') ? 'OnlineGame' : 'ClassicGame';
-  const template = HtmlService.createTemplateFromFile(templateName);
-  template.playerName = playerName;
-  return template.evaluate().getContent();
+  gameHtml = gameHtml.replace(/<\?!=\s*include\(['"]Stylesheet['"]\);\s*\?>/gi, stylesheetHtml);
+  gameHtml = gameHtml.replace(/<\?=\s*playerName\s*\?>/g, playerName);
+
+  return gameHtml;
 }
 
 function getSheet(sheetName) {
@@ -457,5 +478,47 @@ function getOnlineLobby() {
     return { success: true, players: players };
   } catch (err) {
     return { success: false, message: 'Error: ' + err.toString() };
+  }
+}
+/**
+ * Fetches real-time counts of online, waiting, and playing players.
+ * Add this function to Code.gs
+ */
+function getOnlineStats() {
+  try {
+    const sheet = getSheet('Online players');
+    const data = sheet.getDataRange().getValues();
+
+    let waitingCount = 0;
+    let playingCount = 0;
+    let choosingCount = 0;
+
+    for (let i = 1; i < data.length; i++) {
+      const status = data[i][2] ? data[i][2].toString().toLowerCase().trim() : '';
+      if (status === 'waiting') {
+        waitingCount++;
+      } else if (status === 'playing') {
+        playingCount++;
+      } else if (status === 'choosing') {
+        choosingCount++;
+      }
+    }
+
+    return {
+      success: true,
+      totalOnline: waitingCount + playingCount + choosingCount,
+      waitingCount: waitingCount,
+      playingCount: playingCount,
+      choosingCount: choosingCount
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: err.toString(),
+      totalOnline: 0,
+      waitingCount: 0,
+      playingCount: 0,
+      choosingCount: 0
+    };
   }
 }
