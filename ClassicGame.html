@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Security-Policy" content="media-src * data: blob:;">
-    <title>巔峰對決 - 浪潮者 </title>
+    <title>巔峰對決 - 賢者本賢 </title>
     <style>
         :root { --p1-ui: #3498db; --p2-ui: #e74c3c; --font-main: 'Noto Sans TC', sans-serif; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; user-select: none; 
@@ -799,6 +799,13 @@
                 ctx.beginPath(); ctx.arc(0,0,220,0,Math.PI*2); ctx.fillStyle="gray"; ctx.fill(); ctx.strokeStyle="gray"; ctx.stroke();
                 ctx.restore();
             }
+
+            if (p.charIdx === 45 && p.jS2 == true){
+                 ctx.save(); ctx.translate(p.x, p.y); 
+                ctx.beginPath(); ctx.arc(0,0,200,0,Math.PI*2); ctx.fillStyle="white"; ctx.fill(); ctx.strokeStyle="white"; ctx.stroke();
+                ctx.restore();
+            }
+
             if (p.charIdx === 13 && p.cops.length > 0) {
                 p.cops.forEach(cop => { ctx.font = "30px Arial"; ctx.fillText("👮‍♂️", cop.x-15, cop.y+15); });
             }
@@ -871,6 +878,8 @@
                 }
                 const bw = 100; ctx.fillStyle = "#333"; ctx.fillRect(p.x - bw/2, p.y - 65, bw, 10); ctx.fillStyle = "#2ecc71"; ctx.fillRect(p.x - bw/2, p.y - 65, bw * (p.hp/p.maxHp), 10);
                 if(p.shield > 0) { ctx.fillStyle = "white"; ctx.fillRect(p.x - bw/2, p.y - 67, Math.min(bw, bw * p.shield/p.maxHp), 4); }
+                if(p.charIdx === 45) { ctx.fillStyle = "gray"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.jEnergy/2), 5); }
+                
                 if(p.charIdx === 3) { ctx.fillStyle = "red"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.rage/3), 5); }
                 if(p.charIdx === 18) { ctx.fillStyle = "white"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.ammo/4), 5); ctx.fillStyle = "black"; ctx.fillRect(p.x, p.y-75, 1, 5); }
                 if(p.charIdx === 7) { ctx.fillStyle = "gold"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.funds/100), 5); ctx.fillStyle = "black"; ctx.fillRect(p.x, p.y-75, 1, 5); }
@@ -911,6 +920,7 @@
                 if(p.status.chill > 0){ ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("😌", p.x - 20, p.y - 110); }
                 if (p.status.superArmor > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("🪬", p.x - 20, p.y - 110); }
                 if (p.status.divineMark > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("⚜️", p.x - 20, p.y - 110); }
+                if (p.status.high > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("🥵", p.x - 20, p.y - 110); }
             } else if(p.isDying) { for(let i=0; i<1; i++) particles.push(new Particle(p.x+(Math.random()-0.5)*50, p.y+(Math.random()-0.5)*50, "#fff", 'death')); }
         });
         [p1, p2].forEach(p => { 
@@ -1031,7 +1041,7 @@
             this.angle = 0; this.target = null;
             this.cd = { s1:0, s2:0, s3:0, atk:0, recover:0 }; this.isCasting = false; this.isVisible = true; this.isUntouchable = false; this.isDying = false; this.activeWarning = null;
             this.buffs = { speed: 1.0, atk: 1.0, slow: 1.0 };
-            this.status = { stunned: 0, divineMark: 0, disarmed: 0, chill: 0, superArmor: 0, intimidated: 0, taunted: 0, frozen: 0, bound: 0, losegrip: 0 };
+            this.status = { stunned: 0, divineMark: 0, high: 0, disarmed: 0, chill: 0, superArmor: 0, intimidated: 0, taunted: 0, frozen: 0, bound: 0, losegrip: 0 };
             this.heartBroken = 0; this.rage = 0; this.isRageMode = false; this.rageTimer = 0; this.rageEnh = 0; this.isRageEnh = false; this.rageEnhTimer = 0; this.healTickTimer = 0; 
             this.enhancedAtk = false; this.stateTimer = 0; this.critStacks = 0; this.isChargingUlt = false; this.showShush = false; this.missBuffTimer = 0;
             this.comboCount = 0; this.comboTimer = 0; this.damageTakenAccumulator = 0;
@@ -1111,14 +1121,14 @@
             this.wenStationary = false;
             this.wenS3DashBuff = 0;
             this.wenBasicAim = false
-	// Yifeng 
+	        // Yifeng 
             this.yfNest = null;
             this.yfS2Resets = 0;
             this.yfPassiveCd = 0;
             this.yfPassiveReady = true;
             this.yfFlying = false;
             this.yfFlyTimer = 0;
-	// Chain (30)
+	        // Chain (30)
             this.chainLinkTarget = null; // 連結到的敵人
             this.chainLinkPos = null;    // 連結到的空地/牆壁座標
             this.chainLinkTimer = 0;     // 連結持續時間
@@ -1126,7 +1136,7 @@
             this.chainUltTimer = 0;      // 大絕增益時間
             this.chainSpeedBuff = false; // 避免疊加 Bug 的速度標記
             this.chainAtkBuff = false;   // 避免疊加 Bug 的攻擊標記
-	// Yuhao (31)
+	        // Yuhao (31)
             this.yhSmokes = [];          // 儲存場上所有煙霧
             this.yhInSmokeFlag = false;  // 避免重複疊加煙霧 Buff
             this.yhChargeSlowBuff = false; // 避免重複疊加緩速 Buff
@@ -1137,7 +1147,7 @@
             this.yhUltFlying = false;    // 大絕飛天狀態
             this.yhUltTimer = 0;         // 大絕強化狀態倒數
             this.yhUltEnAtkCount = 0;    // 大絕強化普攻次數
-	// Deep Sea (32)
+	        // Deep Sea (32)
             this.passiveWasActivated = false;
             this.shPassiveCd = 0;         // 被動冷卻
             this.shPuddles = [];          // 分裂出的水灘
@@ -1147,7 +1157,7 @@
             this.shVortexes = [];         // S1 的漩渦
             this.shS3Zone = null;         // S3 的海浪範圍
             this.shS3BuffActive = false;  // S3 範圍增益標記
-	// Mimic (33)
+	        // Mimic (33)
             this.mimPieces = 0;          // 🧩 碎片數量 (最多 5)
             this.mimS1Bird = null;       // 🕊️ 一技能鴿子物件
             this.mimS1Phase = 1;         // 一技能階段
@@ -1157,7 +1167,7 @@
             this.mimOriginalCharIdx = -1; // 記錄原本是模仿者(33)
             this.mimPuppetDmgDealt = 0;  // 變身期間造成的總傷害
             this.mimPuppetTimer = 0;     // 6秒自動解除倒數
-	// Seven-Star (34)
+	        // Seven-Star (34)
             this.qxEnergy = 0;           // 能量值 (最高100)
             this.qxMarks = [];           // 場上的 🍬 標記
             this.qxUltTimer = 0;         // 大絕強化狀態倒數
@@ -1165,7 +1175,7 @@
             this.qxUltHealTimer = 0;     // 大絕每秒回血計時器
             this.qxEnergyDrainTimer = 0; // 每2秒減少能量計時器
             this.qxMarkS3CdTimer = 0;    // 標記周圍減大絕CD計時
-	// Clovis (35)
+	        // Clovis (35)
             this.clovisEnergy = 0;
             this.clovisPassiveCd = 0;
             this.clovisPassiveDamageBuff = false;
@@ -1175,7 +1185,7 @@
             this.clovisMines = [];
             this.clovisS2Bombs = [];
             this.clovisAutoShootTimer = 0;
-	// Lingpan (36)
+	        // Lingpan (36)
             this.lpCrutchOut = false;      // 拐杖是否脫手
             this.lpCrutchPos = null;       // 拐杖落地的位置
             this.lpRetrieveBuff = false;   // 是否處於取回強化狀態
@@ -1185,25 +1195,25 @@
             this.lpS3BuffTimer = 0;        // 大招10秒強化狀態倒數
             this.lpAutoTpTimer = 0;        // 大招強化期間自動傳送的倒數計時
             this.lpAutoTpActive = false;   // 自動傳送是否啟動
-	// Tolo (37)
+	        // Tolo (37)
             this.tlBalance = 0;           // 平衡值
             this.tlS2Timer = 0;           // 超強化旋轉時間
             this.tlS2BuffApplied = false; // S2 Buff 標記
             this.tlS3Active = false;      // 大招高速旋轉狀態
             this.tlS3SpeedBuffApplied = false; // 大招速度 Buff 標記
             this.tlS3Tick = 0;            // 大招傷害計時器
-	// Doctor (38)
+	        // Doctor (38)
             this.docStance = 0;           // 0 = 傷害型態 (深藍), 1 = 恢復型態 (綠)
             this.docEnhancedAtk = false;  // 是否擁有強化普攻(暈眩2秒)
             this.docS1SpeedTimer = 0;     // S1 速度提升 60% 計時器
             this.docS3Active = false;     // S3 點穴狀態開關
             this.docS3Timer = 0;          // S3 點穴持續時間倒數
             this.docS3Tick = 0;           // S3 每 0.5 秒傷害計時
-	// Master of Prime Energy (39)
+	        // Master of Prime Energy (39)
             this.ynEnhancedAtk = 0;       // 強化普攻次數
             this.ynShieldTimer = 0;       // 二技能護盾計時器
             this.ynUltTimer = 0;          // 大招強化計時器
-	// Sage (40)
+	        // Sage (40)
             this.zzStationaryTimer = 0;   // 靜止時間計時
             this.zzPassiveStacks = 0;     // 反思被動層數 (最高25層=50%)
             this.zzS1Phase = 1;           // 一技能階段
@@ -1211,13 +1221,13 @@
             this.zzS2Active = false;      // 二技能預判護盾視窗
             this.zzS2Timer = 0;           // 二技能時間
             this.zzS2EnhancedAtk = false; // 二技能強化普攻標記
-	// Night Hunter (41)
+	        // Night Hunter (41)
             this.nhIsRanged = false;       // 初始近戰型態
             this.nhNightfallActive = false; // 夜色降臨被動標記
             this.nhS2SpdBuffTimer = 0;     // 二技能加速計時
             this.nhS2SpdApplied = false;   // 二技能加速標記
             this.nhS3AtkSpdTimer = 0;      // 大招攻速計時
-	// Slime (42)
+	        // Slime (42)
 			this.slS2Phase = 1
             this.slState = 0;              // 0: 黏性型態, 1: 無黏型態
             this.slLinkTarget = null;      // 綠色粗線連接目標
@@ -1226,7 +1236,7 @@
             this.slS2StickyBuff = 0;       // 黏性二技能增益計時 (攻速/傷害 25%)
             this.slS2NonStickyBuff = 0;    // 無黏二技能增益計時 (攻速/傷害 10%)
             this.slS3Timer = 0;            // 大招百變風格計時
-	// Blade Master (43)
+	        // Blade Master (43)
             this.dxState = 0;              // 0: 單刀型態, 1: 雙刀型態
             this.dxEnhancedAtk = 0;        // 強化普攻次數
             this.dxS2PermDmg = 0;          // 二技能永久傷害加成
@@ -1235,16 +1245,20 @@
             this.dxS2FanAngle = 0;         // 雙刀 S2 鎖定扇形角度
             this.dxS3SingleTimer = 0;      // 單刀大絕強化時間
             this.dxS3DualTimer = 0;        // 雙刀大絕強化時間
-    // Waves (44)
+            // Waves (44)
             this.yProtection = 100;
             this.yRegenTimer = 0;
             this.yAim = false;
             this.ycanCombo = true;
             this.yCombo = 0;
             this.ySuper = false;
-	 // jerk (45) 專用 this.deerEnergyStacks = 0; // 0..2，普攻蓄能 this.deerMaxStacks = 2; this.deerMarkTimer = 0; // 當此玩家被標記時（標記存在於被標記的 Player 上），用以倒計時（ms）
-        
-    // kill (46)
+	        // jerk (45) 
+            this.jEnergy = 0;
+            this.jS2 = false;
+            this.jWeakened = false;
+            this.jS2Alr = false;
+            this.jcanCombo = true;
+            // kill (46)
             this.kState = 0;
             this.ksState = 1;
         }
@@ -3104,6 +3118,7 @@ if (this.charIdx === 31) {
                 if (this.charIdx === 31 && this.yhInSmokeFlag) reduction *= 0.6; 
                 if (this.charIdx === 37 && this.tlS3Active) reduction *= 0.8;
                 if (this.charIdx === 42 && this.slState === 0) reduction *= 0.85;
+                if (this.charIdx === 45 && this.jWeakened === true) reduction *= 0.55;
             } else {
                 if(this.yProtection >= 1){
                 if (this.charIdx === 44 && this.ySuper == true) reduction *= 0.2*(1/(this.yCombo/2));
@@ -3209,7 +3224,7 @@ if (this.charIdx === 31) {
     function castAtk(p) {
         const joy = p.id === 1 ? p1Touch : p2Touch;
         if(p.cd.atk > 0 || p.isLock || p.hp <= 0 || p.status.losegrip > 0) return; 
-
+    
     if(p.charIdx === 46){
         p.activeWarning = { type:'rect', l: 150, h: 20}; 
         setGameTimeout(() => { if(dist(p, enemy) < 150) { 
@@ -3238,6 +3253,18 @@ if (this.charIdx === 31) {
              }, 200)
         }
         shakeAmount=5;} p.activeWarning = null; }, 100);  
+    }
+    
+    if(p.charIdx === 45){
+        if(p.jEnergy <= 1){
+        projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "yellow", 91 * p.buffs.atk, p, "👅", 1.5, null, null, 5));
+        p.jEnergy += 1;
+        } else {
+        p.jEnergy = 0;
+        projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 91, p, "🍆", 1.5, 600, (e) => {
+                        e.applyStatus("high", 5000)                    
+        }, 25));
+        }
     }
 
     if(p.charIdx === 44){
@@ -4209,10 +4236,18 @@ if (this.charIdx === 31) {
         p.cd.s1 = CHAR_DATA[p.charIdx].s1Cd;
         if(p.charIdx === 6 && p.commanderMode) p.cd.s1 = 4000;
         const joy = p.id === 1 ? p1Touch : p2Touch;
+    
+    if(p.charIdx === 45){
+        projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 150, p, "⬜️", 1.5, 600, (e) => {
+                        e.applyStatus("high", 5000)
+                        p.heal(100);
+                        p.addShield(100);                    
+        }, 25));
+    }
 
     if(p.charIdx === 44){
         playSkillSound(44, 's1')
-        if(p.ySuper == false){p.yProtectin -= 5;}
+        if(p.ySuper == false){p.yProtection -= 5;}
         for(let i=0; i<25; i++) {
                 let spread = (Math.random() - 0.5) * (Math.PI / 0.5); 
                 let speed = 38 + Math.random() * 12;
@@ -4977,6 +5012,13 @@ if (this.charIdx === 31) {
         const joy = p.id === 1 ? p1Touch : p2Touch;
         if(p.cd.s2 > 0 || p.isLock || p.status.disarmed > 0 || p.hp <= 0) return;
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
+    
+    if(p.charIdx === 45){
+        p.jS2 = true
+        let c = 0;
+        let j = setGameInterval(()=> {if(p.jS2Alr == false && c <= 99){c++; if(dist(p, p.target) <= 200){p.heal(200); p.addShield(200);p.jS2Alr = true; enemy.applyStatus("stunned", 500); enemy.applyStatus("high", 5000); p.jWeakened = true; setGameTimeout(()=> {p.jWeakened = false; p.jS2Alr = false}, 2000)}}else{clearInterval(j)}},10)
+        setGameTimeout(()=> p.jS2 = false, 1000)
+    }
 
     if(p.charIdx === 44){
         const joy = p.id===1?p1Touch:p2Touch; 
@@ -5816,7 +5858,20 @@ if (p.charIdx === 31) {
         if(p.status.stunned > 0 || p.status.disarmed > 0 || p.isCasting) return;
         if(p.status.stunned > 0 || p.status.disarmed > 0) return;
         p.cd.s3 = CHAR_DATA[p.charIdx].s3Cd;
-
+    
+    if(p.charIdx === 45){
+        const joy = p.id===1?p1Touch:p2Touch; 
+        if(Math.abs(joy.joyX) < 0.1 && Math.abs(joy.joyY) < 0.1){
+            p.cd.s3 = 0;
+            floatTexts.push(new FloatText(p.x, p.y - 80, "無法使用！", "gray"));
+        } else {
+        if(dist(p, enemy) < 60){p.jCanCombo = false; p.target.takeDamage(350); if(enemy.status.high >= 1){ p.cd.s3 = 100}; p.heal(60);}
+        let startX = p.x, startY = p.y; 
+        let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*400, ty = p.y + Math.sin(aimAngle)*400; 
+        let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2;for(let i=0; i<3; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "⬜️")); };if(dist(p, enemy) < 52 && p.jcanCombo == true){p.jcanCombo = false;p.target.takeDamage(350); if(enemy.status.high >= 1){p.cd.s3 = 100; enemy.applyStatus("high", 0);}}}, 16); setGameTimeout(() => {clearInterval(sInt); if(p.jcanCombo == false){p.jcanCombo = true;}else{p.jcanCombo = true;}}, 150); 
+       }
+       
+    }
     if (p.charIdx === 44){
     if(p.yProtection >= 50 && p.yCombo >= 2){
       p.ySuper = true;
