@@ -73,6 +73,7 @@
         .btn-s2 { width: 85px; height: 85px; bottom: 110px; right: 110px; }
         .btn-s3 { width: 95px; height: 95px; bottom: 150px; right: 15px; border-color: gold; }
         .btn-rec { width: 65px; height: 65px; bottom: 15px; right: 240px; border-color: #2ecc71; }
+        .btn-ex { width: 55px; height: 55px; bottom: 250px; right: 15px; border: 3px solid #8e44ad; box-shadow: 0 0 12px rgba(142,68,173,0.7); }
         .joystick { position: absolute; width: 140px; height: 140px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; pointer-events: auto; bottom: 50px; left: 50px; }
         .stick { position: absolute; width: 60px; height: 60px; background: rgba(255,255,255,0.3); border-radius: 50%; left: 40px; top: 40px; }
         .p2-ui { position: absolute; inset: 0; pointer-events: none; transform: rotate(180deg); }
@@ -110,6 +111,7 @@
         <div class="game-btn btn-s1" id="p1-btn-s1"><span class="cd-text">1</span></div>
         <div class="game-btn btn-s2" id="p1-btn-s2"><span class="cd-text">2</span></div>
         <div class="game-btn btn-s3" id="p1-btn-s3"><span class="cd-text">終</span></div>
+        <div class="game-btn btn-ex" id="p1-btn-ex"><span class="cd-text">嘲</span></div>
         <div class="game-btn btn-atk" id="p1-btn-atk"><span class="cd-text">攻</span></div>
     </div>
     <div class="p2-ui">
@@ -119,6 +121,7 @@
             <div class="game-btn btn-s1" id="p2-btn-s1"><span class="cd-text">1</span></div>
             <div class="game-btn btn-s2" id="p2-btn-s2"><span class="cd-text">2</span></div>
             <div class="game-btn btn-s3" id="p2-btn-s3"><span class="cd-text">終</span></div>
+            <div class="game-btn btn-ex" id="p2-btn-ex"><span class="cd-text">嘲</span></div>
             <div class="game-btn btn-atk" id="p2-btn-atk"><span class="cd-text">攻</span></div>
         </div>
     </div>
@@ -313,11 +316,11 @@
         
     }
     function updateButtonCD(p, prefix) {
-        ['s1', 's2', 's3', 'recover', 'atk'].forEach(k => {
+        ['s1', 's2', 's3', 'recover', 'atk', 'ex'].forEach(k => {
             const el = document.getElementById(`${prefix}-btn-${k}`); if(!el) return;
             const txt = el.querySelector('.cd-text');
             
-            let disabled = p.status.stunned > 0 || p.status.taunted > 0 || p.status.frozen > 0 || p.status.bound > 0 || (p.status.disarmed > 0 && k !== 'recover' && k !== 'atk') || (p.status.losegrip > 0 && k !== 'recover' && k !== 's1' && k !== 's2'  && k !== 's3');
+            let disabled = p.status.stunned > 0 || p.status.taunted > 0 || p.status.frozen > 0 || p.status.bound > 0 || (p.status.disarmed > 0 && k !== 'recover' && k !== 'atk' && k !== 'ex') || (p.status.losegrip > 0 && k !== 'recover' && k !== 's1' && k !== 's2'  && k !== 's3');
             if (p.isCasting) {
                 if (p.charIdx === 1 && p.taiS1Active && k === 'atk') disabled = false;
                 else disabled = true;
@@ -329,7 +332,7 @@
             
             if (disabled) el.classList.add('disabled'); else el.classList.remove('disabled');
             if(p.cd[k] > 0) { txt.innerText = Math.ceil(p.cd[k]/1000); el.style.opacity = "0.4"; }
-            else { txt.innerText = k==='recover'?'復':(k==='s3'?'終':(k==='atk'?'攻':k.slice(1))); el.style.opacity = "1"; }
+            else { txt.innerText = k==='recover'?'復':(k==='s3'?'終':(k==='atk'?'攻':(k==='ex'?'嘲':k.slice(1)))); el.style.opacity = "1"; }
         });
     }
     function bindButtons() {
@@ -358,10 +361,12 @@
                  else if(type === 's2') castS2(p); 
                  else if(type === 's3') castS3(p); 
                  else if(type === 'recover') castRecover(p); 
+                 else if(type === 'ex') castEx(p);
+
              });
         };
         setupJoy(1, "p1-joy", "p1-stick", p1Touch); setupJoy(2, "p2-joy", "p2-stick", p2Touch);
-        ['atk', 's1', 's2', 's3', 'recover'].forEach(t => { setupBtn(1, t); setupBtn(2, t); });
+        ['atk', 's1', 's2', 's3', 'recover', 'ex'].forEach(t => { setupBtn(1, t); setupBtn(2, t); });
     }
     /**
      * Triggers an achievement banner overlay mid-game, centered on screen.
@@ -859,9 +864,11 @@
                 ctx.fillStyle = "#fff"; ctx.fillRect(15, -5, 10, 10); 
                 if(p.charIdx === 9) { ctx.font="20px Arial"; ctx.fillText("😂", -10, 5); }
                 if(p.charIdx === 23 && p.uniS1 == true) { ctx.font="40px Arial"; ctx.fillText("🌍", -20, -40);  ctx.font="40px Arial"; ctx.fillText("🌕", -20, 70);}
+                if(p.roasting === true) { ctx.font="40px Arial"; ctx.fillText("👉", -20, -40);  ctx.font="50px Arial"; ctx.fillText("🤣", -33, 13);}
                 if(p.charIdx === 10) { ctx.font="20px Arial"; ctx.fillText("🌸", -10, 5); }
                 if(p.stared == true) {ctx.font="35px Arial"; ctx.fillText("👁️", -10, 5); }
                 if(p.charIdx === 16) { ctx.font="20px Arial"; ctx.fillText("🥊", -10, 5); }
+                if(p.roasted === true) { ctx.font="50px Arial"; ctx.fillText("🤡", -33, 13); }
                 if(p.charIdx === 20) { ctx.font="40px Arial"; ctx.fillText("9" , -22, 13); }
                 if(p.charIdx === 22) { ctx.font="40px Arial"; ctx.fillText("👁️" , -33, 13); }
                 if(p.charIdx === 20 && p.holdBall == true) { ctx.font="45px Arial"; ctx.fillText("⚽️", 30, 13); }
@@ -1035,11 +1042,12 @@
     class Player {
         constructor(id, charIdx, x, y) {
             const d = CHAR_DATA[charIdx];
+            this.roasted = false; this.roasting = false;
             this.id = id; this.charIdx = charIdx; this.hp = d.hp; this.maxHp = d.hp; this.shield = 0;
             this.x = x; this.y = y; this.radius = 30;
             this.color = d.color; this.speed = d.speed;
             this.angle = 0; this.target = null;
-            this.cd = { s1:0, s2:0, s3:0, atk:0, recover:0 }; this.isCasting = false; this.isVisible = true; this.isUntouchable = false; this.isDying = false; this.activeWarning = null;
+            this.cd = { s1:0, s2:0, s3:0, atk:0, recover:0, ex:0}; this.isCasting = false; this.isVisible = true; this.isUntouchable = false; this.isDying = false; this.activeWarning = null;
             this.buffs = { speed: 1.0, atk: 1.0, slow: 1.0 };
             this.status = { stunned: 0, divineMark: 0, high: 0, disarmed: 0, chill: 0, superArmor: 0, intimidated: 0, taunted: 0, frozen: 0, bound: 0, losegrip: 0 };
             this.heartBroken = 0; this.rage = 0; this.isRageMode = false; this.rageTimer = 0; this.rageEnh = 0; this.isRageEnh = false; this.rageEnhTimer = 0; this.healTickTimer = 0; 
@@ -7018,6 +7026,21 @@ if (p.charIdx === 31) {
         }
     
     }
+
+    function castEx(p) {
+        const joy = p.id === 1 ? p1Touch : p2Touch;
+        if(p.cd.ex > 0 || p.hp <= 0) return;
+        p.cd.ex = 30000; 
+        shakeAmount = 50;
+        p.target.roasted = true;
+        p.roasting = true;
+        p.target.takeDamage(1);
+        setGameTimeout(()=> {p.target.roasted = false; p.roasting = false}, 3000);
+        for(let i=0; i<15; i++) {
+            particles.push(new Particle(p.target.x, p.target.y, "#9b59b6", "normal", "💩", 15.0, 1.0));
+        }
+    }
+
     function castRecover(p) { if(p.cd.recover > 0 || p.hp <= 0) return; playSkillSound(8888, "s1"); p.cd.recover = 45000; p.heal(p.maxHp * 0.05); }
     // 1. 音效管理系統 (新增)
     // ==========================================
