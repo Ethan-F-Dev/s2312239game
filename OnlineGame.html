@@ -7747,6 +7747,12 @@ if (p.charIdx === 31) {
             startBtn.onclick = handleStart;
             startBtn.addEventListener('touchstart', handleStart);
         }
+		const backModesBtn = document.getElementById('back-modes-btn');
+        if(backModesBtn) {
+            if (e) e.preventDefault();
+            startStatsPolling();
+            backToModeSelection();
+        }
         const restartBtn = document.getElementById('restart-btn');
         if(restartBtn) {
             const handleRestart = (e) => {
