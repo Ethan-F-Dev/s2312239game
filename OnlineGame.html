@@ -7749,9 +7749,11 @@ if (p.charIdx === 31) {
         }
 		const backModesBtn = document.getElementById('back-modes-btn');
         if(backModesBtn) {
-            if (e) e.preventDefault();
-            startStatsPolling();
-            backToModeSelection();
+            const handleRestart = (e) => {
+                if (e) e.preventDefault();
+                startStatsPolling();
+                backToModeSelection();
+            };
         }
         const restartBtn = document.getElementById('restart-btn');
         if(restartBtn) {
