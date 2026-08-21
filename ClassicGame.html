@@ -73,6 +73,7 @@
         .btn-s2 { width: 85px; height: 85px; bottom: 110px; right: 110px; }
         .btn-s3 { width: 95px; height: 95px; bottom: 150px; right: 15px; border-color: gold; }
         .btn-rec { width: 65px; height: 65px; bottom: 15px; right: 240px; border-color: #2ecc71; }
+        .btn-ex { width: 55px; height: 55px; bottom: 250px; right: 15px; border: 3px solid #8e44ad; box-shadow: 0 0 12px rgba(142,68,173,0.7); }
         .joystick { position: absolute; width: 140px; height: 140px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; pointer-events: auto; bottom: 50px; left: 50px; }
         .stick { position: absolute; width: 60px; height: 60px; background: rgba(255,255,255,0.3); border-radius: 50%; left: 40px; top: 40px; }
         .p2-ui { position: absolute; inset: 0; pointer-events: none; transform: rotate(180deg); }
@@ -110,6 +111,7 @@
         <div class="game-btn btn-s1" id="p1-btn-s1"><span class="cd-text">1</span></div>
         <div class="game-btn btn-s2" id="p1-btn-s2"><span class="cd-text">2</span></div>
         <div class="game-btn btn-s3" id="p1-btn-s3"><span class="cd-text">終</span></div>
+        <div class="game-btn btn-ex" id="p1-btn-ex"><span class="cd-text">💩</span></div>
         <div class="game-btn btn-atk" id="p1-btn-atk"><span class="cd-text">攻</span></div>
     </div>
     <div class="p2-ui">
@@ -119,6 +121,7 @@
             <div class="game-btn btn-s1" id="p2-btn-s1"><span class="cd-text">1</span></div>
             <div class="game-btn btn-s2" id="p2-btn-s2"><span class="cd-text">2</span></div>
             <div class="game-btn btn-s3" id="p2-btn-s3"><span class="cd-text">終</span></div>
+            <div class="game-btn btn-ex" id="p2-btn-ex"><span class="cd-text">💩</span></div>
             <div class="game-btn btn-atk" id="p2-btn-atk"><span class="cd-text">攻</span></div>
         </div>
     </div>
@@ -209,7 +212,7 @@
         { name: "史萊姆", hp: 2780, atk: 135, speed: 2.5, color: "#32CD32", s1Cd: 2500, s2Cd: 5000, s3Cd: 25000, atkInt: 1500 },
         { name: "刀俠", hp: 2670, atk: 145, speed: 3.5, color: "#8B0000", s1Cd: 3000, s2Cd: 5000, s3Cd: 25000, atkInt: 800 },
         { name: "凌汐", hp: 1000, atk: 22, speed: 3.4, color: "#27C5F5", s1Cd: 3000, s2Cd: 4500, s3Cd: 35000, atkInt: 300 },
-        { name: "鹿冠", hp: 2550, atk: 91, speed: 3.2, color: "#8B4513", s1Cd: 4000, s2Cd: 7800, s3Cd: 20000, atkInt: 600 },
+        { name: "鹿冠", hp: 2800, atk: 91, speed: 3.2, color: "#8B4513", s1Cd: 4000, s2Cd: 7800, s3Cd: 20000, atkInt: 600 },
         { name: "戮", hp: 3500, atk: 90, speed: 3.5, color: "#FF2A00", s1Cd: 7000, s2Cd: 8000, s3Cd: 15000, atkInt: 1000 }
 
 
@@ -4237,12 +4240,8 @@ if (this.charIdx === 31) {
         if(p.charIdx === 6 && p.commanderMode) p.cd.s1 = 4000;
         const joy = p.id === 1 ? p1Touch : p2Touch;
     
-    if(p.charIdx === 46){
-        
-    }
-
     if(p.charIdx === 45){
-        projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 75, p, "⬜️", 1.5, 600, (e) => {
+        projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 150, p, "⬜️", 1.5, 600, (e) => {
                         e.applyStatus("high", 5000)
                         p.heal(100);
                         p.addShield(100);                    
@@ -5021,7 +5020,7 @@ if (this.charIdx === 31) {
         p.jS2 = true
         let c = 0;
         let j = setGameInterval(()=> {if(p.jS2Alr == false && c <= 99){c++; if(dist(p, p.target) <= 200){p.heal(200); p.addShield(200);p.jS2Alr = true; enemy.applyStatus("stunned", 500); enemy.applyStatus("high", 5000); p.jWeakened = true; setGameTimeout(()=> {p.jWeakened = false; p.jS2Alr = false}, 2000)}}else{clearInterval(j)}},10)
-        setGameTimeout(()=> p.jS2 = false, 500)
+        setGameTimeout(()=> p.jS2 = false, 1000)
     }
 
     if(p.charIdx === 44){
@@ -5863,25 +5862,13 @@ if (p.charIdx === 31) {
         if(p.status.stunned > 0 || p.status.disarmed > 0) return;
         p.cd.s3 = CHAR_DATA[p.charIdx].s3Cd;
     
-    if(p.charIdx === 46){
-       if(p.hp <= 3499){
-         p.hp = p.maxHp - p.hp;
-        shakeAmount = 40;
-        floatTexts.push(new FloatText(p.x, p.y - 80, "血量置換！（獲得強普）", "red"));
-       } else {
-        p.cd.s3 = 0;
-        floatTexts.push(new FloatText(p.x, p.y - 80, "滿血不可使用大招！", "red"));
-       }
-       
-    }
-
     if(p.charIdx === 45){
         const joy = p.id===1?p1Touch:p2Touch; 
         if(Math.abs(joy.joyX) < 0.1 && Math.abs(joy.joyY) < 0.1){
             p.cd.s3 = 0;
             floatTexts.push(new FloatText(p.x, p.y - 80, "無法使用！", "gray"));
         } else {
-        if(dist(p, enemy) < 60){p.jCanCombo = false; p.target.takeDamage(250); if(enemy.status.high >= 1){ p.cd.s3 = 100}; p.heal(60);}
+        if(dist(p, enemy) < 60){p.jCanCombo = false; p.target.takeDamage(350); if(enemy.status.high >= 1){ p.cd.s3 = 100}; p.heal(60);}
         let startX = p.x, startY = p.y; 
         let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*400, ty = p.y + Math.sin(aimAngle)*400; 
         let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2;for(let i=0; i<3; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "⬜️")); };if(dist(p, enemy) < 52 && p.jcanCombo == true){p.jcanCombo = false;p.target.takeDamage(350); if(enemy.status.high >= 1){p.cd.s3 = 100; enemy.applyStatus("high", 0);}}}, 16); setGameTimeout(() => {clearInterval(sInt); if(p.jcanCombo == false){p.jcanCombo = true;}else{p.jcanCombo = true;}}, 150); 
@@ -7034,6 +7021,16 @@ if (p.charIdx === 31) {
         }
     
     }
+
+    function castEx(p) {
+        if(p.cd.ex > 0 || p.hp <= 0) return;
+        p.cd.ex = 30000; 
+        p.heal(1000);
+        for(let i=0; i<15; i++) {
+            particles.push(new Particle(p.x, p.y, "#9b59b6", "normal", "✨", 1.0, 1.2));
+        }
+    }
+
     function castRecover(p) { if(p.cd.recover > 0 || p.hp <= 0) return; playSkillSound(8888, "s1"); p.cd.recover = 45000; p.heal(p.maxHp * 0.05); }
     // 1. 音效管理系統 (新增)
     // ==========================================
