@@ -631,6 +631,12 @@
                 ctx.restore();
             }
 
+            if (p.charIdx === 46 && p.ksState == 2) {
+                ctx.save(); ctx.translate(p.x, p.y); 
+                ctx.beginPath(); ctx.arc(0,0,80,0,Math.PI*2); ctx.strokeStyle="red"; ctx.stroke();
+                ctx.restore();
+            }
+
             if (p.charIdx === 21 && p.divineWarning) {
                 ctx.save(); ctx.translate(p.target.x, p.target.y); 
                 ctx.beginPath(); ctx.arc(0,0,300,0,Math.PI*2); ctx.fillStyle="rgba(255,50,0,0.3)"; ctx.fill(); ctx.strokeStyle="red"; ctx.stroke();
@@ -927,6 +933,8 @@
                 if(p.status.chill > 0){ ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("😌", p.x - 20, p.y - 110); }
                 if (p.status.superArmor > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("🪬", p.x - 20, p.y - 110); }
                 if (p.status.divineMark > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("⚜️", p.x - 20, p.y - 110); }
+                if (p.status.calm > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("😶", p.x - 20, p.y - 110); }
+                if (p.status.insane > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("😡", p.x - 20, p.y - 110); }
                 if (p.status.high > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("🥵", p.x - 20, p.y - 110); }
             } else if(p.isDying) { for(let i=0; i<1; i++) particles.push(new Particle(p.x+(Math.random()-0.5)*50, p.y+(Math.random()-0.5)*50, "#fff", 'death')); }
         });
@@ -1267,8 +1275,9 @@
             this.jS2Alr = false;
             this.jcanCombo = true;
             // kill (46)
-            this.kState = 0;
             this.ksState = 1;
+            this.kaState = 1;
+            this.kcanCombo = true;
         }
         triggerClovisPassive() {
             if (this.charIdx !== 35 || this.clovisPassiveCd > 0) return;
@@ -3234,8 +3243,11 @@ if (this.charIdx === 31) {
         if(p.cd.atk > 0 || p.isLock || p.hp <= 0 || p.status.losegrip > 0) return; 
     
     if(p.charIdx === 46){
-        p.activeWarning = { type:'rect', l: 150, h: 20}; 
-        setGameTimeout(() => { if(dist(p, enemy) < 150) { 
+        if(p.kaState == 1){
+
+           p.activeWarning = { type:'rect', l: 150, h: 20, color:'purple'}; 
+        setGameTimeout(() => { if(dist(p, enemy) < 150) {
+        if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(30)} 
         if(p.hp > 1750){
         enemy.takeDamage(70 * p.buffs.atk, 1);}
         if(p.hp <= 1750 && p.hp > 1050){
@@ -3261,6 +3273,81 @@ if (this.charIdx === 31) {
              }, 200)
         }
         shakeAmount=5;} p.activeWarning = null; }, 100);  
+
+        }
+        
+        if(p.kaState == 2){
+
+        p.activeWarning = { type:'rect', l: 180, h: 60, color: 'yellow'}; 
+        setGameTimeout(() => { if(dist(p, enemy) < 180) {
+        p.kaState = 1
+        let ang = Math.atan2(enemy.y-p.y, enemy.x-p.x);
+        enemy.x += Math.cos(ang) * 60; enemy.y += Math.sin(ang) * 60;
+        enemy.applyStatus("stunned", 600)
+        if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(30)} 
+        if(p.hp > 1750){
+        enemy.takeDamage(70 * p.buffs.atk, 1);}
+        if(p.hp <= 1750 && p.hp > 1050){
+            let wave = 0;
+             let ln = Math.floor(Math.random() * 3) + 2;
+             let lc = setGameInterval(()=> {
+             wave++;
+             if(wave <= ln){
+              enemy.takeDamage(70 * p.buffs.atk, 1);
+              } else {
+                clearInterval(lc)}
+             }, 200)
+        }
+        if(p.hp <= 1050){
+            let wave = 0;
+             let ln = Math.floor(Math.random() * 3) + 3;
+             let lc = setGameInterval(()=> {
+             wave++;
+             if(wave <= ln){
+              enemy.takeDamage(70 * p.buffs.atk, 1);
+              } else {
+                clearInterval(lc)}
+             }, 200)
+        }
+        shakeAmount=5;} p.activeWarning = null; }, 100);  
+        
+        }
+
+        if(p.kaState == 3){
+
+        p.activeWarning = { type:'rect', l: 200, h: 80, color: 'red'}; 
+        setGameTimeout(() => { if(dist(p, enemy) < 200) {
+        enemy.applyStatus("stunned", 600)
+        p.kaState = 1;
+        if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(30)} 
+        if(p.hp > 1750){
+        enemy.takeDamage(200 * p.buffs.atk, 1);}
+        if(p.hp <= 1750 && p.hp > 1050){
+            let wave = 0;
+             let ln = Math.floor(Math.random() * 3) + 2;
+             let lc = setGameInterval(()=> {
+             wave++;
+             if(wave <= ln){
+              enemy.takeDamage(200 * p.buffs.atk, 1);
+              } else {
+                clearInterval(lc)}
+             }, 200)
+        }
+        if(p.hp <= 1050){
+            let wave = 0;
+             let ln = Math.floor(Math.random() * 3) + 3;
+             let lc = setGameInterval(()=> {
+             wave++;
+             if(wave <= ln){
+              enemy.takeDamage(200 * p.buffs.atk, 1);
+              } else {
+                clearInterval(lc)}
+             }, 200)
+        }
+        shakeAmount=5;} p.activeWarning = null; }, 100);  
+        
+
+        }
     }
     
     if(p.charIdx === 45){
@@ -4234,9 +4321,6 @@ if (this.charIdx === 31) {
 
 
 // ------------------------------ 一技能 -----------------------------------------
-
-
-
     function castS1(p) {
         const enemy = p.target;
         if(p.cd.s1 > 0 || (p.isLock && !p.isChargingUlt) || p.status.disarmed > 0 || p.hp <= 0) return;
@@ -4245,6 +4329,35 @@ if (this.charIdx === 31) {
         if(p.charIdx === 6 && p.commanderMode) p.cd.s1 = 4000;
         const joy = p.id === 1 ? p1Touch : p2Touch;
     
+    if(p.charIdx === 46){
+      if(p.ksState == 1){
+        p.ksState = 2;
+        const joy = p.id===1?p1Touch:p2Touch; 
+        if(Math.abs(joy.joyX) < 0.1 && Math.abs(joy.joyY) < 0.1){
+        p.cd.s1 = 0;
+        floatTexts.push(new FloatText(p.x, p.y - 80, "無法使用！", "gray"));
+        } else {
+        p.kaState = 2;
+        if(dist(p, enemy) < 60){if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(30)};p.kcanCombo = false; p.target.takeDamage(100);if(p.status.insane > 0){ p.applyStatus("insane", 0)}; p.applyStatus("calm", 6000)}
+        let startX = p.x, startY = p.y; 
+        let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*400, ty = p.y + Math.sin(aimAngle)*400; 
+        let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.02; p.y += (ty - p.y)*0.02;if(dist(p, enemy) < 52 && p.kcanCombo == true){if(p.status.insane > 0){ p.applyStatus("insane", 0)}; if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(30)};p.kcanCombo = false;p.applyStatus("calm", 6000); p.target.takeDamage(100);}}, 16); setGameTimeout(() => {clearInterval(sInt); p.kaState = 1; if(p.kcanCombo == false){p.kcanCombo = true;}else{p.kcanCombo = true; if(p.kSuper == false){p.kCombo = 0}}}, 500); 
+       }
+      } else {
+        p.ksState = 1;
+        const joy = p.id===1?p1Touch:p2Touch; 
+        if(Math.abs(joy.joyX) < 0.1 && Math.abs(joy.joyY) < 0.1){
+        p.cd.s1 = 0;
+        floatTexts.push(new FloatText(p.x, p.y - 80, "無法使用！", "gray"));
+        } else {
+        if(dist(p, enemy) < 60){let aimAngle = p.angle; if(Math.abs(joy.joyX)>0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); let startX = p.x, startY = p.y; enemy.x = p.x + Math.cos(aimAngle)*300; enemy.y = p.y + Math.sin(aimAngle)*300;  if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(30)};p.kcanCombo = false; p.target.takeDamage(120);;}
+        let startX = p.x, startY = p.y; 
+        let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*400, ty = p.y + Math.sin(aimAngle)*400; 
+        let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.1; p.y += (ty - p.y)*0.1;if(dist(p, enemy) < 52 && p.kcanCombo == true){let aimAngle = p.angle; if(Math.abs(joy.joyX)>0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); let startX = p.x, startY = p.y; enemy.x = p.x + Math.cos(aimAngle)*300; enemy.y = p.y + Math.sin(aimAngle)*300; if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(30)};p.kcanCombo = false; p.target.takeDamage(120);}}, 16); setGameTimeout(() => {clearInterval(sInt);if(p.kcanCombo == false){p.kcanCombo = true;}else{p.kcanCombo = true; if(p.kSuper == false){p.kCombo = 0}}}, 300); 
+       }
+      }
+    }
+
     if(p.charIdx === 45){
         projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 150, p, "⬜️", 1.5, 600, (e) => {
                         e.applyStatus("high", 5000)
@@ -5021,6 +5134,31 @@ if (this.charIdx === 31) {
         if(p.cd.s2 > 0 || p.isLock || p.status.disarmed > 0 || p.hp <= 0) return;
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
     
+    if(p.charIdx === 46){
+        if(p.ksState == 1){
+        p.ksState = 2;
+        p.activeWarning = { type:'circle', r: 100, x: p.x, y: p.y, color: 'red' }; 
+        setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 100) {if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(30)}; p.target.takeDamage(175, 10); p.applyStatus("insane", 6000); if(p.status.calm > 0){ p.applyStatus("calm", 0)}} }, 100); }
+        else {
+        p.ksState = 1;
+        let wave = 0;
+            p.applyStatus("disarmed",2000)
+             let wi = setGameInterval(() => {
+                 wave++;
+                 if(wave <= 4) {
+                     projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 120, p, "🩸", 1.5, 600, (e) => {
+                        if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(30)}                
+                    }, 25));
+                 } 
+                 else if(wave == 5){
+                     clearInterval(wi);
+                     
+
+                 }
+             }, 500);
+        }
+    }
+
     if(p.charIdx === 45){
         p.jS2 = true
         let c = 0;
@@ -5867,6 +6005,19 @@ if (p.charIdx === 31) {
         if(p.status.stunned > 0 || p.status.disarmed > 0) return;
         p.cd.s3 = CHAR_DATA[p.charIdx].s3Cd;
     
+    if(p.charIdx === 46){
+       if(p.hp <= 3499){
+        p.cd.s1 = 0;
+        p.cd.s2 = 0;
+        p.hp = p.maxHp - p.hp;
+        p.kaState = 3;
+        floatTexts.push(new FloatText(p.x, p.y - 80, "血量置換！獲得強普！", "red"));
+       } else {
+        p.cd.s3 = 0;
+        floatTexts.push(new FloatText(p.x, p.y - 80, "滿血無法使用！", "red"));
+       }
+    }
+
     if(p.charIdx === 45){
         const joy = p.id===1?p1Touch:p2Touch; 
         if(Math.abs(joy.joyX) < 0.1 && Math.abs(joy.joyY) < 0.1){
