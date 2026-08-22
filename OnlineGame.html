@@ -1020,6 +1020,7 @@
     }
     function checkMatchEnd() {
         if((p1.hp <= 0 || p2.hp <= 0) && !gameOver) {
+            if(p1.hp <= 0){sendDeath()}
             if(currentGameMode === "normal" || (p1.hp <= 0 && p1PlayProgress === 3 )||(p2.hp <= 0 && p2PlayProgress === 3)){
                 playSkillSound(9998, 's1')
                 gameOver = true;
