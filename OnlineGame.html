@@ -295,42 +295,7 @@
     /**
      * Action 2: Player returns to Mode Selection Screen
      */
-    function backToModeSelection() {
-        stopMatchPolling();
-        disconnectPeer();
-        currentSelectedMode = null;
-        isWaiting = false;
-
-        // Reset Mode Display Indicator
-        const modeLabel = document.getElementById('current-mode-label');
-        if (modeLabel) modeLabel.innerText = "UNSELECTED";
-
-        p1SelChar = {}; p2SelChar = {};
-        const startBtn = document.getElementById('start-btn');
-        if (startBtn) {
-            startBtn.innerText = "VS";
-            startBtn.classList.remove('waiting');
-        }
-
-        const gameModeOverlay = document.getElementById('game-mode');
-        if (gameModeOverlay) {
-            gameModeOverlay.style.display = "flex";
-            setTimeout(() => {
-                gameModeOverlay.style.opacity = "1";
-                gameModeOverlay.style.visibility = "visible";
-            }, 10);
-        }
-
-        backToMenu();
-
-        if (typeof google !== 'undefined' && google.script && google.script.run) {
-            google.script.run
-                .withSuccessHandler(res => {
-                    console.log("[State] Returned to Mode Selection screen.");
-                })
-                .setPlayerStatus(playerName, 'choosing', 'Unselected');
-        }
-    }
+    //in window(most bittom code)
 
     /**
      * Action 3: Player clicks "READY" / "FIND MATCH"
@@ -7747,24 +7712,69 @@ if (p.charIdx === 31) {
             startBtn.onclick = handleStart;
             startBtn.addEventListener('touchstart', handleStart);
         }
-		const backModesBtn = document.getElementById('back-modes-btn');
-        if(backModesBtn) {
-            const handleRestart = (e) => {
-                if (e) e.preventDefault();
-                startStatsPolling();
-                backToModeSelection();
-            };
+        /**
+         * Resets matchmaking state and returns to the Mode Selection Overlay
+         */
+        function backToModeSelection() {
+            if (typeof stopMatchPolling === 'function') stopMatchPolling();
+            if (typeof disconnectPeer === 'function') disconnectPeer();
+            
+            currentSelectedMode = null;
+            isWaiting = false;
+        
+            // Reset current mode UI label
+            const modeLabel = document.getElementById('current-mode-label');
+            if (modeLabel) modeLabel.innerText = "UNSELECTED";
+        
+            // Reset character selections & progress
+            p1SelChar = {}; 
+            p2SelChar = {};
+            p1SelProgress = [1, 2, 3];
+            p2SelProgress = [1, 2, 3];
+        
+            // Reset VS button state
+            const startBtn = document.getElementById('start-btn');
+            if (startBtn) {
+                startBtn.innerText = "VS";
+                startBtn.classList.remove('waiting');
+            }
+        
+            // Show Mode Selection Overlay
+            const gameModeOverlay = document.getElementById('game-mode');
+            if (gameModeOverlay) {
+                gameModeOverlay.style.display = "flex";
+                setTimeout(() => {
+                    gameModeOverlay.style.opacity = "1";
+                    gameModeOverlay.style.visibility = "visible";
+                }, 10);
+            }
+        
+            // Hide game over screen / reset menu state
+            if (typeof backToMenu === 'function') backToMenu();
+        
+            // Sync status update with Apps Script Backend
+            if (typeof google !== 'undefined' && google?.script?.run) {
+                google.script.run
+                    .withSuccessHandler(() => {
+                        console.log("[State] Returned to Mode Selection screen.");
+                    })
+                    .setPlayerStatus(playerName, 'choosing', 'Unselected');
+            }
         }
-        const restartBtn = document.getElementById('restart-btn');
-        if(restartBtn) {
-            const handleRestart = (e) => {
-                if (e) e.preventDefault();
-                startStatsPolling();
+        
+        // Button Bindings
+        const backModesBtn = document.getElementById('back-modes-btn');
+        if (backModesBtn) {
+            backModesBtn.onclick = backToModeSelection;
+            backModesBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
                 backToModeSelection();
-            };
-
-            restartBtn.onclick = handleRestart;
-            restartBtn.addEventListener('touchstart', handleRestart);
+            });
+        }
+        
+        const restartBtn = document.getElementById('restart-btn');
+        if (restartBtn) {
+            restartBtn.onclick = backToModeSelection;
         }
         const rechooseCharbtn = document.getElementById('rechooseChar-btn');
         if(rechooseCharbtn) {
