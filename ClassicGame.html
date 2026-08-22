@@ -446,7 +446,7 @@
     }
     
     function startGame() {
-        if(currentGameMode === "sf" && (p1SelChar[3] === undefined || p2SelChar[3] === undefined)){return}
+        if(currentGameMode === "sf" && (p1SelChar[3] === undefined || p2SelChar[3] === undefined || p1SelChar[2] === undefined || p2SelChar[2] === undefined || p1SelChar[1] === undefined || p2SelChar[1] === undefined)){return}
         document.getElementById('menu').style.display = 'none';
         clearGameTimers(); resize();
         if(currentGameMode === "sf"){
