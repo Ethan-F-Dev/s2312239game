@@ -7702,7 +7702,7 @@ if (p.charIdx === 31) {
             const handleStart = (e) => {
                 if (e) e.preventDefault();
                 if (!isWaiting) {
-                    if(currentGameMode === "sf" && (p1SelChar[3] === undefined || p1SelChar[2] === undefined ||p1SelChar[1] === undefined ){return}
+                    if(currentGameMode === "sf" && (p1SelChar[0] === undefined || p1SelChar[1] === undefined || p1SelChar[2] === undefined))
                     clickReady();
                 } else {
                     cancelQueue();
