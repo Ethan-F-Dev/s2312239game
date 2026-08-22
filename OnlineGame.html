@@ -7704,6 +7704,7 @@ if (p.charIdx === 31) {
             const handleStart = (e) => {
                 if (e) e.preventDefault();
                 if (!isWaiting) {
+                    if(currentGameMode === "sf" && (p1SelChar[3] === undefined || p2SelChar[3] === undefined)){return}
                     clickReady();
                 } else {
                     cancelQueue();
