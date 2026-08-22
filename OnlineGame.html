@@ -502,9 +502,6 @@
             else if (data.type === 'HP') {
                 if (typeof p2 !== 'undefined' && p2) {
                     p2.hp = data.hp;
-                    if(p2.hp <= 0){
-                        p2.triggerDeath
-                    }
                 }
             }
             else if (data.type === 'SKILL') {
