@@ -7773,6 +7773,7 @@ if (p.charIdx === 31) {
         
         const restartBtn = document.getElementById('restart-btn');
         if (restartBtn) {
+            startStatsPolling();
             restartBtn.onclick = backToModeSelection;
         }
         const rechooseCharbtn = document.getElementById('rechooseChar-btn');
