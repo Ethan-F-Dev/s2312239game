@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Security-Policy" content="media-src * data: blob:;">
-    <title>巔峰對決 - 賢者本賢 </title>
+    <title>巔峰對決 - 化學攻擊 </title>
     <style>
         :root { --p1-ui: #3498db; --p2-ui: #e74c3c; --font-main: 'Noto Sans TC', sans-serif; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; user-select: none; 
@@ -214,8 +214,9 @@
         { name: "凌汐", hp: 1000, atk: 22, speed: 3.4, color: "#27C5F5", s1Cd: 3000, s2Cd: 4500, s3Cd: 35000, atkInt: 300 },
         { name: "鹿冠", hp: 2800, atk: 91, speed: 3.2, color: "#8B4513", s1Cd: 4000, s2Cd: 7800, s3Cd: 20000, atkInt: 600 },
         { name: "戮", hp: 3500, atk: 90, speed: 3.5, color: "#FF2A00", s1Cd: 7000, s2Cd: 8000, s3Cd: 15000, atkInt: 1000 },
-        { name: "韵淇", hp: 2800, atk: 80, speed: 3.7, color: "#E48FFF", s1Cd: 4000, s2Cd: 6000, s3Cd: 35000, atkInt: 800 }
-
+        { name: "韵淇", hp: 2800, atk: 80, speed: 3.7, color: "#E48FFF", s1Cd: 4000, s2Cd: 6000, s3Cd: 35000, atkInt: 800 },
+        // page 9
+        { name: "茵", hp: 3100, atk: 20, speed: 3.4, color: "#E37332", s1Cd: 6000, s2Cd: 12000, s3Cd: 35000, atkInt: 100 }
 
     ]);
     function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
@@ -1301,6 +1302,10 @@
             this.musicEnh = false;
             this.kikiUlt = false;
             this.kikiUltCount = 0;
+            // Yin (48)
+            this.yinFuel = 0;
+            this.yinTimer = 0;
+            this.candleClone = null;
         }
         triggerClovisPassive() {
             if (this.charIdx !== 35 || this.clovisPassiveCd > 0) return;
@@ -1354,6 +1359,7 @@
             if(this.isDying) return;
             this.buffs.speed = 1.0 * this.buffs.slow; 
 
+// Kiki (47) Update logic
         if(this.charIdx === 47){
            setGameInterval(()=> {if(this.musicNotes < 0){this.musicNotes = 0;}},500)
            setGameInterval(()=> {if(this.musicNotes >= 101){this.musicNotes = 100;}},500)
@@ -3049,7 +3055,7 @@ if (this.charIdx === 31) {
             
             if(this.charIdx === 47){
                 if(dmg >= 0 && this.musicCooldown == false){
-                    this.musicNotes -= 2;
+                    this.musicNotes -= 5;
                     this.musicCooldown = true;
                     setGameTimeout(()=> this.musicCooldown = false, 500)
                 }
@@ -3059,6 +3065,7 @@ if (this.charIdx === 31) {
                         this.musicShield -= dmg;
                     return { hpDmg: 0, shieldDmg: 0 };
                     } else {
+                        this.cd.s3 = 35000;
                         this.musicShield = 0;
                         this.kikiUlt = false;
                         this.status.disarmed = 0;
@@ -3292,6 +3299,11 @@ if (this.charIdx === 31) {
         const joy = p.id === 1 ? p1Touch : p2Touch;
         if(p.cd.atk > 0 || p.isLock || p.hp <= 0 || p.status.losegrip > 0) return; 
     
+    if(p.charIdx === 48){
+        let i = 0;
+        let yf = setGameInterval(()=> {if(i<2){projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gray", 20, p, "🔥", 1.0, 200, null, 20, false, false, false, false));} else {clearInterval(yf);}},50)
+    }
+
     if(p.charIdx === 47){
          if(p.kikiUlt == false){
             if(p.musicEnh == false){
@@ -4406,7 +4418,7 @@ if (this.charIdx === 31) {
     if(p.charIdx === 47){
     p.musicEnh = true;
     p.activeWarning = { type:'circle', r: 150, x: p.x, y: p.y, color: '#5091FA' }; 
-    setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 150) { p.heal(50); p.musicNotes += 8; p.target.takeDamage(229, 10); } }, 100);   
+    setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 150) { p.heal(50); p.musicNotes += 6; p.target.takeDamage(198, 10); } }, 100);   
     }
 
     if(p.charIdx === 46){
@@ -5217,8 +5229,8 @@ if (this.charIdx === 31) {
     if(p.charIdx ===  47){
         p.musicStatus = true;
         setGameTimeout(()=>{
-            if(dist(p, enemy) < 160){enemy.takeDamage(80); p.heal(80);p.musicNotes += 8;};
-            if(dist(p, enemy) < 240 && dist(p, enemy) >= 160){enemy.takeDamage(238); enemy.applyStatus("stunned", 1200); p.musicEnh = true; p.musicNotes += 15;};
+            if(dist(p, enemy) < 160){enemy.takeDamage(0); p.heal(80);p.musicNotes += 6;};
+            if(dist(p, enemy) < 240 && dist(p, enemy) >= 160){enemy.takeDamage(229); enemy.applyStatus("stunned", 1200); p.musicEnh = true; p.musicNotes += 12;};
         p.musicStatus = false;
         },800)
     }
@@ -6097,13 +6109,13 @@ if (p.charIdx === 31) {
     if(p.charIdx === 47){
        if(p.musicNotes >= 1){
         p.heal(800);
-        p.applyStatus("disarmed", 9999999);
-        p.musicShield = p.musicNotes * 20;
+        p.musicShield = p.musicNotes * 15;
         p.musicNotes = 0;
         p.musicStatus = false;
         p.kikiUlt = true;
         let ka = setGameInterval(()=> {
             if(p.kikiUlt == true){
+                p.applyStatus("disarmed", 9999);
                 if(p.kikiUltCount >= 4){
                     p.kikiUltCount = 0;
                     let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1)
