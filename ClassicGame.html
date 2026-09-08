@@ -1503,7 +1503,7 @@
             if (this.hp < this.maxHp * 0.5) {
                 if (!this.nhNightfallActive) {
                     this.nhNightfallActive = true;
-                    this.buffs.atk += 0.2;   // 傷害增加 20%
+                    this.buffs.atk += 0.15;   // 傷害增加 15%
                     this.buffs.speed += 0.2; // 速度增加 20%
                     floatTexts.push(new FloatText(this.x, this.y - 80, "夜色降臨", "purple"));
                 }
@@ -3594,9 +3594,9 @@ if (this.charIdx === 31) {
 	if (p.charIdx === 41) {
             let aimAngle = Math.atan2(p.target.y - p.y, p.target.x - p.x);
             
-            // 計算大招攻速加成 (攻速上升 30% = 間隔縮小)
+            // 計算大招攻速加成 (攻速上升 20% = 間隔縮小)
             let currentAtkInt = 600;
-            if (p.nhS3AtkSpdTimer > 0) currentAtkInt *= 0.7; 
+            if (p.nhS3AtkSpdTimer > 0) currentAtkInt *= 0.8; 
             p.cd.atk = currentAtkInt;
             
             if (!p.nhIsRanged) {
@@ -3621,7 +3621,7 @@ if (this.charIdx === 31) {
                 let sInt = setGameInterval(() => {
                     shots++;
                     projectiles.push(new Projectile(p.x, p.y, aimAngle + (Math.random()-0.5)*0.2, 22, "gray", 0, p, "🔪", 1.5, 600, (e) => {
-                        let dmg = 60 * p.buffs.atk;
+                        let dmg = 50 * p.buffs.atk;
                         e.takeDamage(dmg, 41);
                         if (p.nhNightfallActive) p.heal(dmg * 0.6);
                     }, 25));
@@ -5435,8 +5435,8 @@ if (this.charIdx === 31) {
                     if (p.nhNightfallActive) p.heal(dmg * 0.6);
                     
                     // 繳械與緩速
-                    e.applyStatus('disarmed', 3000);
-                    e.cd.atk = 3000; // 雙重保險確保無法攻擊
+                    e.applyStatus('disarmed', 1500);
+                    e.cd.atk = 1500; // 雙重保險確保無法攻擊
                     e.applyStatus('slow', 5000);
                     e.buffs.slow = Math.min(e.buffs.slow, 0.8); // 緩速 20%
                     
@@ -6242,7 +6242,7 @@ if (p.charIdx === 31) {
             let aimAngle = (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) ? Math.atan2(joy.joyY, joy.joyX) : p.angle;
             
             if (!p.nhIsRanged) {
-                // 近戰：移動一大段距離，沿途真傷 450
+                // 近戰：移動一大段距離，沿途真傷 400
                 p.isCasting = true;
                 p.isUntouchable = true; // 衝刺期間無敵
                 let dashSpeed = 25;
@@ -6262,7 +6262,7 @@ if (p.charIdx === 31) {
                     
                     if (!hitTarget && Math.hypot(p.target.x - p.x, p.target.y - p.y) <= 60 + p.target.radius) {
                         hitTarget = true;
-                        let dmg = 450; // 真實傷害
+                        let dmg = 400; // 真實傷害
                         p.target.hp -= dmg;
                         if (p.target.hp <= 0) { p.target.hp = 1; p.target.takeDamage(9999, 41); }
                         else floatTexts.push(new FloatText(p.target.x, p.target.y - 40, "-450", "white"));
@@ -7473,3 +7473,12 @@ if (p.charIdx === 31) {
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
