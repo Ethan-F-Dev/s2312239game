@@ -908,6 +908,7 @@
                 }
                 const bw = 100; ctx.fillStyle = "#333"; ctx.fillRect(p.x - bw/2, p.y - 65, bw, 10); ctx.fillStyle = "#2ecc71"; ctx.fillRect(p.x - bw/2, p.y - 65, bw * (p.hp/p.maxHp), 10);
                 if(p.shield > 0) { ctx.fillStyle = "white"; ctx.fillRect(p.x - bw/2, p.y - 67, Math.min(bw, bw * p.shield/p.maxHp), 4); }
+                if(p.charIdx === 48) { ctx.fillStyle = "red"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.yinFuel/100), 5); }
                 if(p.charIdx === 45) { ctx.fillStyle = "gray"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.jEnergy/2), 5); }
                 if(p.charIdx === 3) { ctx.fillStyle = "red"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.rage/3), 5); }
                 if(p.charIdx === 18) { ctx.fillStyle = "white"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.ammo/4), 5); ctx.fillStyle = "black"; ctx.fillRect(p.x, p.y-75, 1, 5); }
@@ -951,12 +952,14 @@
                 if(p.status.chill > 0){ ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("😌", p.x - 20, p.y - 110); }
                 if (p.status.superArmor > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("🪬", p.x - 20, p.y - 110); }
                 if (p.status.divineMark > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("⚜️", p.x - 20, p.y - 110); }
+                if (p.status.dusted > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("🌫️", p.x - 20, p.y - 110); }
                 if (p.status.calm > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("😶", p.x - 20, p.y - 110); }
                 if (p.status.insane > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("😡", p.x - 20, p.y - 110); }
                 if (p.status.high > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("🥵", p.x - 20, p.y - 110); }
             } else if(p.isDying) { for(let i=0; i<1; i++) particles.push(new Particle(p.x+(Math.random()-0.5)*50, p.y+(Math.random()-0.5)*50, "#fff", 'death')); }
         });
         [p1, p2].forEach(p => { 
+        if(p.candleClone) { ctx.save(); ctx.translate(p.candleClone.x, p.candleClone.y); ctx.font = "40px Arial"; ctx.fillText("🕯️", -20, 20); ctx.restore(); }
         if(p.bokeClone) { ctx.save(); ctx.translate(p.bokeClone.x, p.bokeClone.y); ctx.font = "40px Arial"; ctx.fillText("👤", -20, 20); ctx.restore(); }
         if(p.sunClone) { ctx.save(); ctx.translate(p.sunClone.x, p.sunClone.y); ctx.font = "40px Arial"; ctx.fillText("🌞", -20, 20); ctx.restore(); } 
         if (p.status.bound > 0) {
@@ -1303,6 +1306,8 @@
             this.kikiUlt = false;
             this.kikiUltCount = 0;
             // Yin (48)
+            this.yinLength = 2;
+            this.yinCost = 1;
             this.yinFuel = 0;
             this.yinTimer = 0;
             this.candleClone = null;
@@ -1358,7 +1363,11 @@
         update(dt) {
             if(this.isDying) return;
             this.buffs.speed = 1.0 * this.buffs.slow; 
-
+// Yin (48) Update logic
+        if(this.charIdx === 48){
+           setGameInterval(()=> {if(this.yinFuel < 0){this.yinFuel = 0;}},500)
+           setGameInterval(()=> {if(this.yinFuel >= 101){this.yinFuel = 100;}},500)
+        }
 // Kiki (47) Update logic
         if(this.charIdx === 47){
            setGameInterval(()=> {if(this.musicNotes < 0){this.musicNotes = 0;}},500)
@@ -2720,6 +2729,11 @@ if (this.charIdx === 31) {
                     this.micahHealTimer = 0;
                 }
             }
+            
+            if(this.charIdx === 48){
+               this.yinTimer += dt * timeScale;
+                if (this.yinTimer >= 1000) { this.yinFuel = Math.min(100, this.yinFuel + 5); this.yinTimer = 0; } 
+            }
 
             if (this.charIdx === 19) {
                 if(this.soundAmount < 500){
@@ -2742,6 +2756,19 @@ if (this.charIdx === 31) {
                 else if (this.target && this.target.wounds > 0 && Math.random() < 0.05) this.target.wounds--;
                 let now = Date.now(); this.damageTakenHistory = this.damageTakenHistory.filter(d => now - d.time < 5000);
             }
+
+            if(this.charIdx === 48){
+                if(this.candleClone){
+                   this.candleClone.life -= dt * timeScale; 
+                   if(this.candleClone.life <= 0) { this.candleClone = null; }  
+                   else if(dist(this, this.candleClone) < 50) {
+                        this.yinFuel += 10;
+                        this.candleClone = null;
+                        floatTexts.push(new FloatText(this.x, this.y, "蠟燭已被拾取！", "gray"));
+                    }
+                }
+            }
+
             // Boke (9) - Marks logic
             if(this.charIdx === 9) {
                 if(this.bokeClone) { 
@@ -3300,8 +3327,15 @@ if (this.charIdx === 31) {
         if(p.cd.atk > 0 || p.isLock || p.hp <= 0 || p.status.losegrip > 0) return; 
     
     if(p.charIdx === 48){
+        if(p.yinFuel >= 5){
         let i = 0;
-        let yf = setGameInterval(()=> {if(i<2){projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gray", 20, p, "🔥", 1.0, 200, null, 20, false, false, false, false));} else {clearInterval(yf);}},50)
+        p.buffs.speed += 0.3
+        p.yinFuel -= (5 / p.yinCost);
+        if(p.target.status.dusted >= 1){
+            let syf = setGameInterval(()=> {if(i<2){i++; projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gray", (20 * p.buffs.atk) * 1.5, p, "🔥", 1.0, 200 + p.yinLength, null, 20, false, false, false, false));} else {clearInterval(syf); i=0}},200)
+        } else {
+            let yf = setGameInterval(()=> {if(i<2){i++; projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gray", 20 * p.buffs.atk, p, "🔥", 1.0, 200 + p.yinLength, null, 20, false, false, false, false));} else {clearInterval(yf); i=0}},200)}
+        }
     }
 
     if(p.charIdx === 47){
@@ -4413,7 +4447,12 @@ if (this.charIdx === 31) {
         p.cd.s1 = CHAR_DATA[p.charIdx].s1Cd;
         if(p.charIdx === 6 && p.commanderMode) p.cd.s1 = 4000;
         const joy = p.id === 1 ? p1Touch : p2Touch;
-    
+
+    if(p.charIdx === 48){
+        p.activeWarning = { type:'rect', l: 250, h: 60}; 
+        setGameTimeout(() => { if(dist(p, enemy) < 250) { let startX = enemy.x, startY = enemy.y; for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "💥")); }; enemy.applyStatus("stunned", 1000); enemy.takeDamage(200, 1);shakeAmount=5;} p.activeWarning = null; }, 100); 
+    }
+
     if(p.charIdx === 47){
     p.musicEnh = true;
     p.activeWarning = { type:'circle', r: 150, x: p.x, y: p.y, color: '#5091FA' }; 
@@ -5224,6 +5263,10 @@ if (this.charIdx === 31) {
         if(p.cd.s2 > 0 || p.isLock || p.status.disarmed > 0 || p.hp <= 0) return;
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
     
+    if(p.charIdx === 48){
+        projectiles.push(new Projectile(p.x, p.y, p.angle, 18, "orange", 0, p, "◽", 3.0, null, (e)=>{e.applyStatus("dusted", 5000); p.candleClone = { x: enemy.x, y: enemy.y, life: 10000 };}, 35, true));
+    }
+
     if(p.charIdx ===  47){
         p.musicStatus = true;
         setGameTimeout(()=>{
@@ -6103,6 +6146,21 @@ if (p.charIdx === 31) {
         if(p.status.stunned > 0 || p.status.disarmed > 0) return;
         p.cd.s3 = CHAR_DATA[p.charIdx].s3Cd;
     
+    if(p.charIdx === 48){
+        let startX = enemy.x, startY = enemy.y; for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "⛽️")); };
+       floatTexts.push(new FloatText(p.x, p.y - 80, "後備能源啓動！", "orange"));
+       p.yinFuel = 100;
+       p.heal(500);
+       p.buffs.atk *= 1.8;
+       p.yinLength = 150;
+       p.yinCost = 2;
+       setGameTimeout(()=> {
+       p.buffs.atk = 1.0
+       p.yinLength = 2
+       p.yinCost = 1
+       }, 10000)
+    }
+
     if(p.charIdx === 47){
        if(p.musicNotes >= 1){
         p.heal(800);
