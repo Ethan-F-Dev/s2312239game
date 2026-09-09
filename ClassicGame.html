@@ -1739,21 +1739,21 @@
             // 大技能：高速旋轉狀態
             if (this.tlS3Active) {
                 // 每秒消耗 5 點平衡值
-                this.tlBalance -= 10 * (dt / 1000);
+                this.tlBalance -= 10 * (dt / 800);
                 
                 if (this.tlBalance <= 0) {
                     this.tlBalance = 0;
                     this.tlS3Active = false;
                     if (this.tlS3SpeedBuffApplied) {
-                        this.buffs.speed -= 0.4;
+                        this.buffs.speed -= 0.3;
                         this.tlS3SpeedBuffApplied = false;
                     }
                     floatTexts.push(new FloatText(this.x, this.y - 80, "平衡耗盡，旋轉結束", "gray"));
                 } else {
                     // 每 0.25 秒造成 10 點傷害
                     this.tlS3Tick += dt * timeScale;
-                    if (this.tlS3Tick >= 250) {
-                        this.tlS3Tick -= 250;
+                    if (this.tlS3Tick >= 300) {
+                        this.tlS3Tick -= 300;
                         if (dist(this, this.target) <= 100 + this.target.radius) {
                             let dmg = 30 * this.buffs.atk;
                             // 真傷判定
@@ -1771,7 +1771,7 @@
                 }
             } else {
                 // 正常狀態：每秒恢復 10 點平衡值
-                this.tlBalance = Math.min(100, this.tlBalance + 10 * (dt / 1000));
+                this.tlBalance = Math.min(100, this.tlBalance + 8 * (dt / 1000));
             }
         }
 // Lingpan (36) Update Logic
@@ -5088,7 +5088,7 @@ if (this.charIdx === 31) {
              return;
         }
         if(p.charIdx === 22) {projectiles.push(new Projectile(p.x, p.y, p.angle, 30, "gray", 450, p, "➖", 1.35, null, (e)=>{e.applyStatus("stunned", 500); let tx = e.x; let ty = e.y; p.x = tx -10 ; p.y = ty - 10;}, 10, false, false, false, false));}
-        if (p.charIdx === 21) {let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*150, ty = p.y + Math.sin(aimAngle)*150; let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2; }, 16); setGameTimeout(() => clearInterval(sInt), 150); p.applyStatus('superArmor', 3000); p.isTransparent = true; p.shine = true; p.divineEnh += 3; setGameTimeout(()=> {p.isTransparent = false; p.shine = false}, 3000)}
+        if (p.charIdx === 21) {let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*150, ty = p.y + Math.sin(aimAngle)*150; let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2; }, 16); setGameTimeout(() => clearInterval(sInt), 150); p.applyStatus('superArmor', 1000); p.isTransparent = true; p.shine = true; p.divineEnh += 3; setGameTimeout(()=> {p.isTransparent = false; p.shine = false}, 1000)}
         if (p.charIdx === 9) { let aimAngle = p.angle; if(Math.abs(joy.joyX)>0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); let startX = p.x, startY = p.y; p.x += Math.cos(aimAngle)*200; p.y += Math.sin(aimAngle)*200; for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "🩶")); } if(dist(p.target, {x:(startX+p.x)/2, y:(startY+p.y)/2}) < 100) { if(!p.target.activeMarks) p.target.activeMarks = []; p.target.activeMarks.push({time: Date.now(), triggered: false}); } }
         if(p.charIdx === 20) {if(p.holdBall == false){p.holdBall = true;setGameTimeout(()=> p.holdBall = false, 6000)}else{p.cd.s1 = 0; floatTexts.push(new FloatText(p.x, p.y-100, "你正在持球！", "white"));}}
         if(p.charIdx === 19) {if(p.soundAmount < 100){p.cd.s1 = 0;} else {p.soundAmount -= 100; projectiles.push(new Projectile(p.x, p.y, p.angle, 35, "blue", 0, p, "👁️", 1.2, null, (e)=> {e.stared = true; e.buffs.slow=0.7; let stwave = 0; let st = setGameInterval(()=> {e.buffs.slow = 0.7; e.takeDamage(150); stwave++; if(stwave > 4){clearInterval(st); e.stared = false}},1000);}, 1));}}
@@ -6939,7 +6939,7 @@ if (p.charIdx === 31) {
                 let dy = (p.target.y - p.y) / (51 - d);
                 p.isCasting = true;
                 p.x += dx; p.y += dy}, 1);
-                let de = setGameInterval(()=> {if(d == 50){p.divineS2 = 1; clearInterval(df); p.target.takeDamage(350);p.target.applyStatus("divineMark", 0); p.isCasting = false; p.target.applyStatus("stunned", 1000);p.heal(450);p.divineS3 = 2;clearInterval(de);}},1)
+                let de = setGameInterval(()=> {if(d == 50){p.divineS2 = 1; clearInterval(df); p.target.takeDamage(250);p.target.applyStatus("divineMark", 0); p.isCasting = false; p.target.applyStatus("stunned", 800);p.heal(300);p.divineS3 = 2;clearInterval(de);}},1)
                 let c = 0;
                 let sf = setGameInterval(()=> {if(p.divineS3 == 2){c++;p.activeWarning = { type:'circle', r:200, x: tx, y: ty, color: 'rgba(255,255,0,0.6)' };if(dist({x: tx, y: ty}, enemy) < 200){ enemy.takeDamage(30 * p.divineAtk , 1); shakeAmount=5;} }}, 150)
                 let se = setGameInterval(()=> {if(c >= 10){clearInterval(sf); p.divineEnh += 3; p.divineAtk += 0.25;clearInterval(se); p.divineS3 = 3;}},1)
@@ -7473,7 +7473,6 @@ if (p.charIdx === 31) {
 </script>
 </body>
 </html>
-
 
 
 
