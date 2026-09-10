@@ -2919,16 +2919,16 @@ if (this.charIdx === 31) {
         //output: angle/null/"wrong input"
         angleCalculate(mode, nomove="off"){
             let joy = this.id===1?p1Touch:p2Touch;
-            if(mode === "hand" && nomove === "off"){
+            if(mode === "hand"){
                 if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1){
                     return Math.atan2(joy.joyY, joy.joyX)
+                }else if(nomove === "on"){
+                    return this.angle
                 }else{
                     return null
                 }
-            }else if(mode === "auto"){
-                return this.angle
             }else{
-                return"wrong input"
+                return this.angle
             }
         }
         //mode must be "hand"/"auto" , dist, time, rectW, rectH must be a number, 
@@ -3650,6 +3650,7 @@ if (this.charIdx === 31) {
                 }
             } else {
                 // 遠程普攻：0.5秒內連續發射三次高速 🔪 emoji
+                aimAngle = p.angleCalculate("hand", "on")
                 let shots = 0;
                 let sInt = setGameInterval(() => {
                     shots++;
