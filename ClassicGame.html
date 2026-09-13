@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Security-Policy" content="media-src * data: blob:;">
-    <title>巔峰對決 - 化學攻擊 </title>
+    <title>巔峰對決 - 當心身後 </title>
     <style>
         :root { --p1-ui: #3498db; --p2-ui: #e74c3c; --font-main: 'Noto Sans TC', sans-serif; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; user-select: none; 
@@ -216,8 +216,9 @@
         { name: "戮", hp: 3500, atk: 90, speed: 3.5, color: "#FF2A00", s1Cd: 7000, s2Cd: 8000, s3Cd: 15000, atkInt: 1000 },
         { name: "韵淇", hp: 2800, atk: 80, speed: 3.89, color: "#E48FFF", s1Cd: 4000, s2Cd: 6000, s3Cd: 35000, atkInt: 800 },
         // page 9
-        { name: "茵", hp: 3100, atk: 20, speed: 3.4, color: "#E37332", s1Cd: 6000, s2Cd: 12000, s3Cd: 35000, atkInt: 100 }
-
+        { name: "茵", hp: 3100, atk: 20, speed: 3.4, color: "#E37332", s1Cd: 6000, s2Cd: 12000, s3Cd: 35000, atkInt: 100 },
+        { name: "瑞艾斯", hp: 2350, atk: 160, speed: 3.7, color: "#DEDEDE", s1Cd: 5000, s2Cd: 8000, s3Cd: 30000, atkInt: 400 }
+        
     ]);
     function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
     function resize() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
@@ -875,6 +876,7 @@
                 if(p.charIdx === 16 && p.fightStacks >= 5) { ctx.shadowBlur = 70; ctx.shadowColor = "red"; }
                 if(p.charIdx === 14 && p.forestUlt == true) { ctx.shadowBlur = 20; ctx.shadowColor = "orange"; }
                 if(p.charIdx === 24 && p.zhenUltTimer > 0) { ctx.shadowBlur = 30; ctx.shadowColor = "red"; }
+                if(p.charIdx === 49 && p.riseBuff == true){ctx.shadowBlur = 30; ctx.shadowColor = "yellow";}
                 if(p.charIdx === 18 && p.autoaim == true) { ctx.shadowBlur = 20; ctx.shadowColor = "yellow"; }
                 if(p.charIdx === 44 && p.ySuper == true) { ctx.shadowBlur = 50; ctx.shadowColor = "blue"; }
                 if(p.charIdx === 21 && p.shine == true) { ctx.shadowBlur = 30; ctx.shadowColor = "gold"; };
@@ -883,6 +885,7 @@
                 if(p.charIdx === 20 && p.jLauUlt == true) { ctx.shadowBlur = 30; ctx.shadowColor = "orange"; }
                 if(p.status.frozen > 0) { ctx.fillStyle = "rgba(0,100,255,0.5)"; ctx.fillRect(-35, -35, 70, 70); }
                 if(p.charIdx === 8 && p.isTransparent) ctx.globalAlpha = 0.5;
+                if(p.charIdx === 49 && p.isTransparent) ctx.globalAlpha = 0;
                 ctx.rotate(p.angle); ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(0,0, p.radius, 0, Math.PI*2); ctx.fill();
                 ctx.fillStyle = "#fff"; ctx.fillRect(15, -5, 10, 10); 
                 if(p.charIdx === 9) { ctx.font="20px Arial"; ctx.fillText("😂", -10, 5); }
@@ -906,7 +909,8 @@
                 if (p.charIdx === 6) {
                     p.soldiers.forEach(s => { ctx.save(); ctx.translate(s.x, s.y); ctx.fillStyle = s.type==='trap' ? 'rgba(100,100,100,0.5)' : '#4b0082'; ctx.beginPath(); ctx.arc(0,0,18, 0,Math.PI*2); ctx.fill(); if(s.type === 'soldier') { ctx.fillStyle = "red"; ctx.fillRect(-10, -20, 20, 3); ctx.fillStyle = "lime"; ctx.fillRect(-10, -20, 20 * (s.hp/s.maxHp), 3); } ctx.restore(); });
                 }
-                const bw = 100; ctx.fillStyle = "#333"; ctx.fillRect(p.x - bw/2, p.y - 65, bw, 10); ctx.fillStyle = "#2ecc71"; ctx.fillRect(p.x - bw/2, p.y - 65, bw * (p.hp/p.maxHp), 10);
+                const bw = 100;
+                if(p.charIdx !== 49 || p.riseTrans !== true) {ctx.fillStyle = "#333"; ctx.fillRect(p.x - bw/2, p.y - 65, bw, 10); ctx.fillStyle = "#2ecc71"; ctx.fillRect(p.x - bw/2, p.y - 65, bw * (p.hp/p.maxHp), 10); }
                 if(p.shield > 0) { ctx.fillStyle = "white"; ctx.fillRect(p.x - bw/2, p.y - 67, Math.min(bw, bw * p.shield/p.maxHp), 4); }
                 if(p.charIdx === 48) { ctx.fillStyle = "red"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.yinFuel/100), 5); }
                 if(p.charIdx === 45) { ctx.fillStyle = "gray"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.jEnergy/2), 5); }
@@ -924,7 +928,7 @@
                 if(p.charIdx === 14) { ctx.fillStyle = "green"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.luckStacks/6), 5); ctx.fillStyle="black"; ctx.fillRect(p.x, p.y-75, 1, 5); }
                 if(p.charIdx === 1) { ctx.fillStyle = "orange"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.flame/150), 5);}
                 if(p.charIdx === 47) { ctx.fillStyle = "#FACD50"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.musicNotes/100), 5);}
-                if(p.charIdx === 47 && p.musicShield >= 1) {ctx.fillStyle = "#8FC9FF"; ctx.fillRect(p.x - bw/2, p.y + 35, bw * (p.musicShield/2000),5);}
+                if(p.charIdx === 47 && p.musicShield >= 1) {ctx.fillStyle = "#8FC9FF"; ctx.fillRect(p.x - bw/2, p.y + 35, bw * (p.musicShield/1500),5);}
                 if(p.charIdx === 44) { ctx.fillStyle = "cyan"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.yProtection/100), 5);}
                 if( p.charIdx === 34) { ctx.fillStyle = "lime"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.qxEnergy/100), 5); ctx.fillStyle = "black"; ctx.fillRect(p.x, p.y-75, 1, 5);}
                 if(p.charIdx === 23 && p.uniState == 1) { ctx.fillStyle = "rgba(0, 36, 122, 1)"; ctx.fillRect(p.x - bw/2, p.y - 75, bw, 5);}
@@ -1094,64 +1098,155 @@
             this.heartBroken = 0; this.rage = 0; this.isRageMode = false; this.rageTimer = 0; this.rageEnh = 0; this.isRageEnh = false; this.rageEnhTimer = 0; this.healTickTimer = 0; 
             this.enhancedAtk = false; this.stateTimer = 0; this.critStacks = 0; this.isChargingUlt = false; this.showShush = false; this.missBuffTimer = 0;
             this.comboCount = 0; this.comboTimer = 0; this.damageTakenAccumulator = 0;
-            // Jiming
-            this.jiminUltImmune = false; this.speedStacks = 0; this.speedStackTimer = 0; this.isJimingUlt = false; this.jimingUltTimer = 0; this.jimingTotalDmg = 0; this.jimingUltZone = { active: false, x: 0, y: 0, r: 272, timer: 0 }; this.struggleSpeedStacks = 0; this.isJimingDash = false;
-            // Tai
-            this.flame = 0;this.taiS1Phase = 1;this.taiRegenTimer = 0; this.taiUltActive = false; this.taiS1Active = false; 
-            // Saint
+            // Tai (1)
+            this.flame = 0;
+            this.taiS1Phase = 1;
+            this.taiRegenTimer = 0;
+            this.taiUltActive = false;
+            this.taiS1Active = false; 
+            // Saint (2)
             this.isSaintInvisible = false;
-            // Commander
-            this.commanderMode = false; this.soldiers = []; this.commDamageTaken = 0; this.lastHitTime = 0; this.commMoveLock = false; this.commLockDir = 0; this.superEnhancedAtk = false; this.hasDealtS2Dmg = false;
-            // Micah
-            this.funds = 0; this.fundsTimer = 0; this.isGrappling = false; this.micahEnhanced = false; this.micahHealTimer = 0;
-            // Shili
-            this.wounds = 0; this.woundTimer = 0; this.damageTakenHistory = []; this.isTransparent = false; this.shiliS1Lock = false; 
-            this.shiliLifelineCd = 0; this.shiliLifelineActive = false; this.shiliLifelineTimer = 0; this.shiliLifelineShown = false;
-            // Swordman
+            // Swordman (4)
             this.ultLockedAngle = 0;
-            // Boke
-            this.bokeClone = null; this.activeMarks = [];
-            // Hanhan
-            this.capacity = 0; this.hanhanRegenTimer = 0; this.hasHitDash = false;
-            // Mars
-            this.energy = 0; this.marsFireZones = []; this.isMarsFlying = false; this.energyConsumed = 0; this.ultTargetX=0; this.ultTargetY=0; 
+            // Jiming (5)
+            this.jiminUltImmune = false;
+            this.speedStacks = 0;
+            this.speedStackTimer = 0;
+            this.isJimingUlt = false;
+            this.jimingUltTimer = 0;
+            this.jimingTotalDmg = 0; 
+            this.jimingUltZone = { active: false, x: 0, y: 0, r: 272, timer: 0 };
+            this.struggleSpeedStacks = 0;
+            this.isJimingDash = false;
+            // Commander (6)
+            this.commanderMode = false;
+            this.soldiers = [];
+            this.commDamageTaken = 0;
+            this.lastHitTime = 0;
+            this.commMoveLock = false;
+            this.commLockDir = 0;
+            this.superEnhancedAtk = false; 
+            this.hasDealtS2Dmg = false;
+            // Micah (7)
+            this.funds = 0;
+            this.fundsTimer = 0;
+            this.isGrappling = false;
+            this.micahEnhanced = false;
+            this.micahHealTimer = 0;
+            // Shili (8)
+            this.wounds = 0;
+            this.woundTimer = 0;
+            this.damageTakenHistory = [];
+            this.isTransparent = false;
+            this.shiliS1Lock = false; 
+            this.shiliLifelineCd = 0;
+            this.shiliLifelineActive = false;
+            this.shiliLifelineTimer = 0;
+            this.shiliLifelineShown = false;
+            // Boke (9)
+            this.bokeClone = null;
+            this.activeMarks = [];
+            // Hanhan (10)
+            this.capacity = 0;
+            this.hanhanRegenTimer = 0;
+            this.hasHitDash = false;
+            // Mars (11)
+            this.energy = 0;
+            this.marsFireZones = [];
+            this.isMarsFlying = false;
+            this.energyConsumed = 0;
+            this.ultTargetX=0;
+            this.ultTargetY=0; 
             this.marsRing = { active: false, x: 0, y: 0, timer: 0, rocks: [] };
-            this.marsBuffTimer = 0; this.marsS3State = 0; this.marsS3Timer = 0;
-            // Nicholas
-            this.chewing = false; this.chewingTimer = 0; this.stolenSkill = null; this.chewingState = '';this.screaming = false;
-            // JingCha
-            this.assaultStacks = 0; this.assaultTimer = 0; this.cops = []; this.copShootTimer = 0; this.copRocketTimer = 0;
-            // Carson
-            this.forestUlt = false;this.luckStacks = 0;this.forestAtk = false;this.forestMode = false;this.atkTri = false;this.healBuff = 1;
-            // Stone
-            this.stoneS3 = 0;this.stoneAtkStore = 0;this.stoneUndying = true;this.stoneEnAtk = false; this.undyingStatus = false; this.stoneAddShd = true;
-            // Tewy
-            this.fightStacks = 0; this.fightingState = false;
-            //Alison
-            this.writeStatus = false;this.writeStacks = 0;this.knockStatus = false;
-            //H.S.
-            this.autoaim = false; this.ammo = 4;this.frozeAttack = false; this.hsUltPhase = 1; this.ultBuff = 0;
-            //Leo
-            this.leoUlt = false;this.soundAmount = 0;this.leoEnAtk = 0; this.leoTimer = 0;this.stared = false;this.respectState = false;
-            //Jlau
-            this.jlauPerformance = 2;this.holdBall = false;this.jLauBuff = 1; this.jLauUlt = false;
-            //Divine
-            this.divineDash = false; this.divineS2 = 1; this.divineSpd = 0; this.divineAtk = 1;this.shine = false;this.divineEnh = 0; this.divineS3 = 1;
-            // Somber
-            this.slashStart = false; this.endSlash = 1;
-            // Universe
-            this.uniState = 0;this.sunClone = null; this.uniBurn = 0;this.uniAim = false
+            this.marsBuffTimer = 0;
+            this.marsS3State = 0; 
+            this.marsS3Timer = 0;
+            // Nicholas (12)
+            this.chewing = false;
+            this.chewingTimer = 0;
+            this.stolenSkill = null;
+            this.chewingState = '';
+            this.screaming = false;
+            // JingCha (13)
+            this.assaultStacks = 0;
+            this.assaultTimer = 0;
+            this.cops = [];
+            this.copShootTimer = 0;
+            this.copRocketTimer = 0;
+            // Carson (14)
+            this.forestUlt = false;
+            this.luckStacks = 0;
+            this.forestAtk = false;
+            this.forestMode = false;
+            this.atkTri = false;
+            this.healBuff = 1;
+            // Stone (15)
+            this.stoneS3 = 0;
+            this.stoneAtkStore = 0;
+            this.stoneUndying = true;
+            this.stoneEnAtk = false;
+            this.undyingStatus = false;
+            this.stoneAddShd = true;
+            // Tewy (16)
+            this.fightStacks = 0;
+            this.fightingState = false;
+            //Alison (17)
+            this.writeStatus = false;
+            this.writeStacks = 0;
+            this.knockStatus = false;
+            //H.S. (18)
+            this.autoaim = false;
+            this.ammo = 4;
+            this.frozeAttack = false;
+            this.hsUltPhase = 1;
+            this.ultBuff = 0;
+            //Leo (19)
+            this.leoUlt = false;
+            this.soundAmount = 0;
+            this.leoEnAtk = 0;
+            this.leoTimer = 0;
+            this.stared = false;
+            this.respectState = false;
+            //Jlau (20)
+            this.jlauPerformance = 2;
+            this.holdBall = false;
+            this.jLauBuff = 1;
+             this.jLauUlt = false;
+            //Divine (21)
+            this.divineDash = false;
+            this.divineS2 = 1;
+            this.divineSpd = 0;
+            this.divineAtk = 1;
+            this.shine = false;
+            this.divineEnh = 0;
+            this.divineS3 = 1;
+            // Somber (22)
+            this.slashStart = false;
+            this.endSlash = 1;
+            // Universe (23)
+            this.uniState = 0;
+            this.sunClone = null;
+            this.uniBurn = 0;
+            this.uniAim = false
             // Zhen (24)
             this.blood = 0;              // 血性 (最多3層)
             this.zhenEnhTimer = 0;       // 強化普攻後的 25% 狀態計時器
             this.zhenS2SpeedTimer = 0;   // 二技能攻速 20% 計時器
             this.zhenUltTimer = 0;       // 大招強化狀態倒數
             this.zhenAtkSpeedBuff = 1.0; // 總攻速倍率
-            // Jingshan
-            this.jsStacks = 0; this.jsS2SpeedTimer = 0; this.truthState = false; this.truthTimer = 0; this.truthTick = 0; this.truthStunTick = 0;
-            // Yushan
-            this.plantZones = []; this.yushanEnhanced = false; this.yushanEnhTimer = 0; this.yushanInPlant = false;
-            // Constance
+            // Jingshan (25)
+            this.jsStacks = 0;
+            this.jsS2SpeedTimer = 0;
+            this.truthState = false;
+            this.truthTimer = 0;
+            this.truthTick = 0;
+            this.truthStunTick = 0;
+            // Yushan (26)
+            this.plantZones = [];
+            this.yushanEnhanced = false;
+            this.yushanEnhTimer = 0;
+            this.yushanInPlant = false;
+            // Constance (27)
             this.consRegenActive = false;
             this.consS1SpeedBuff = 0;
             this.consTetherActive = false;
@@ -1162,7 +1257,7 @@
             this.consS3TickDmg = 0;
             this.consS3TickHeal = 0;
             this.consS3TickPull = 0;
-            // Wen Kang
+            // Wen Kang (28)
             this.wenAiming = false;
             this.wenS1Buff = false;
             this.wenS3Buff = false;
@@ -1170,7 +1265,7 @@
             this.wenStationary = false;
             this.wenS3DashBuff = 0;
             this.wenBasicAim = false
-	        // Yifeng 
+	        // Yifeng (29)
             this.yfNest = null;
             this.yfS2Resets = 0;
             this.yfPassiveCd = 0;
@@ -1324,6 +1419,9 @@
             this.yinTimer = 0;
             this.yinCooldown = false;
             this.candleClone = null;
+            // Rise (49)
+            this.riseEnh = false;
+            this.riseBuff = false;
         }
         triggerClovisPassive() {
             if (this.charIdx !== 35 || this.clovisPassiveCd > 0) return;
@@ -1376,6 +1474,10 @@
         update(dt) {
             if(this.isDying) return;
             this.buffs.speed = 1.0 * this.buffs.slow; 
+// Rise (49) Update logic
+        if(this.charIdx === 49){
+            setGameInterval(()=> {if(this.maxHp < this.hp){this.hp = this.maxHp}}, 500)
+        }
 // Yin (48) Update logic
         if(this.charIdx === 48){
            setGameInterval(()=> {if(this.yinFuel < 0){this.yinFuel = 0;}},500)
@@ -2779,7 +2881,8 @@ if (this.charIdx === 31) {
                    this.candleClone.life -= dt * timeScale; 
                    if(this.candleClone.life <= 0) { this.candleClone = null; }  
                    else if(dist(this, this.candleClone) < 50) {
-                        this.yinFuel += 10;
+                        this.yinFuel += 15;
+                        this.heal(50);
                         this.candleClone = null;
                         floatTexts.push(new FloatText(this.x, this.y, "蠟燭已被拾取！", "gray"));
                     }
@@ -2919,7 +3022,7 @@ if (this.charIdx === 31) {
                     else if (this.charIdx === 6 && (this.isCasting || this.commMoveLock)) { }
                     else { 
                         // 修復：將 this.charIdx === 26 (玉山) 從手動瞄準名單中移除，讓他平時就能自動面向敵人
-                        if(this.charIdx === 6 || (this.charIdx === 44 && this.yAim == true) || this.charIdx === 10 || (this.charIdx === 18 && this.autoaim == false) || (this.charIdx === 19 &&  this.leoUlt == true) || (this.charIdx === 21 && this.divineDash == true) || this.charIdx === 23 || this.charIdx === 27 || (this.charIdx === 28 && !this.wenBasicAim)) {
+                        if((this.target.charIdx === 49 && this.target.riseTrans == true) || this.charIdx === 6 || (this.charIdx === 44 && this.yAim == true) || this.charIdx === 10 || (this.charIdx === 18 && this.autoaim == false) || (this.charIdx === 19 &&  this.leoUlt == true) || (this.charIdx === 21 && this.divineDash == true) || this.charIdx === 23 || this.charIdx === 27 || (this.charIdx === 28 && !this.wenBasicAim)) {
                             const joy = this.id===1?p1Touch:p2Touch;
                             if(Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) this.angle = Math.atan2(joy.joyY, joy.joyX);
                         } else {
@@ -3122,12 +3225,20 @@ if (this.charIdx === 31) {
                  this.yinCooldown = true;
                  setGameTimeout(()=> this.yinCooldown = false, 500)
                  this.yinFuel -= 30;
+                 this.heal(200);
                  let aimAngle = this.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1)
                  aimAngle = Math.atan2(joy.joyY, joy.joyX);this.angle = aimAngle; let tx = this.x + Math.cos(aimAngle)*250, ty = this.y + Math.sin(aimAngle)*250; let sInt = setGameInterval(() => {this.x += (tx - this.x)*0.7; this.y += (ty - this.y)*0.7; }, 16); setGameTimeout(() => {clearInterval(sInt)}, 150);
                  shakeAmount = 20;
                  for(let i=0; i<20; i++) particles.push(new Particle(this.x, this.y, "lime", "normal", "🔥", 1.5));
                  floatTexts.push(new FloatText(this.x, this.y-80, "本生燈會證明一切！", "red"));
                  return { hpDmg: 0, shieldDmg: 0 };
+               }
+            }
+            if(this.charIdx === 49){
+               if(dmg >= 0 && this.riseTrans == true){
+                this.riseTrans = false;
+                this.isTransparent = false;
+                floatTexts.push(new FloatText(this.x, this.y-80, "隱身狀態被打斷", "red"));
                }
             }
 
@@ -3357,15 +3468,38 @@ if (this.charIdx === 31) {
         const joy = p.id === 1 ? p1Touch : p2Touch;
         if(p.cd.atk > 0 || p.isLock || p.hp <= 0 || p.status.losegrip > 0) return; 
     
+    if(p.charIdx === 49){
+        p.riseTrans = false;
+        p.isTransparent = false;
+       if(p.riseEnh == true){
+        shakeAmount = 20;
+        p.riseEnh = false;
+        p.activeWarning = { type:'circle', r: 100, x: p.x, y: p.y, color: 'white' }; 
+        setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 110) {
+            if(p.riseBuff == true){enemy.takeDamage(448);p.heal(135)} else {p.heal(135);enemy.takeDamage(320)}
+            let c = 0;
+            let rd = setGameInterval(()=> {
+                if(c < 10 && dist(p, p.target) < 50){
+                let tx = (enemy.x - p.x)/ (11 - c);
+                let ty = (enemy.y - p.y)/ (11 - c);
+                p.x += tx; p.y += ty;
+                c++
+                }else{clearInterval(rd);}},10)
+            } }, 100); 
+       } else {
+        p.activeWarning = { type:'rect', l: 175, h: 30, color: "white"}; setGameTimeout(() => { if(dist(p, enemy) < 175) { enemy.takeDamage(60, 1); } p.activeWarning = null; }, 100); 
+       }
+    }
+
     if(p.charIdx === 48){
         if(p.yinFuel >= 5){
         let i = 0;
         p.buffs.speed += 0.3
         p.yinFuel -= (5 / p.yinCost);
         if(p.target.status.dusted >= 1){
-            let syf = setGameInterval(()=> {if(i<2){i++; projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gray", (15 * p.buffs.atk) * 1.5, p, "🔥", 1.0, 200 + p.yinLength, null, 20, false, false, false, false));} else {clearInterval(syf); i=0}},200)
+            let syf = setGameInterval(()=> {if(i<2){i++; projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gray", (13 * p.buffs.atk) * 1.5, p, "🔥", 1.0, 200 + p.yinLength, null, 20, false, false, false, false));} else {clearInterval(syf); i=0}},200)
         } else {
-            let yf = setGameInterval(()=> {if(i<2){i++; projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gray", 15 * p.buffs.atk, p, "🔥", 1.0, 200 + p.yinLength, null, 20, false, false, false, false));} else {clearInterval(yf); i=0}},200)}
+            let yf = setGameInterval(()=> {if(i<2){i++; projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gray", 13 * p.buffs.atk, p, "🔥", 1.0, 200 + p.yinLength, null, 20, false, false, false, false));} else {clearInterval(yf); i=0}},200)}
         }
     }
 
@@ -4477,8 +4611,17 @@ if (this.charIdx === 31) {
         if(p.cd.s1 > 0 || (p.isLock && !p.isChargingUlt) || p.status.disarmed > 0 || p.hp <= 0) return;
         if(p.charIdx === 8 && p.shiliS1Lock) return;
         p.cd.s1 = CHAR_DATA[p.charIdx].s1Cd;
+        p.speed = CHAR_DATA[p.charIdx].speed;
         if(p.charIdx === 6 && p.commanderMode) p.cd.s1 = 4000;
         const joy = p.id === 1 ? p1Touch : p2Touch;
+    
+    if(p.charIdx === 49){
+        p.isTransparent = false;
+        p.riseTrans = false;
+        let aimAngle = p.angle;
+        if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; 
+        let tx = p.x + Math.cos(aimAngle)*150, ty = p.y + Math.sin(aimAngle)*150; let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2; }, 16); setGameTimeout(() => clearInterval(sInt), 150); p.speed = 5.5; p.riseEnh = true; setGameTimeout(()=> p.speed = 3.7, 3000) 
+    }
 
     if(p.charIdx === 48){
         p.activeWarning = { type:'rect', l: 250, h: 60}; 
@@ -5295,6 +5438,13 @@ if (this.charIdx === 31) {
         if(p.cd.s2 > 0 || p.isLock || p.status.disarmed > 0 || p.hp <= 0) return;
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
     
+    if(p.charIdx === 49){
+        p.riseEnh = true;
+        p.isTransparent = true;
+        p.riseTrans = true;
+        let c = 0;
+        let ri = setGameInterval(()=> {if(c < 4 && p.riseTrans == true){particles.push(new Particle(p.x, p.y, "red", "normal", "👣", 1.5));c++; p.hp += 102;} else {clearInterval(ri); p.hp += 102;p.riseTrans = false; p.isTransparent = false;}},1000)
+    }
     if(p.charIdx === 48){
         projectiles.push(new Projectile(p.x, p.y, p.angle, 18, "orange", 0, p, "◽", 3.0, null, (e)=>{e.applyStatus("dusted", 5000); p.candleClone = { x: enemy.x, y: enemy.y, life: 10000 };}, 35, true));
     }
@@ -6178,6 +6328,24 @@ if (p.charIdx === 31) {
         if(p.status.stunned > 0 || p.status.disarmed > 0) return;
         p.cd.s3 = CHAR_DATA[p.charIdx].s3Cd;
     
+    if(p.charIdx === 49){
+        shakeAmount = 50;
+        p.activeWarning = { type:'circle', r: 120, x: p.x, y: p.y, color: 'red' }; 
+        setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 130) {
+            p.riseBuff = true; setGameTimeout(()=> p.riseBuff = false, 800)
+            if(p.riseTrans == true){p.heal(135);enemy.takeDamage(1000); enemy.applyStatus("stunned", 700); p.isTransparent = false; p.riseTrans = false;} else {enemy.takeDamage(700)}
+            let c = 0;
+            let rd = setGameInterval(()=> {
+                if(c < 10){
+                particles.push(new Particle(p.x, p.y, "red", "normal", "👆", 1.5));
+                let tx = (enemy.x - p.x)/ (11 - c);
+                let ty = (enemy.y - p.y)/ (11 - c);
+                p.x += tx; p.y += ty;
+                c++
+                }else{clearInterval(rd);let ang = Math.atan2(enemy.y-p.y, enemy.x-p.x); enemy.x += Math.cos(ang) * 150; enemy.y += Math.sin(ang) * 150;}},10)
+            } }, 100); 
+    }
+
     if(p.charIdx === 48){
         let startX = enemy.x, startY = enemy.y; for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "⛽️")); };
        floatTexts.push(new FloatText(p.x, p.y - 80, "後備能源啓動！", "orange"));
