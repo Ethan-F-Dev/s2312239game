@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Security-Policy" content="media-src * data: blob:;">
-    <title>巔峰對決 - 化學攻擊 </title>
+    <title>巔峰對決 - 當心身後 </title>
     <style>
         :root { --p1-ui: #3498db; --p2-ui: #e74c3c; --font-main: 'Noto Sans TC', sans-serif; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; user-select: none; 
@@ -177,14 +177,14 @@
         { name: "尼古拉斯", hp: 4200, atk: 150, speed: 3.2, color: "#a0a0a0", s1Cd: 8000, s2Cd: 9000, s3Cd: 30000, atkInt: 1200 },
         { name: "境查", hp: 2850, atk: 130, speed: 3.3, color: "#113388", s1Cd: 7000, s2Cd: 10000, s3Cd: 35000, atkInt: 1300 },
         { name: "卡爾森", hp: 2550, atk: 20, speed: 3.2, color: "#90EE90", s1Cd: 6000, s2Cd: 6500, s3Cd: 15000, atkInt: 400 },
-        { name: "磐石", hp: 3000, atk: 135, speed: 2.3, color: "#4D4D4D", s1Cd: 5000, s2Cd: 9000, s3Cd: 15000, atkInt: 650 },
+        { name: "磐石", hp: 2400, atk: 135, speed: 2.3, color: "#4D4D4D", s1Cd: 5000, s2Cd: 9000, s3Cd: 15000, atkInt: 650 },
         { name: "特維", hp: 3278, atk: 150, speed: 3.1, color: "#025E00", s1Cd: 6800, s2Cd: 5000, s3Cd: 30000, atkInt: 920 },
         { name: "婭", hp: 3600, atk: 90, speed: 3.0, color: "#ffcccc", s1Cd:9000, s2Cd: 16000, s3Cd: 35000, atkInt: 800 },
         // page 4
         { name: "寒朔", hp: 2800, atk: 150, speed: 4.5, color: "#e6e6e6", s1Cd: 10000, s2Cd: 12000, s3Cd: 30000, atkInt: 800 },
         { name: "離奧", hp: 3800, atk: 199, speed: 3.0, color: "#613D00", s1Cd: 8000, s2Cd: 12000, s3Cd: 35000, atkInt: 1000 },
         { name: "杰牢", hp: 4200, atk: 160, speed: 3.7, color: "#2750F5", s1Cd: 6500, s2Cd: 7500, s3Cd: 25000, atkInt: 1400 },
-        { name: "帝衛祢", hp: 2500, atk: 100, speed: 3.6, color: "#000080", s1Cd: 6000, s2Cd: 10000, s3Cd: 20000, atkInt: 400 },
+        { name: "帝衛祢", hp: 2500, atk: 100, speed: 3.6, color: "#000080", s1Cd: 6000, s2Cd: 13500, s3Cd: 25000, atkInt: 400 },
         { name: "深柏", hp: 2600, atk: 230, speed: 3.5, color: "#66356E", s1Cd: 6000, s2Cd: 10000, s3Cd: 25000, atkInt: 500 },
         { name: "宇", hp: 3500, atk: 550, speed: 3.5, color: "#708BFF", s1Cd: 6000, s2Cd: 12000, s3Cd: 35000, atkInt: 1000 },
         // page 5
@@ -214,10 +214,11 @@
         { name: "凌汐", hp: 1000, atk: 22, speed: 3.4, color: "#27C5F5", s1Cd: 3000, s2Cd: 4500, s3Cd: 35000, atkInt: 300 },
         { name: "鹿冠", hp: 2800, atk: 91, speed: 3.2, color: "#8B4513", s1Cd: 4000, s2Cd: 7800, s3Cd: 20000, atkInt: 600 },
         { name: "戮", hp: 3500, atk: 90, speed: 3.5, color: "#FF2A00", s1Cd: 7000, s2Cd: 8000, s3Cd: 15000, atkInt: 1000 },
-        { name: "韵淇", hp: 2800, atk: 80, speed: 3.7, color: "#E48FFF", s1Cd: 4000, s2Cd: 6000, s3Cd: 35000, atkInt: 800 },
+        { name: "韵淇", hp: 2800, atk: 80, speed: 3.89, color: "#E48FFF", s1Cd: 4000, s2Cd: 6000, s3Cd: 35000, atkInt: 800 },
         // page 9
-        { name: "茵", hp: 3100, atk: 20, speed: 3.4, color: "#E37332", s1Cd: 6000, s2Cd: 12000, s3Cd: 35000, atkInt: 100 }
-
+        { name: "茵", hp: 3100, atk: 20, speed: 3.4, color: "#E37332", s1Cd: 6000, s2Cd: 12000, s3Cd: 35000, atkInt: 100 },
+        { name: "瑞艾斯", hp: 2450, atk: 160, speed: 3.6, color: "#DEDEDE", s1Cd: 5000, s2Cd: 8000, s3Cd: 30000, atkInt: 400 }
+        
     ]);
     function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
     function resize() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
@@ -875,6 +876,7 @@
                 if(p.charIdx === 16 && p.fightStacks >= 5) { ctx.shadowBlur = 70; ctx.shadowColor = "red"; }
                 if(p.charIdx === 14 && p.forestUlt == true) { ctx.shadowBlur = 20; ctx.shadowColor = "orange"; }
                 if(p.charIdx === 24 && p.zhenUltTimer > 0) { ctx.shadowBlur = 30; ctx.shadowColor = "red"; }
+                if(p.charIdx === 49 && p.riseBuff == true){ctx.shadowBlur = 30; ctx.shadowColor = "yellow";}
                 if(p.charIdx === 18 && p.autoaim == true) { ctx.shadowBlur = 20; ctx.shadowColor = "yellow"; }
                 if(p.charIdx === 44 && p.ySuper == true) { ctx.shadowBlur = 50; ctx.shadowColor = "blue"; }
                 if(p.charIdx === 21 && p.shine == true) { ctx.shadowBlur = 30; ctx.shadowColor = "gold"; };
@@ -883,6 +885,7 @@
                 if(p.charIdx === 20 && p.jLauUlt == true) { ctx.shadowBlur = 30; ctx.shadowColor = "orange"; }
                 if(p.status.frozen > 0) { ctx.fillStyle = "rgba(0,100,255,0.5)"; ctx.fillRect(-35, -35, 70, 70); }
                 if(p.charIdx === 8 && p.isTransparent) ctx.globalAlpha = 0.5;
+                if(p.charIdx === 49 && p.isTransparent) ctx.globalAlpha = 0;
                 ctx.rotate(p.angle); ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(0,0, p.radius, 0, Math.PI*2); ctx.fill();
                 ctx.fillStyle = "#fff"; ctx.fillRect(15, -5, 10, 10); 
                 if(p.charIdx === 9) { ctx.font="20px Arial"; ctx.fillText("😂", -10, 5); }
@@ -906,8 +909,10 @@
                 if (p.charIdx === 6) {
                     p.soldiers.forEach(s => { ctx.save(); ctx.translate(s.x, s.y); ctx.fillStyle = s.type==='trap' ? 'rgba(100,100,100,0.5)' : '#4b0082'; ctx.beginPath(); ctx.arc(0,0,18, 0,Math.PI*2); ctx.fill(); if(s.type === 'soldier') { ctx.fillStyle = "red"; ctx.fillRect(-10, -20, 20, 3); ctx.fillStyle = "lime"; ctx.fillRect(-10, -20, 20 * (s.hp/s.maxHp), 3); } ctx.restore(); });
                 }
-                const bw = 100; ctx.fillStyle = "#333"; ctx.fillRect(p.x - bw/2, p.y - 65, bw, 10); ctx.fillStyle = "#2ecc71"; ctx.fillRect(p.x - bw/2, p.y - 65, bw * (p.hp/p.maxHp), 10);
+                const bw = 100;
+                if(p.charIdx !== 49 || p.riseTrans !== true) {ctx.fillStyle = "#333"; ctx.fillRect(p.x - bw/2, p.y - 65, bw, 10); ctx.fillStyle = "#2ecc71"; ctx.fillRect(p.x - bw/2, p.y - 65, bw * (p.hp/p.maxHp), 10); }
                 if(p.shield > 0) { ctx.fillStyle = "white"; ctx.fillRect(p.x - bw/2, p.y - 67, Math.min(bw, bw * p.shield/p.maxHp), 4); }
+                if(p.charIdx === 48) { ctx.fillStyle = "red"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.yinFuel/100), 5); }
                 if(p.charIdx === 45) { ctx.fillStyle = "gray"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.jEnergy/2), 5); }
                 if(p.charIdx === 3) { ctx.fillStyle = "red"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.rage/3), 5); }
                 if(p.charIdx === 18) { ctx.fillStyle = "white"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.ammo/4), 5); ctx.fillStyle = "black"; ctx.fillRect(p.x, p.y-75, 1, 5); }
@@ -923,7 +928,7 @@
                 if(p.charIdx === 14) { ctx.fillStyle = "green"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.luckStacks/6), 5); ctx.fillStyle="black"; ctx.fillRect(p.x, p.y-75, 1, 5); }
                 if(p.charIdx === 1) { ctx.fillStyle = "orange"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.flame/150), 5);}
                 if(p.charIdx === 47) { ctx.fillStyle = "#FACD50"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.musicNotes/100), 5);}
-                if(p.charIdx === 47 && p.musicShield >= 1) {ctx.fillStyle = "#8FC9FF"; ctx.fillRect(p.x - bw/2, p.y + 35, bw * (p.musicShield/2000),5);}
+                if(p.charIdx === 47 && p.musicShield >= 1) {ctx.fillStyle = "#8FC9FF"; ctx.fillRect(p.x - bw/2, p.y + 35, bw * (p.musicShield/1500),5);}
                 if(p.charIdx === 44) { ctx.fillStyle = "cyan"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.yProtection/100), 5);}
                 if( p.charIdx === 34) { ctx.fillStyle = "lime"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.qxEnergy/100), 5); ctx.fillStyle = "black"; ctx.fillRect(p.x, p.y-75, 1, 5);}
                 if(p.charIdx === 23 && p.uniState == 1) { ctx.fillStyle = "rgba(0, 36, 122, 1)"; ctx.fillRect(p.x - bw/2, p.y - 75, bw, 5);}
@@ -944,6 +949,7 @@
                 if(p.status.disarmed > 0) sTxt += "⛓️";
                 if(p.status.frozen > 0) sTxt += "💀";
                 if(p.status.bound > 0) sTxt += "🌿";
+                if(p.status.divineShow > 0) sTxt += "";
                 if(p.target && p.target.charIdx === 27 && (p.target.consTetherActive || (p.target.consS3Active && dist(p, p.target) <= 350 && p.status.taunted > 0))) sTxt += "😍";
                 if(p.charIdx === 15 && p.stoneUndying == true) sTxt += "🈵" ;
                 ctx.font = "20px Arial"; ctx.fillStyle = "white"; ctx.fillText(sTxt, p.x - 30, p.y - 85);
@@ -951,12 +957,14 @@
                 if(p.status.chill > 0){ ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("😌", p.x - 20, p.y - 110); }
                 if (p.status.superArmor > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("🪬", p.x - 20, p.y - 110); }
                 if (p.status.divineMark > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("⚜️", p.x - 20, p.y - 110); }
+                if (p.status.dusted > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("🌫️", p.x - 20, p.y - 110); }
                 if (p.status.calm > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("😶", p.x - 20, p.y - 110); }
                 if (p.status.insane > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("😡", p.x - 20, p.y - 110); }
                 if (p.status.high > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("🥵", p.x - 20, p.y - 110); }
             } else if(p.isDying) { for(let i=0; i<1; i++) particles.push(new Particle(p.x+(Math.random()-0.5)*50, p.y+(Math.random()-0.5)*50, "#fff", 'death')); }
         });
         [p1, p2].forEach(p => { 
+        if(p.candleClone) { ctx.save(); ctx.translate(p.candleClone.x, p.candleClone.y); ctx.font = "40px Arial"; ctx.fillText("🕯️", -20, 20); ctx.restore(); }
         if(p.bokeClone) { ctx.save(); ctx.translate(p.bokeClone.x, p.bokeClone.y); ctx.font = "40px Arial"; ctx.fillText("👤", -20, 20); ctx.restore(); }
         if(p.sunClone) { ctx.save(); ctx.translate(p.sunClone.x, p.sunClone.y); ctx.font = "40px Arial"; ctx.fillText("🌞", -20, 20); ctx.restore(); } 
         if (p.status.bound > 0) {
@@ -968,6 +976,17 @@
             }
             ctx.restore();
         }
+
+        if (p.status.divineShow > 0) {
+            ctx.save(); ctx.translate(p.x, p.y); ctx.font = "24px Arial";
+            let t = Date.now() / 320;
+            for(let i=0; i< p.divineEnh/3; i++) {
+                let a = t + (i * Math.PI / 3);
+                ctx.fillText("🟡", Math.cos(a)*65 - 12, Math.sin(a)*65 + 12);
+            }
+            ctx.restore();
+        }
+
         });
         particles.forEach(p => p.draw());
         floatTexts.forEach(t => { ctx.fillStyle = t.color; ctx.font = "bold 24px Arial"; ctx.fillText(t.text, t.x, t.y); });
@@ -1079,64 +1098,156 @@
             this.heartBroken = 0; this.rage = 0; this.isRageMode = false; this.rageTimer = 0; this.rageEnh = 0; this.isRageEnh = false; this.rageEnhTimer = 0; this.healTickTimer = 0; 
             this.enhancedAtk = false; this.stateTimer = 0; this.critStacks = 0; this.isChargingUlt = false; this.showShush = false; this.missBuffTimer = 0;
             this.comboCount = 0; this.comboTimer = 0; this.damageTakenAccumulator = 0;
-            // Jiming
-            this.jiminUltImmune = false; this.speedStacks = 0; this.speedStackTimer = 0; this.isJimingUlt = false; this.jimingUltTimer = 0; this.jimingTotalDmg = 0; this.jimingUltZone = { active: false, x: 0, y: 0, r: 272, timer: 0 }; this.struggleSpeedStacks = 0; this.isJimingDash = false;
-            // Tai
-            this.flame = 0;this.taiS1Phase = 1;this.taiRegenTimer = 0; this.taiUltActive = false; this.taiS1Active = false; 
-            // Saint
+            // Tai (1)
+            this.flame = 0;
+            this.taiS1Phase = 1;
+            this.taiRegenTimer = 0;
+            this.taiUltActive = false;
+            this.taiS1Active = false; 
+            // Saint (2)
             this.isSaintInvisible = false;
-            // Commander
-            this.commanderMode = false; this.soldiers = []; this.commDamageTaken = 0; this.lastHitTime = 0; this.commMoveLock = false; this.commLockDir = 0; this.superEnhancedAtk = false; this.hasDealtS2Dmg = false;
-            // Micah
-            this.funds = 0; this.fundsTimer = 0; this.isGrappling = false; this.micahEnhanced = false; this.micahHealTimer = 0;
-            // Shili
-            this.wounds = 0; this.woundTimer = 0; this.damageTakenHistory = []; this.isTransparent = false; this.shiliS1Lock = false; 
-            this.shiliLifelineCd = 0; this.shiliLifelineActive = false; this.shiliLifelineTimer = 0; this.shiliLifelineShown = false;
-            // Swordman
+            // Swordman (4)
             this.ultLockedAngle = 0;
-            // Boke
-            this.bokeClone = null; this.activeMarks = [];
-            // Hanhan
-            this.capacity = 0; this.hanhanRegenTimer = 0; this.hasHitDash = false;
-            // Mars
-            this.energy = 0; this.marsFireZones = []; this.isMarsFlying = false; this.energyConsumed = 0; this.ultTargetX=0; this.ultTargetY=0; 
+            // Jiming (5)
+            this.jiminUltImmune = false;
+            this.speedStacks = 0;
+            this.speedStackTimer = 0;
+            this.isJimingUlt = false;
+            this.jimingUltTimer = 0;
+            this.jimingTotalDmg = 0; 
+            this.jimingUltZone = { active: false, x: 0, y: 0, r: 272, timer: 0 };
+            this.struggleSpeedStacks = 0;
+            this.isJimingDash = false;
+            // Commander (6)
+            this.commanderMode = false;
+            this.soldiers = [];
+            this.commDamageTaken = 0;
+            this.lastHitTime = 0;
+            this.commMoveLock = false;
+            this.commLockDir = 0;
+            this.superEnhancedAtk = false; 
+            this.hasDealtS2Dmg = false;
+            // Micah (7)
+            this.funds = 0;
+            this.fundsTimer = 0;
+            this.isGrappling = false;
+            this.micahEnhanced = false;
+            this.micahHealTimer = 0;
+            // Shili (8)
+            this.wounds = 0;
+            this.woundTimer = 0;
+            this.damageTakenHistory = [];
+            this.isTransparent = false;
+            this.shiliS1Lock = false; 
+            this.shiliLifelineCd = 0;
+            this.shiliLifelineActive = false;
+            this.shiliLifelineTimer = 0;
+            this.shiliLifelineShown = false;
+            // Boke (9)
+            this.bokeClone = null;
+            this.activeMarks = [];
+            // Hanhan (10)
+            this.capacity = 0;
+            this.hanhanRegenTimer = 0;
+            this.hasHitDash = false;
+            // Mars (11)
+            this.energy = 0;
+            this.marsFireZones = [];
+            this.isMarsFlying = false;
+            this.energyConsumed = 0;
+            this.ultTargetX=0;
+            this.ultTargetY=0; 
             this.marsRing = { active: false, x: 0, y: 0, timer: 0, rocks: [] };
-            this.marsBuffTimer = 0; this.marsS3State = 0; this.marsS3Timer = 0;
-            // Nicholas
-            this.chewing = false; this.chewingTimer = 0; this.stolenSkill = null; this.chewingState = '';this.screaming = false;
-            // JingCha
-            this.assaultStacks = 0; this.assaultTimer = 0; this.cops = []; this.copShootTimer = 0; this.copRocketTimer = 0;
-            // Carson
-            this.forestUlt = false;this.luckStacks = 0;this.forestAtk = false;this.forestMode = false;this.atkTri = false;this.healBuff = 1;
-            // Stone
-            this.stoneS3 = 0;this.stoneAtkStore = 0;this.stoneUndying = true;this.stoneEnAtk = false; this.undyingStatus = false; this.stoneAddShd = true;
-            // Tewy
-            this.fightStacks = 0; this.fightingState = false;
-            //Alison
-            this.writeStatus = false;this.writeStacks = 0;this.knockStatus = false;
-            //H.S.
-            this.autoaim = false; this.ammo = 4;this.frozeAttack = false; this.hsUltPhase = 1; this.ultBuff = 0;
-            //Leo
-            this.leoUlt = false;this.soundAmount = 0;this.leoEnAtk = 0; this.leoTimer = 0;this.stared = false;this.respectState = false;
-            //Jlau
-            this.jlauPerformance = 2;this.holdBall = false;this.jLauBuff = 1; this.jLauUlt = false;
-            //Divine
-            this.divineDash = false; this.divineS2 = 1; this.divineSpd = 0; this.divineAtk = 1;this.shine = false;this.divineEnh = 0; this.divineS3 = 1;
-            // Somber
-            this.slashStart = false; this.endSlash = 1;
-            // Universe
-            this.uniState = 0;this.sunClone = null; this.uniBurn = 0;this.uniAim = false
+            this.marsBuffTimer = 0;
+            this.marsS3State = 0; 
+            this.marsS3Timer = 0;
+            // Nicholas (12)
+            this.chewing = false;
+            this.chewingTimer = 0;
+            this.stolenSkill = null;
+            this.chewingState = '';
+            this.screaming = false;
+            // JingCha (13)
+            this.assaultStacks = 0;
+            this.assaultTimer = 0;
+            this.cops = [];
+            this.copShootTimer = 0;
+            this.copRocketTimer = 0;
+            // Carson (14)
+            this.forestUlt = false;
+            this.luckStacks = 0;
+            this.forestAtk = false;
+            this.forestMode = false;
+            this.atkTri = false;
+            this.healBuff = 1;
+            // Stone (15)
+            this.stoneS3 = 0;
+            this.stoneAtkStore = 0;
+            this.stoneUndying = true;
+            this.stoneEnAtk = false;
+            this.undyingStatus = false;
+            this.stoneAddShd = true;
+            // Tewy (16)
+            this.fightStacks = 0;
+            this.fightingState = false;
+            //Alison (17)
+            this.writeStatus = false;
+            this.writeStacks = 0;
+            this.knockStatus = false;
+            this.chillTimer = 0;
+            //H.S. (18)
+            this.autoaim = false;
+            this.ammo = 4;
+            this.frozeAttack = false;
+            this.hsUltPhase = 1;
+            this.ultBuff = 0;
+            //Leo (19)
+            this.leoUlt = false;
+            this.soundAmount = 0;
+            this.leoEnAtk = 0;
+            this.leoTimer = 0;
+            this.stared = false;
+            this.respectState = false;
+            //Jlau (20)
+            this.jlauPerformance = 2;
+            this.holdBall = false;
+            this.jLauBuff = 1;
+             this.jLauUlt = false;
+            //Divine (21)
+            this.divineDash = false;
+            this.divineS2 = 1;
+            this.divineSpd = 0;
+            this.divineAtk = 1;
+            this.shine = false;
+            this.divineEnh = 0;
+            this.divineS3 = 1;
+            // Somber (22)
+            this.slashStart = false;
+            this.endSlash = 1;
+            // Universe (23)
+            this.uniState = 0;
+            this.sunClone = null;
+            this.uniBurn = 0;
+            this.uniAim = false
             // Zhen (24)
             this.blood = 0;              // 血性 (最多3層)
             this.zhenEnhTimer = 0;       // 強化普攻後的 25% 狀態計時器
             this.zhenS2SpeedTimer = 0;   // 二技能攻速 20% 計時器
             this.zhenUltTimer = 0;       // 大招強化狀態倒數
             this.zhenAtkSpeedBuff = 1.0; // 總攻速倍率
-            // Jingshan
-            this.jsStacks = 0; this.jsS2SpeedTimer = 0; this.truthState = false; this.truthTimer = 0; this.truthTick = 0; this.truthStunTick = 0;
-            // Yushan
-            this.plantZones = []; this.yushanEnhanced = false; this.yushanEnhTimer = 0; this.yushanInPlant = false;
-            // Constance
+            // Jingshan (25)
+            this.jsStacks = 0;
+            this.jsS2SpeedTimer = 0;
+            this.truthState = false;
+            this.truthTimer = 0;
+            this.truthTick = 0;
+            this.truthStunTick = 0;
+            // Yushan (26)
+            this.plantZones = [];
+            this.yushanEnhanced = false;
+            this.yushanEnhTimer = 0;
+            this.yushanInPlant = false;
+            // Constance (27)
             this.consRegenActive = false;
             this.consS1SpeedBuff = 0;
             this.consTetherActive = false;
@@ -1147,7 +1258,7 @@
             this.consS3TickDmg = 0;
             this.consS3TickHeal = 0;
             this.consS3TickPull = 0;
-            // Wen Kang
+            // Wen Kang (28)
             this.wenAiming = false;
             this.wenS1Buff = false;
             this.wenS3Buff = false;
@@ -1155,7 +1266,7 @@
             this.wenStationary = false;
             this.wenS3DashBuff = 0;
             this.wenBasicAim = false
-	        // Yifeng 
+	        // Yifeng (29)
             this.yfNest = null;
             this.yfS2Resets = 0;
             this.yfPassiveCd = 0;
@@ -1303,9 +1414,15 @@
             this.kikiUlt = false;
             this.kikiUltCount = 0;
             // Yin (48)
+            this.yinLength = 2;
+            this.yinCost = 1;
             this.yinFuel = 0;
             this.yinTimer = 0;
+            this.yinCooldown = false;
             this.candleClone = null;
+            // Rise (49)
+            this.riseEnh = false;
+            this.riseBuff = false;
         }
         triggerClovisPassive() {
             if (this.charIdx !== 35 || this.clovisPassiveCd > 0) return;
@@ -1358,7 +1475,15 @@
         update(dt) {
             if(this.isDying) return;
             this.buffs.speed = 1.0 * this.buffs.slow; 
-
+// Rise (49) Update logic
+        if(this.charIdx === 49){
+            setGameInterval(()=> {if(this.maxHp < this.hp){this.hp = this.maxHp}}, 500)
+        }
+// Yin (48) Update logic
+        if(this.charIdx === 48){
+           setGameInterval(()=> {if(this.yinFuel < 0){this.yinFuel = 0;}},500)
+           setGameInterval(()=> {if(this.yinFuel >= 101){this.yinFuel = 100;}},500)
+        }
 // Kiki (47) Update logic
         if(this.charIdx === 47){
            setGameInterval(()=> {if(this.musicNotes < 0){this.musicNotes = 0;}},500)
@@ -1504,7 +1629,7 @@
                 if (!this.nhNightfallActive) {
                     this.nhNightfallActive = true;
                     this.buffs.atk += 0.15;   // 傷害增加 15%
-                    this.buffs.speed += 0.2; // 速度增加 20%
+                    this.speed *= 1.2; // 速度增加 20%
                     floatTexts.push(new FloatText(this.x, this.y - 80, "夜色降臨", "purple"));
                 }
                 this.alpha = 0.5; // 半透明
@@ -1519,7 +1644,7 @@
                 if (this.nhNightfallActive) {
                     this.nhNightfallActive = false;
                     this.buffs.atk -= 0.2;
-                    this.buffs.speed -= 0.2;
+                    this.speed = this.speed/ 1.2;
                 }
                 this.alpha = 1.0;
             }
@@ -2435,6 +2560,9 @@ if (this.charIdx === 31) {
                     this.buffs.atk = 1.0; // 修復：狀態結束時，確實將攻擊力重置回正常值
                 }
             }
+        if(this.charIdx === 21){
+            this.applyStatus("divineShow", 9999);
+        }
 	// 仁見狼 (24) Update Logic
         if (this.charIdx === 24) {
             // 大招狀態倒數
@@ -2531,6 +2659,7 @@ if (this.charIdx === 31) {
                 }
               }
             }
+
             if (this.charIdx === 8) {
                 if (this.shiliLifelineActive) { this.shiliLifelineTimer -= dt * timeScale; if (this.shiliLifelineTimer <= 0) this.shiliLifelineActive = false; }
                 if (this.shiliLifelineCd > 0) { this.shiliLifelineCd -= dt * timeScale; this.shiliLifelineShown = false; } else if (!this.shiliLifelineShown) { floatTexts.push(new FloatText(this.x, this.y - 80, "獲得保命", "green")); this.shiliLifelineShown = true; }
@@ -2576,8 +2705,6 @@ if (this.charIdx === 31) {
                         }
                         this.addShield(250);
                         this.heal(200);
-                        this.cd.s1 = 0;
-                        this.cd.s2 = 0;
                         shakeAmount = 20;
                         for (let i = 0; i < 30; i++) particles.push(new Particle(this.x, this.y, "purple", "normal", "🔮", 1.5));
                     }
@@ -2720,6 +2847,11 @@ if (this.charIdx === 31) {
                     this.micahHealTimer = 0;
                 }
             }
+            
+            if(this.charIdx === 48){
+               this.yinTimer += dt * timeScale;
+                if (this.yinTimer >= 1000) { this.yinFuel = Math.min(100, this.yinFuel + 5); this.yinTimer = 0; } 
+            }
 
             if (this.charIdx === 19) {
                 if(this.soundAmount < 500){
@@ -2734,7 +2866,13 @@ if (this.charIdx === 31) {
                 if (this.leoTimer >= 3000) { this.leoEnAtk = Math.min(3, this.leoEnAtk + 1); this.leoTimer = 0; } 
                        }
             }
-
+            
+            if(this.charIdx === 17){
+                this.chillTimer -= dt * timeScale;
+                if(this.chillTimer < 0){
+                    this.chillTimer = 0;
+                }
+            }
 
             // Shili (8)
             if (this.charIdx === 8) {
@@ -2742,6 +2880,22 @@ if (this.charIdx === 31) {
                 else if (this.target && this.target.wounds > 0 && Math.random() < 0.05) this.target.wounds--;
                 let now = Date.now(); this.damageTakenHistory = this.damageTakenHistory.filter(d => now - d.time < 5000);
             }
+
+            if(this.charIdx === 48){
+                if(this.candleClone){
+                   this.candleClone.life -= dt * timeScale; 
+                   if(this.candleClone.life <= 0) { this.candleClone = null; }  
+                   else if(dist(this, this.candleClone) < 50) {
+                        this.yinFuel += 15;
+                        this.heal(170);
+                        this.speed *= 1.4;
+                        setGameTimeout(()=> this.speed = this.speed/1.4, 2000)
+                        this.candleClone = null;
+                        floatTexts.push(new FloatText(this.x, this.y, "蠟燭已被拾取！", "gray"));
+                    }
+                }
+            }
+
             // Boke (9) - Marks logic
             if(this.charIdx === 9) {
                 if(this.bokeClone) { 
@@ -2875,7 +3029,7 @@ if (this.charIdx === 31) {
                     else if (this.charIdx === 6 && (this.isCasting || this.commMoveLock)) { }
                     else { 
                         // 修復：將 this.charIdx === 26 (玉山) 從手動瞄準名單中移除，讓他平時就能自動面向敵人
-                        if(this.charIdx === 6 || (this.charIdx === 44 && this.yAim == true) || this.charIdx === 10 || (this.charIdx === 18 && this.autoaim == false) || (this.charIdx === 19 &&  this.leoUlt == true) || (this.charIdx === 21 && this.divineDash == true) || this.charIdx === 23 || this.charIdx === 27 || (this.charIdx === 28 && !this.wenBasicAim)) {
+                        if((this.target.charIdx === 49 && this.target.riseTrans == true) || this.charIdx === 6 || (this.charIdx === 44 && this.yAim == true) || this.charIdx === 10 || (this.charIdx === 18 && this.autoaim == false) || (this.charIdx === 19 &&  this.leoUlt == true) || (this.charIdx === 21 && this.divineDash == true) || this.charIdx === 23 || this.charIdx === 27 || (this.charIdx === 28 && !this.wenBasicAim)) {
                             const joy = this.id===1?p1Touch:p2Touch;
                             if(Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) this.angle = Math.atan2(joy.joyY, joy.joyX);
                         } else {
@@ -2892,16 +3046,16 @@ if (this.charIdx === 31) {
         //output: angle/null/"wrong input"
         angleCalculate(mode, nomove="off"){
             let joy = this.id===1?p1Touch:p2Touch;
-            if(mode === "hand" && nomove === "off"){
+            if(mode === "hand"){
                 if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1){
                     return Math.atan2(joy.joyY, joy.joyX)
+                }else if(nomove === "on"){
+                    return this.angle
                 }else{
                     return null
                 }
-            }else if(mode === "auto"){
-                return this.angle
             }else{
-                return"wrong input"
+                return this.angle
             }
         }
         //mode must be "hand"/"auto" , dist, time, rectW, rectH must be a number, 
@@ -3055,7 +3209,7 @@ if (this.charIdx === 31) {
             
             if(this.charIdx === 47){
                 if(dmg >= 0 && this.musicCooldown == false){
-                    this.musicNotes -= 5;
+                    this.musicNotes -= 3;
                     this.musicCooldown = true;
                     setGameTimeout(()=> this.musicCooldown = false, 500)
                 }
@@ -3071,6 +3225,28 @@ if (this.charIdx === 31) {
                         this.status.disarmed = 0;
                     }
                 }
+            }
+            if(this.charIdx === 48){
+               const joy = this.id === 1 ? p1Touch : p2Touch;
+               if((this.yinFuel >= 30 && dmg > this.hp) && this.yinCooldown == false){
+                 this.yinCooldown = true;
+                 setGameTimeout(()=> this.yinCooldown = false, 500)
+                 this.yinFuel -= 30;
+                 this.heal(200);
+                 let aimAngle = this.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1)
+                 aimAngle = Math.atan2(joy.joyY, joy.joyX);this.angle = aimAngle; let tx = this.x + Math.cos(aimAngle)*250, ty = this.y + Math.sin(aimAngle)*250; let sInt = setGameInterval(() => {this.x += (tx - this.x)*0.7; this.y += (ty - this.y)*0.7; }, 16); setGameTimeout(() => {clearInterval(sInt)}, 150);
+                 shakeAmount = 20;
+                 for(let i=0; i<20; i++) particles.push(new Particle(this.x, this.y, "lime", "normal", "🔥", 1.5));
+                 floatTexts.push(new FloatText(this.x, this.y-80, "本生燈會證明一切！", "red"));
+                 return { hpDmg: 0, shieldDmg: 0 };
+               }
+            }
+            if(this.charIdx === 49){
+               if(dmg >= 0 && this.riseTrans == true){
+                this.riseTrans = false;
+                this.isTransparent = false;
+                floatTexts.push(new FloatText(this.x, this.y-80, "隱身狀態被打斷", "red"));
+               }
             }
 
             if(this.charIdx === 19){
@@ -3299,9 +3475,40 @@ if (this.charIdx === 31) {
         const joy = p.id === 1 ? p1Touch : p2Touch;
         if(p.cd.atk > 0 || p.isLock || p.hp <= 0 || p.status.losegrip > 0) return; 
     
+    if(p.charIdx === 49){
+        p.riseTrans = false;
+        p.isTransparent = false;
+       if(p.riseEnh == true){
+        shakeAmount = 20;
+        p.riseEnh = false;
+        p.activeWarning = { type:'circle', r: 120, x: p.x, y: p.y, color: 'white' }; 
+        setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 130) {
+            enemy.applyStatus("stunned", 200);
+            if(p.riseBuff == true){enemy.takeDamage(448);p.heal(135 + ((p.maxHp - p.hp)*0.1))} else {p.heal(135 + ((p.maxHp - p.hp)*0.1));enemy.takeDamage(320)}
+            let c = 0;
+            let rd = setGameInterval(()=> {
+                if(c < 10 && dist(p, p.target) < 50){
+                let tx = (enemy.x - p.x)/ (11 - c);
+                let ty = (enemy.y - p.y)/ (11 - c);
+                p.x += tx; p.y += ty;
+                c++
+                }else{clearInterval(rd);}},10)
+            } }, 100); 
+       } else {
+        p.activeWarning = { type:'rect', l: 175, h: 30, color: "white"}; setGameTimeout(() => { if(dist(p, enemy) < 175) { enemy.takeDamage(80, 1); } p.activeWarning = null; }, 100); 
+       }
+    }
+
     if(p.charIdx === 48){
+        if(p.yinFuel >= 5){
         let i = 0;
-        let yf = setGameInterval(()=> {if(i<2){projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gray", 20, p, "🔥", 1.0, 200, null, 20, false, false, false, false));} else {clearInterval(yf);}},50)
+        p.buffs.speed += 0.3
+        p.yinFuel -= (5 / p.yinCost);
+        if(p.target.status.dusted >= 1){
+            let syf = setGameInterval(()=> {if(i<2){i++; projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gray", (15 * p.buffs.atk) * 1.5, p, "🔥", 1.0, 200 + p.yinLength, null, 20, false, false, false, false));} else {clearInterval(syf); i=0}},200)
+        } else {
+            let yf = setGameInterval(()=> {if(i<2){i++; projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gray", 15 * p.buffs.atk, p, "🔥", 1.0, 200 + p.yinLength, null, 20, false, false, false, false));} else {clearInterval(yf); i=0}},200)}
+        }
     }
 
     if(p.charIdx === 47){
@@ -3449,7 +3656,6 @@ if (this.charIdx === 31) {
     }
 
     if(p.charIdx === 44){
-        playSkillSound(44, 'a')
         projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 0, p, "💧", 0.85, 600, (e) => {
                         let dmg = 41
                         p.yProtection += 1
@@ -3582,7 +3788,7 @@ if (this.charIdx === 31) {
                     let localY = vX * Math.sin(-aimAngle) + vY * Math.cos(-aimAngle);
                     
                     if (localX >= 0 && localX <= rectW && Math.abs(localY) <= rectH / 2 + p.target.radius) {
-                        p.target.takeDamage(135 * p.buffs.atk, 42);
+                        p.target.takeDamage(135 + p.buffs.atk, 42);
                         p.target.applyStatus('slow', 1000);
                         p.target.buffs.slow = Math.min(p.target.buffs.slow, 0.95); 
                         shakeAmount = 5;
@@ -3617,6 +3823,7 @@ if (this.charIdx === 31) {
                 }
             } else {
                 // 遠程普攻：0.5秒內連續發射三次高速 🔪 emoji
+                aimAngle = p.angleCalculate("hand", "on")
                 let shots = 0;
                 let sInt = setGameInterval(() => {
                     shots++;
@@ -4189,15 +4396,15 @@ if (this.charIdx === 31) {
         else if(p.charIdx === 4) { if(p.enhancedAtk) { const joy = p.id===1?p1Touch:p2Touch; if(Math.abs(joy.joyX) < 0.1 && Math.abs(joy.joyY) < 0.1) { floatTexts.push(new FloatText(p.x, p.y-80, "無法使用", "gray")); p.cd.atk = 0; return; } } let aimAngle = p.angle; const joy = p.id===1?p1Touch:p2Touch; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); if (p.enhancedAtk) { p.isCasting = true; p.angle = aimAngle; p.activeWarning = { type:'rect', l: 176, h: 70, color: 'rgba(0,191,255,0.5)' }; let dashSpeed = 176 / 150 * 16; let dashInt = setGameInterval(() => { p.x += Math.cos(aimAngle)*dashSpeed; p.y += Math.sin(aimAngle)*dashSpeed; }, 16); setGameTimeout(() => { clearInterval(dashInt); p.isCasting = false; p.activeWarning = null; let dmg = 99; let cr = p.calculateCrit(dmg); let vX = enemy.x - (p.x - Math.cos(aimAngle)*176), vY = enemy.y - (p.y - Math.sin(aimAngle)*176); let lX = vX * Math.cos(-aimAngle) - vY * Math.sin(-aimAngle), lY = vX * Math.sin(-aimAngle) + vY * Math.cos(-aimAngle); if (lX >= 0 && lX <= 176 && Math.abs(lY) <= 70 + enemy.radius) { p.cd.s2 = 0; p.heal(50); enemy.takeDamage(cr.damage, 4, cr.isCrit); p.cd.s3 = Math.max(0, p.cd.s3 - 500); for(let i=0; i<10; i++) particles.push(new Particle(enemy.x, enemy.y, "cyan", "normal", "🩵", 1.0, 1.0)); p.addCombo(); if(p.shiliLifelineActive) p.heal(cr.damage*0.8); } p.critStacks = 0; p.enhancedAtk = false; document.getElementById(`p${p.id}-btn-atk`).classList.remove('special-active'); }, 150); } else { p.activeWarning = { type:'rect', l: 150, h: 40, color: 'rgba(0,191,255,0.5)' }; setGameTimeout(() => { let dmg = 21; let cr = p.calculateCrit(dmg); if(dist(p, enemy) < 150) { enemy.takeDamage(cr.damage, 4, cr.isCrit); if(p.shiliLifelineActive) p.heal(cr.damage*0.8); } p.critStacks = 0; p.activeWarning = null; }, 100); } }
         else if(p.charIdx === 0) { let r = p.enhancedAtk ? 178.5 : 118; p.activeWarning = { type:'sector', r: r, ap: Math.PI*0.9, color: 'rgba(255, 0, 255, 0.6)' }; setGameTimeout(() => { if(dist(p, enemy) < r) { let dmg = (p.enhancedAtk ? 220 : 130) * p.buffs.atk; let act = enemy.takeDamage(dmg, 0); p.heal((act.hpDmg + act.shieldDmg) * 0.9); shakeAmount=5; floatTexts.push(new FloatText(p.x, p.y-80, "+HP", "magenta")); if(p.shiliLifelineActive) p.heal(dmg*0.8); } p.enhancedAtk = false; p.activeWarning = null; document.getElementById(`p${p.id}-btn-atk`).classList.remove('special-active'); }, 150); }
         else if(p.charIdx === 1) { p.activeWarning = { type:'rect', l: 180, h: 60}; setGameTimeout(() => { if(dist(p, enemy) < 180) { enemy.takeDamage(100 * p.buffs.atk, 1); p.flame += 2; shakeAmount=5; if(p.shiliLifelineActive) p.heal(100*0.8); } p.activeWarning = null; }, 100); }
-        else if(p.charIdx === 21){if(p.divineEnh < 1){p.activeWarning = { type:'rect', l: 100, h: 60, color: 'yellow'}; setGameTimeout(() => { if(dist(p, enemy) < 100) {for(let i=0; i<15; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "☀️", 10.0)); enemy.takeDamage(80 * p.divineAtk , 1); shakeAmount=5; if(p.shiliLifelineActive) p.heal(100*0.8); if(p.divineSpd < 65){p.divineSpd += 1; p.speed = 5;};if(p.divineAtk < 1.65){p.divineAtk += 0.01;}} p.activeWarning = null; }, 100); } else {if(!Math.abs(joy.joyX) < 0.1 && !Math.abs(joy.joyY) < 0.1){p.cd.s1 -= 500; p.cd.s2 -= 500; p.cd.s3 -= 500; p.divineDash = true; p.activeWarning = { type:'rect', l: 120, h: 60, color: 'red'}; setGameTimeout(() => { if(dist(p, enemy) < 120) {for(let i=0; i<15; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "🌟", 10.0)); enemy.takeDamage(85 * p.divineAtk , 1); p.heal(99); shakeAmount=5; if(p.shiliLifelineActive) p.heal(100*0.8); if(p.divineSpd < 65){p.divineSpd += 1; p.speed = 5;};if(p.divineAtk < 1.65){p.divineAtk += 0.01;}} p.activeWarning = null; p.cd.atk = 100; p.divineEnh -= 1;}, 100);let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*150, ty = p.y + Math.sin(aimAngle)*150; let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2; }, 16); setGameTimeout(() => {clearInterval(sInt);p.divineDash = false}, 150);}else{p.cd.atk = 0; floatTexts.push(new FloatText(p.x, p.y-80, "無法使用", "gray"));}}}
+        else if(p.charIdx === 21){ if(p.divineEnh < 1){p.activeWarning = { type:'rect', l: 100, h: 60, color: 'yellow'}; setGameTimeout(() => { if(dist(p, enemy) < 100) {for(let i=0; i<15; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "☀️", 10.0)); enemy.takeDamage(60 * p.divineAtk , 1); shakeAmount=5; if(p.shiliLifelineActive) p.heal(90*0.8); if(p.divineSpd < 65){p.divineSpd += 1; p.speed = 5;};if(p.divineAtk < 1.65){p.divineAtk += 0.01;}} p.activeWarning = null; }, 100); } else {if(!Math.abs(joy.joyX) < 0.1 && !Math.abs(joy.joyY) < 0.1){p.cd.s1 -= 500; p.cd.s2 -= 500; p.cd.s3 -= 500; p.divineDash = true; p.activeWarning = { type:'rect', l: 120, h: 60, color: 'red'}; setGameTimeout(() => { if(dist(p, enemy) < 120) {for(let i=0; i<15; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "🌟", 10.0)); enemy.takeDamage(85 * p.divineAtk , 1); p.heal(99); shakeAmount=5; if(p.shiliLifelineActive) p.heal(100*0.8); if(p.divineSpd < 65){p.divineSpd += 1; p.speed = 5;};if(p.divineAtk < 1.65){p.divineAtk += 0.01;}} p.activeWarning = null; p.cd.atk = 100; p.divineEnh -= 1;}, 100);let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*150, ty = p.y + Math.sin(aimAngle)*150; let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2; }, 16); setGameTimeout(() => {clearInterval(sInt);p.divineDash = false}, 150);}else{p.cd.atk = 0; floatTexts.push(new FloatText(p.x, p.y-80, "無法使用", "gray"));}}}
         else if(p.charIdx === 2) { projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "yellow", 156 * p.buffs.atk, p, "☀️", 1.05, null, null, 5)); if(p.shiliLifelineActive) p.heal(156*0.8); }
         else if(p.charIdx === 3) { p.activeWarning = { type:'rect', l: 140, h: 50 }; setGameTimeout(() => { if(dist(p, enemy) < 140) {if(p.isRageEnh == false){enemy.takeDamage(120 * p.buffs.atk, 3); shakeAmount=5; if(p.shiliLifelineActive) p.heal(145*0.8); } else { if(p.target.hp * 0.08 >= 120){enemy.takeDamage((p.target.hp * 0.08) * p.buffs.atk, 3); shakeAmount=5; if(p.shiliLifelineActive) p.heal(145*0.8); } else { enemy.takeDamage(120 * p.buffs.atk, 3); shakeAmount=5; if(p.shiliLifelineActive) p.heal(145*0.8); }}} p.activeWarning = null; }, 100); }
         else if(p.charIdx === 7) { p.activeWarning = { type:'sector', r: 180, ap: Math.PI/2, color: 'rgba(0,0,255,0.5)' }; setGameTimeout(() => { p.activeWarning = null; if(dist(p, enemy) < 180) { let ang = Math.atan2(enemy.y-p.y, enemy.x-p.x); let diff = Math.abs(ang - p.angle); if(diff > Math.PI) diff = 2*Math.PI - diff; if(diff < Math.PI/4) { let dmg = 170 * (p.micahEnhanced ? 1.3 : 1.0); enemy.takeDamage(dmg, 7); if(p.shiliLifelineActive) p.heal(dmg*0.8); } }  }, 200); }
         else if(p.charIdx === 8) { if(enemy.wounds > 0) { enemy.wounds--; p.heal(100); } p.activeWarning = { type:'sector', r: 180, ap: Math.PI/3, color: 'rgba(139,0,0,0.6)' }; setGameTimeout(() => { p.activeWarning = null; if(dist(p, enemy) < 180) { enemy.takeDamage(130, 8); if(Math.random()<0.5) { enemy.wounds = (enemy.wounds||0)+1; enemy.woundTimer = 10000; } if(p.shiliLifelineActive) p.heal(150*0.8); } }, 100); }
         else if(p.charIdx === 15) { 
              if(p.stoneEnAtk == false) {
-             if(p.stoneAtkStore < 3) {p.activeWarning = { type:'rect', l: 150, h: 60, color:'gray'}; setGameTimeout(() => { if(dist(p, enemy) < 150) {p.addShield(46);p.stoneAtkStore += 1;enemy.takeDamage(67 , 1); shakeAmount=5; if(p.shiliLifelineActive) p.heal(100*0.8); for(let i=0; i<12; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "🪨", 10.0)); } p.activeWarning = null;}, 100); }
-             else if(p.stoneAtkStore == 3) {p.activeWarning = { type:'rect', l: 150, h: 60, color:'gray'}; setGameTimeout(() => { if(dist(p, enemy) < 150) {p.addShield(46);enemy.takeDamage(67 , 1); shakeAmount= 20;p.stoneAtkStore =0; if(p.shiliLifelineActive) p.heal(100*0.8);p.target.applyStatus("stunned", 300);for(let i=0; i<12; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "🪨", 10.0)); } p.activeWarning = null;}, 100);}
+             if(p.stoneAtkStore < 3) {p.activeWarning = { type:'rect', l: 150, h: 60, color:'gray'}; setGameTimeout(() => { if(dist(p, enemy) < 150) {p.addShield(46);p.stoneAtkStore += 1;enemy.takeDamage(107 , 1); shakeAmount=5; if(p.shiliLifelineActive) p.heal(100*0.8); for(let i=0; i<12; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "🪨", 10.0)); } p.activeWarning = null;}, 100); }
+             else if(p.stoneAtkStore == 3) {p.activeWarning = { type:'rect', l: 150, h: 60, color:'gray'}; setGameTimeout(() => { if(dist(p, enemy) < 150) {p.addShield(46);enemy.takeDamage(107 , 1); shakeAmount= 20;p.stoneAtkStore =0; if(p.shiliLifelineActive) p.heal(100*0.8);p.target.applyStatus("stunned", 300);for(let i=0; i<12; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "🪨", 10.0)); } p.activeWarning = null;}, 100);}
              }
              else if(p.stoneEnAtk == true) {
              if(p.stoneAtkStore < 3) {p.activeWarning = { type:'rect', l: 150, h: 60, color:'gray'}; setGameTimeout(() => { if(dist(p, enemy) < 150) {p.addShield(46);p.stoneAtkStore += 1;enemy.takeDamage(67 , 1);p.target.applyStatus("stunned", 300);shakeAmount=20; if(p.shiliLifelineActive) p.heal(100*0.8); for(let i=0; i<12; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "🪨", 10.0)); } p.activeWarning = null;p.stoneEnAtk = false;}, 100); }
@@ -4412,13 +4619,28 @@ if (this.charIdx === 31) {
         if(p.cd.s1 > 0 || (p.isLock && !p.isChargingUlt) || p.status.disarmed > 0 || p.hp <= 0) return;
         if(p.charIdx === 8 && p.shiliS1Lock) return;
         p.cd.s1 = CHAR_DATA[p.charIdx].s1Cd;
+        p.speed = CHAR_DATA[p.charIdx].speed;
         if(p.charIdx === 6 && p.commanderMode) p.cd.s1 = 4000;
         const joy = p.id === 1 ? p1Touch : p2Touch;
     
+    if(p.charIdx === 49){
+        p.cd.atk = 0;
+        p.isTransparent = false;
+        p.riseTrans = false;
+        let aimAngle = p.angle;
+        if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; 
+        let tx = p.x + Math.cos(aimAngle)*150, ty = p.y + Math.sin(aimAngle)*150; let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2; }, 16); setGameTimeout(() => clearInterval(sInt), 150); p.speed = 5.5; p.riseEnh = true; setGameTimeout(()=> p.speed = 3.7, 3000) 
+    }
+
+    if(p.charIdx === 48){
+        p.activeWarning = { type:'rect', l: 250, h: 60}; 
+        setGameTimeout(() => { if(dist(p, enemy) < 250) { let startX = enemy.x, startY = enemy.y; for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "💥")); }; enemy.applyStatus("stunned", 1000); enemy.takeDamage(200 + (p.yinFuel * 1.1), 1);shakeAmount=5;} p.activeWarning = null; }, 100); 
+    }
+
     if(p.charIdx === 47){
     p.musicEnh = true;
     p.activeWarning = { type:'circle', r: 150, x: p.x, y: p.y, color: '#5091FA' }; 
-    setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 150) { p.heal(50); p.musicNotes += 6; p.target.takeDamage(198, 10); } }, 100);   
+    setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 150) { p.heal(50); p.musicNotes += 6; p.target.takeDamage(218, 10); } }, 100);   
     }
 
     if(p.charIdx === 46){
@@ -4459,7 +4681,6 @@ if (this.charIdx === 31) {
     }
 
     if(p.charIdx === 44){
-        playSkillSound(44, 's1')
         if(p.ySuper == false){p.yProtection -= 5;}
         for(let i=0; i<25; i++) {
                 let spread = (Math.random() - 0.5) * (Math.PI / 0.5); 
@@ -5145,7 +5366,7 @@ if (this.charIdx === 31) {
         else if (p.charIdx === 5) { if (p.isJimingUlt) { if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) { let inputAngle = Math.atan2(joy.joyY, joy.joyX); let afc = Math.atan2(p.y - p.jimingUltZone.y, p.x - p.jimingUltZone.x); let diff = Math.abs(inputAngle - afc); if (diff > Math.PI) diff = 2*Math.PI - diff; if(Math.abs(diff - Math.PI/2) > 0.8) { floatTexts.push(new FloatText(p.x, p.y - 80, "無法移動", "red")); p.cd.s1 = 0; return; } let dir = (joy.joyX * Math.sin(afc) - joy.joyY * Math.cos(afc)) > 0 ? -1 : 1; let ca = afc; let si = setGameInterval(() => { ca += dir * 0.15; p.x = p.jimingUltZone.x + Math.cos(ca)*(p.jimingUltZone.r-20); p.y = p.jimingUltZone.y + Math.sin(ca)*(p.jimingUltZone.r-20); }, 16); setGameTimeout(() => clearInterval(si), 150); p.cd.s2 *= 0.1; } else { p.cd.s1 = 0; } } else { let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*200, ty = p.y + Math.sin(aimAngle)*200; let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2; }, 16); setGameTimeout(() => clearInterval(sInt), 150); p.addShield(100); p.triggerJimingDodge(); p.heal(150); p.addJimingStack(); } }
         else if(p.charIdx === 4) { let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.applyStatus('superArmor', 500); p.enhancedAtk = true; if(p.critStacks < 2) p.critStacks++; p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*160, ty = p.y + Math.sin(aimAngle)*160; let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.25; p.y += (ty - p.y)*0.25; }, 16); setGameTimeout(() => clearInterval(sInt), 150); document.getElementById(`p${p.id}-btn-atk`).classList.add('special-active'); }
         else if(p.charIdx === 14) { let aimAngle = p.angle; if(Math.abs(joy.joyX)>0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); let startX = p.x, startY = p.y; p.x += Math.cos(aimAngle)*200; p.y += Math.sin(aimAngle)*200; for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "🍃")); } if(dist(p.target, {x:(startX+p.x)/2, y:(startY+p.y)/2}) < 100); p.heal(3 * p.healBuff);p.applyStatus('superArmor', 250); shakeAmount = 0;setGameTimeout(() => { if(dist(p, enemy) < 175) {enemy.takeDamage(20 * p.buffs.atk, 1);} p.target.buffs.disarmed = 5000;p.activeWarning = null;}, 0);p.cd.s2 = 0; if (p.luckStacks < 6){p.luckStacks += 1;}p.heal(100); p.forestAtk = true;}
-        else if(p.charIdx === 17) {if(dist(p, enemy) < 100){enemy.takeDamage(100)}; let aimAngle = p.angle; if(Math.abs(joy.joyX)>0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); let startX = p.x, startY = p.y; p.x += Math.cos(aimAngle)*200; p.y += Math.sin(aimAngle)*200; for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "💨")); } if(dist(p.target, {x:(startX+p.x)/2, y:(startY+p.y)/2}) < 100); p.applyStatus('chill', 2000);shakeAmount = 15;p.addShield(200); setGameTimeout(() => { if(dist(p, enemy) < 105) {enemy.takeDamage(180, 1);p.addShield(80)} p.activeWarning = null;}, 200);}
+        else if(p.charIdx === 17) {if(dist(p, enemy) < 100){enemy.takeDamage(100)}; let aimAngle = p.angle; if(Math.abs(joy.joyX)>0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); let startX = p.x, startY = p.y; p.x += Math.cos(aimAngle)*200; p.y += Math.sin(aimAngle)*200; for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "💨")); } if(dist(p.target, {x:(startX+p.x)/2, y:(startY+p.y)/2}) < 100)p.applyStatus('chill', 2000 ); p.chillTimer += 2000;shakeAmount = 15;p.addShield(200); setGameTimeout(() => { if(dist(p, enemy) < 105) {enemy.takeDamage(180, 1);p.addShield(80)} p.activeWarning = null;}, 200);}
         else if(p.charIdx === 0) { p.dash("hand", 200, 200, 200, 50, 'rgba(255,0,255,0.6)', "on");p.enhanceAtk(); }
         else if(p.charIdx === 2) { projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gold", 162, p, "✨", 2.0, 500, (t) => { if(t) { t.applyStatus('stunned', 630); t.applyStatus('slow', 3000); t.buffs.slow = 0.6; } }, 60, false, true)); }
         
@@ -5165,7 +5386,7 @@ if (this.charIdx === 31) {
         else if(p.charIdx === 6) { let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; p.addShield(100); let dashSteps = 0; let maxSteps = 20; p.applyStatus('superArmor', 500); p.isCasting = true; let si = setGameInterval(() => { p.x += Math.cos(aimAngle) * 12; p.y += Math.sin(aimAngle) * 12; dashSteps++; if(p.commanderMode) { p.soldiers.forEach(s => { s.x += Math.cos(aimAngle)*12; s.y += Math.sin(aimAngle)*12; }); if(dist(p, p.target) < 80) { p.target.x += Math.cos(aimAngle)*15; p.target.y += Math.sin(aimAngle)*15; } } if(dashSteps >= maxSteps) { clearInterval(si); p.isCasting = false; if(p.commanderMode) { p.superEnhancedAtk = true; shakeAmount = 10; floatTexts.push(new FloatText(p.x, p.y-80, "Ready!", "purple")); } } }, 16); }
         else if(p.charIdx === 7) { let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); let steps = 0; let dashInt = setGameInterval(() => { p.x += Math.cos(aimAngle) * 20; p.y += Math.sin(aimAngle) * 20; steps++; if(steps > 8) clearInterval(dashInt); }, 16); p.enhancedAtk = true; p.funds = Math.max(0, p.funds - 10); }
         else if(p.charIdx === 8) { p.isUntouchable = false; p.applyStatus('superArmor', 3000); p.isTransparent = true; p.shiliS1Lock = true; let count = 0; let si = setGameInterval(() => { p.heal(25); p.activeWarning = { type:'circle', r: 50, x: p.x, y: p.y, color: 'rgba(139,0,0,0.5)' }; if(dist(p, p.target) < 50) { p.target.takeDamage(30, 8); p.cd.s2 = Math.max(0, p.cd.s2-250); p.cd.s3 = Math.max(0, p.cd.s3-250); } count++; if(count > 12) { clearInterval(si); p.activeWarning = null; p.isTransparent = false; p.shiliS1Lock = false; } }, 250); }
-        else if(p.charIdx === 15) {let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; p.addShield(150); let dashSteps = 0; let maxSteps = 20; p.isCasting = true; let si = setGameInterval(() => { p.x += Math.cos(aimAngle) * 12; p.y += Math.sin(aimAngle) * 12; dashSteps++;if(dashSteps >= maxSteps) { clearInterval(si); p.isCasting = false; setGameTimeout(() => {if(dist(p, enemy) < 180){enemy.takeDamage(150, 1);} p.addShield(100);p.activeWarning = null;p.stoneEnAtk = true;},0) } }, 16);}
+        else if(p.charIdx === 15) {let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; p.addShield(150); let dashSteps = 0; let maxSteps = 20; p.isCasting = true; let si = setGameInterval(() => { p.x += Math.cos(aimAngle) * 12; p.y += Math.sin(aimAngle) * 12; dashSteps++;if(dashSteps >= maxSteps) { clearInterval(si); p.isCasting = false; setGameTimeout(() => {if(dist(p, enemy) < 180){enemy.takeDamage(300, 1);} p.addShield(100);p.activeWarning = null;p.stoneEnAtk = true;},0) } }, 16);}
         else if(p.charIdx === 18) {floatTexts.push(new FloatText(p.x, p.y-100, "恢復補給！", "white"));if(p.ammo <= 3){p.ammo = 4; p.heal(200 +(p.ammo * 50));} else if(p.ammo == 4){p.heal(500)}}
         else if(p.charIdx === 1){
           if(p.taiS1Phase == 1){
@@ -5226,11 +5447,23 @@ if (this.charIdx === 31) {
         if(p.cd.s2 > 0 || p.isLock || p.status.disarmed > 0 || p.hp <= 0) return;
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
     
+    if(p.charIdx === 49){
+        p.cd.atk = 0;
+        p.riseEnh = true;
+        p.isTransparent = true;
+        p.riseTrans = true;
+        let c = 0;
+        let ri = setGameInterval(()=> {if(c < 4 && p.riseTrans == true){particles.push(new Particle(p.x, p.y, "red", "normal", "👣", 1.5));c++; p.hp += 180;} else {clearInterval(ri); p.hp += 180;p.riseTrans = false; p.isTransparent = false;}},1000)
+    }
+    if(p.charIdx === 48){
+        projectiles.push(new Projectile(p.x, p.y, p.angle, 18, "orange", 0, p, "◽", 3.0, null, (e)=>{e.applyStatus("dusted", 5000); p.candleClone = { x: enemy.x, y: enemy.y, life: 10000 };}, 35, true));
+    }
+
     if(p.charIdx ===  47){
         p.musicStatus = true;
         setGameTimeout(()=>{
-            if(dist(p, enemy) < 160){enemy.takeDamage(0); p.heal(80);p.musicNotes += 6;};
-            if(dist(p, enemy) < 240 && dist(p, enemy) >= 160){enemy.takeDamage(229); enemy.applyStatus("stunned", 1200); p.musicEnh = true; p.musicNotes += 12;};
+            if(dist(p, enemy) < 160){enemy.takeDamage(30); p.heal(110);p.musicNotes += 6;};
+            if(dist(p, enemy) < 240 && dist(p, enemy) >= 160){enemy.takeDamage(249); enemy.applyStatus("stunned", 1200); p.musicEnh = true; p.musicNotes += 12;};
         p.musicStatus = false;
         },800)
     }
@@ -5273,7 +5506,6 @@ if (this.charIdx === 31) {
             p.cd.s2 = 0;
             floatTexts.push(new FloatText(p.x, p.y - 80, "無法使用！", "gray"));
         } else {
-		playSkillSound(44, "s2")
         if(dist(p, enemy) < 60){p.ycanCombo = false; p.target.takeDamage(121); p.cd.s1 = 0; p.cd.s2 = 300; if(p.yCombo <= 7){p.yCombo += 1;} if(p.yProtection <= 99){p.yProtection += 10;}else{p.yProtection = 100;}}
         let startX = p.x, startY = p.y; 
         let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*400, ty = p.y + Math.sin(aimAngle)*400; 
@@ -5869,7 +6101,7 @@ if (p.charIdx === 31) {
                 let spread = (Math.random() - 0.5) * (Math.PI / 1.5); // 約 120 度扇形
                 let speed = 8 + Math.random() * 12;
                 let range = 250 + Math.random() * 150;
-                projectiles.push(new Projectile(p.x, p.y, p.angle + spread, speed, "silver", 40 * p.buffs.atk, p, "🗝️", 1.2, range, (e) => { p.addJsStack(); }, 10, false, false, false, true));
+                projectiles.push(new Projectile(p.x, p.y, p.angle + spread, speed, "silver", 20 * p.buffs.atk, p, "🗝️", 1.2, range, (e) => { p.addJsStack(); }, 10, false, false, false, true));
             }
             return;
         }
@@ -5909,7 +6141,7 @@ if (p.charIdx === 31) {
             let ws = setGameInterval(()=> 
             {if(dist(p, p.target) <200){p.target.takeDamage(40);p.target.applyStatus("disarmed", 500);setGameTimeout(() => {floatTexts.push(new FloatText(p.target.x, p.target.y-50, "奮筆範圍内持續繳械！", "white"));},200);p.writeStacks += 1;} setGameTimeout(()=> {clearInterval(ws); p.writeStatus = false;}, 5000)}
             , 500)
-            setGameTimeout(()=> {p.applyStatus("chill", (3000 + 500 * 10 - p.writeStacks))}, 5100)
+            setGameTimeout(()=> {p.applyStatus("chill", (3000 + 500 * 10 - p.writeStacks) + p.chillTimer); p.chillTimer += 3000 + 500 * 10 - p.writeStacks;}, 5100)
          }
 
         if (p.charIdx === 13) { // JingCha S2
@@ -5932,7 +6164,7 @@ if (p.charIdx === 31) {
         if(p.charIdx === 21){
             p.status.superArmor = 0;
             if(p.divineS2 == 1){
-              projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 0 * p.jLauBuff, p, "⚜️", 1.6, null, (e)=>{let d2 = setGameInterval(()=> {if(e.status.divineMark){e.takeDamage(30 * p.divineAtk)}},1000);p.divineS2 = 2; e.applyStatus("divineMark", 5000);shakeAmount = 10; p.cd.s2 = 0; setGameTimeout(()=> {clearInterval(d2); if(p.divineS2 == 2){p.divineS2 = 1; p.cd.s2 = 12000;}},5000)}, 20, false, false, false, false));
+              projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 0 * p.jLauBuff, p, "⚜️", 1.6, null, (e)=>{let d2 = setGameInterval(()=> {if(e.status.divineMark){e.takeDamage(30 * p.divineAtk)}},1000);p.divineS2 = 2; e.applyStatus("divineMark", 5000);shakeAmount = 10; p.cd.s2 = 0; setGameTimeout(()=> {clearInterval(d2); if(p.divineS2 == 2){p.divineS2 = 1; p.cd.s2 = 13500;}},5000)}, 20, false, false, false, false));
             } else{
                 let dx = (p.target.x - p.x) / 10; 
                 let dy = (p.target.y - p.y) / 10;
@@ -6072,7 +6304,7 @@ if (p.charIdx === 31) {
              p.heal(200);
         }
 
-         if(p.charIdx === 15) { p.activeWarning = { type:'sector', r: 150, ap: Math.PI, color: 'gray' }; setGameTimeout(() => {shakeAmount = 25; p.activeWarning = null; if(dist(p, enemy) < 180) { let ang = Math.atan2(enemy.y-p.y, enemy.x-p.x); let diff = Math.abs(ang - p.angle); if(diff > Math.PI) diff = 2*Math.PI - diff; if(diff < Math.PI/4) {for(let i=0; i<50; i++)particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "🪨", 10.0));p.heal(250);p.target.applyStatus('slow', 2000); p.target.buffs.slow = 0.5;p.addShield(300);enemy.takeDamage(150, 1); if(p.shiliLifelineActive) p.heal(dmg*0.8); } }  }, 200); }
+         if(p.charIdx === 15) { p.activeWarning = { type:'sector', r: 150, ap: Math.PI, color: 'gray' }; setGameTimeout(() => {shakeAmount = 25; p.activeWarning = null; if(dist(p, enemy) < 180) { let ang = Math.atan2(enemy.y-p.y, enemy.x-p.x); let diff = Math.abs(ang - p.angle); if(diff > Math.PI) diff = 2*Math.PI - diff; if(diff < Math.PI/4) {for(let i=0; i<50; i++)particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "🪨", 10.0));p.heal(50);p.target.applyStatus('slow', 2000); p.target.buffs.slow = 0.5;p.addShield(500);enemy.takeDamage(330, 1); if(p.shiliLifelineActive) p.heal(dmg*0.8); } }  }, 200); }
          
          else if(p.charIdx === 16) {
             let wave = 0;
@@ -6106,6 +6338,39 @@ if (p.charIdx === 31) {
         if(p.status.stunned > 0 || p.status.disarmed > 0) return;
         p.cd.s3 = CHAR_DATA[p.charIdx].s3Cd;
     
+    if(p.charIdx === 49){
+        shakeAmount = 50;
+        p.activeWarning = { type:'circle', r: 120, x: p.x, y: p.y, color: 'red' }; 
+        setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 130) {
+            p.riseBuff = true; setGameTimeout(()=> p.riseBuff = false, 800)
+            if(p.riseTrans == true){p.heal(135 + ((p.maxHp - p.hp)*0.1));enemy.takeDamage(1000); enemy.applyStatus("stunned", 1200); p.isTransparent = false; p.riseTrans = false;} else {enemy.takeDamage(700)}
+            let c = 0;
+            let rd = setGameInterval(()=> {
+                if(c < 10){
+                particles.push(new Particle(p.x, p.y, "red", "normal", "👆", 1.5));
+                let tx = (enemy.x - p.x)/ (11 - c);
+                let ty = (enemy.y - p.y)/ (11 - c);
+                p.x += tx; p.y += ty;
+                c++
+                }else{clearInterval(rd);}},10)
+            } }, 100); 
+    }
+
+    if(p.charIdx === 48){
+        let startX = enemy.x, startY = enemy.y; for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "⛽️")); };
+       floatTexts.push(new FloatText(p.x, p.y - 80, "後備能源啓動！", "orange"));
+       p.yinFuel = 100;
+       p.heal(500);
+       p.buffs.atk *= 1.8;
+       p.yinLength = 150;
+       p.yinCost = 2;
+       setGameTimeout(()=> {
+       p.buffs.atk = 1.0
+       p.yinLength = 2
+       p.yinCost = 1
+       }, 10000)
+    }
+
     if(p.charIdx === 47){
        if(p.musicNotes >= 1){
         p.heal(800);
@@ -6348,9 +6613,9 @@ if (p.charIdx === 31) {
                         shots++;
                         let ballAng = Math.atan2(e.y - p.y, e.x - p.x) + (Math.random() - 0.5);
                         let proj = new Projectile(p.x, p.y, ballAng, 12, "cyan", 0, p, "🔹", 1.5, 1500, (hitE) => {
-                            hitE.hp -= 250;
+                            if(p.target.charIdx == 44){e.takeDamage(250)}else{hitE.hp -= 250;}
                             if(hitE.hp <= 0) { hitE.hp = 1; hitE.takeDamage(9999, 40); }
-                            else { floatTexts.push(new FloatText(hitE.x, hitE.y - 40, "-250", "white")); }
+                            else { if(p.target.charIdx === 44){}else{floatTexts.push(new FloatText(hitE.x, hitE.y - 40, "-250", "white")); }}
                             shakeAmount = 10;
                         }, 25);
                         proj.trackingTarget = e;
@@ -6939,7 +7204,7 @@ if (p.charIdx === 31) {
                 let dy = (p.target.y - p.y) / (51 - d);
                 p.isCasting = true;
                 p.x += dx; p.y += dy}, 1);
-                let de = setGameInterval(()=> {if(d == 50){p.divineS2 = 1; clearInterval(df); p.target.takeDamage(250);p.target.applyStatus("divineMark", 0); p.isCasting = false; p.target.applyStatus("stunned", 800);p.heal(300);p.divineS3 = 2;clearInterval(de);}},1)
+                let de = setGameInterval(()=> {if(d == 50){p.divineS2 = 1; clearInterval(df); p.target.takeDamage(200);p.target.applyStatus("divineMark", 0); p.isCasting = false; p.target.applyStatus("stunned", 800);p.heal(300);p.divineS3 = 2;clearInterval(de);}},1)
                 let c = 0;
                 let sf = setGameInterval(()=> {if(p.divineS3 == 2){c++;p.activeWarning = { type:'circle', r:200, x: tx, y: ty, color: 'rgba(255,255,0,0.6)' };if(dist({x: tx, y: ty}, enemy) < 200){ enemy.takeDamage(30 * p.divineAtk , 1); shakeAmount=5;} }}, 150)
                 let se = setGameInterval(()=> {if(c >= 10){clearInterval(sf); p.divineEnh += 3; p.divineAtk += 0.25;clearInterval(se); p.divineS3 = 3;}},1)
@@ -6954,7 +7219,7 @@ if (p.charIdx === 31) {
                 setGameTimeout(()=>{
                 let e = 0
                 let df = setGameInterval(()=> {e++; p.x += dx; p.y += dy},10);
-                let de = setGameInterval(()=> {if(e >= 10){clearInterval(df);p.target.applyStatus("divineMark", 0);p.isCasting = false;if(dist(p, p.target) < 200){p.target.takeDamage(300 * p.divineAtk);};clearInterval(de);p.divineS3 = 2;}},20)}, 500)
+                let de = setGameInterval(()=> {if(e >= 10){clearInterval(df);p.target.applyStatus("divineMark", 0);p.isCasting = false;if(dist(p, p.target) < 200){p.target.takeDamage(200 * p.divineAtk);};clearInterval(de);p.divineS3 = 2;}},20)}, 500)
                 let c = 0;
                 let sf = setGameInterval(()=> {if(p.divineS3 == 2){c++;p.activeWarning = { type:'circle', r:200, x: tx, y: ty, color: 'rgba(255,255,0,0.6)' };if(dist({x: tx, y: ty}, enemy) < 200){ enemy.takeDamage(30 * p.divineAtk , 1); shakeAmount=5;} }}, 150)
                 let se = setGameInterval(()=> {if(c >= 10){clearInterval(sf); p.divineEnh += 3; p.divineAtk += 0.15;clearInterval(se); p.divineS3 = 3;}},150)
@@ -7249,31 +7514,36 @@ if (p.charIdx === 31) {
                 {if(dist(p, enemy) < 100){
                   p.addShield(600);
                   enemy.takeDamage(1500);
-                  p.applyStatus("chill", 10000)
+                  p.applyStatus("chill", 10000 + p.chillTimer)
+                  p.chillTimer += 10000;
                   shakeAmount = 50;
                   
                 }
                 else if(dist(p, enemy) > 100 && dist(p, enemy) <= 200){
                   enemy.takeDamage(1200);
-                  p.applyStatus("chill", 8000)
+                  p.applyStatus("chill", 8000 + p.chillTimer)
+                  p.chillTimer += 8000;
                   p.addShield(400);
                   shakeAmount = 40;
                 }
                 else if(dist(p, enemy) > 200 && dist(p, enemy) <= 300){
                   enemy.takeDamage(1000);
-                  p.applyStatus("chill", 6500)
+                  p.applyStatus("chill", 6500 + p.chillTimer)
+                  p.chillTimer += 6000;
                   p.addShield(300);
                   shakeAmount = 30;
                 }
                 else if(dist(p, enemy) > 300 && dist(p, enemy) <= 500){
                   enemy.takeDamage(800);
-                  p.applyStatus("chill", 5000)
+                  p.applyStatus("chill", 5000 + p.chillTimer)
+                  p.chillTimer += 5000;
                   p.addShield(200);
                   shakeAmount = 20
                 }
                 else if(dist(p, enemy) > 500){
                   enemy.takeDamage(500);
-                  p.applyStatus("chill", 3000)
+                  p.applyStatus("chill", 3000 + p.chillTimer)
+                  p.chillTimer += 3000;
                   shakeAmount = 10
                 }
              }
@@ -7473,7 +7743,6 @@ if (p.charIdx === 31) {
 </script>
 </body>
 </html>
-
 
 
 
