@@ -2440,11 +2440,11 @@ if (this.charIdx === 31) {
                     if (this.hp >= this.maxHp / 2) {
                         this.consRegenActive = false;
                     } else {
-                        this.heal(80 * (dt / 1000));
+                        this.heal(100 * (dt / 1000));
                     }
                 }
                 if (this.hp < 1500 && this.hp > 0) {
-                    this.buffs.speed += 0.3;
+                    this.buffs.speed += 0.4;
                 }
                 if (this.consS1SpeedBuff > 0) {
                     this.consS1SpeedBuff -= dt * timeScale;
@@ -7743,7 +7743,6 @@ if (p.charIdx === 31) {
 </script>
 </body>
 </html>
-
 
 
 
