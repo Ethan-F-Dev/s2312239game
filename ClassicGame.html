@@ -678,6 +678,9 @@
                 ctx.fillStyle="rgba(128,0,128,0.2)"; ctx.fill(); 
                 ctx.strokeStyle="purple"; ctx.lineWidth=2; ctx.stroke();
                 ctx.restore();
+                
+// Call example:
+drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/photos/plato.webp", p.x, p.y, 5, 5);
             }
 	
 	// 🔴 新增雨昊的煙霧繪製
@@ -7611,32 +7614,43 @@ if (p.charIdx === 31) {
         audio.currentTime = 0;
         audio.play().catch(err => console.log("音效播放失敗(可能是瀏覽器限制):"+soundUrl, err));
     }
-    function drawImage(url, x, y, w, h, angle = null, flip = null){
+    function drawImage(url, x, y, w, h, angle = null, flip = null) {
         const canvas = document.getElementById("myCanvas");
+        if (!canvas) return;
         const ctx = canvas.getContext("2d");
+        
         const img = new Image();
         img.crossOrigin = "anonymous"; 
-        img.scr = url
+        
         img.onload = function() {
             ctx.save();        
             ctx.translate(x, y); 
-            if(flip ==! null){
-                if(flip === "horizontal"){
+
+            // Apply rotation if provided (convert degrees to radians)
+            if (angle !== null) {
+                let rotateAngle = angle * Math.PI / 180;
+                ctx.rotate(rotateAngle);
+            }
+
+            // Apply flip if provided
+            if (flip !== null) {
+                if (flip === "horizontal") {
                     ctx.scale(-1, 1);
-                }else{
+                } else if (flip === "vertical") {
                     ctx.scale(1, -1);
                 }
             }
-            if(angle ==! null){
-                let rotateAngke = angle * Math.PI / 180;
-                ctx.rotate(angle);
-            }
+
             ctx.drawImage(img, -w / 2, -h / 2, w, h);
             ctx.restore(); 
         };
+
         img.onerror = function() {
             console.error("The image failed to load. Check the URL or CORS settings.");
         };
+
+        // Fixed typo: scr -> src
+        img.src = url;
     }
     window.onload = function() {
         const modeButtons = document.querySelectorAll('.mode-btn');
@@ -7743,6 +7757,7 @@ if (p.charIdx === 31) {
 </script>
 </body>
 </html>
+
 
 
 
