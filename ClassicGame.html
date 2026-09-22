@@ -4677,9 +4677,10 @@ if (this.charIdx === 31) {
                 p.moonPower -= 15;
                 projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 135, p, "🌙", 1.5, 450, (e) => {
                     p.heal(135);
+                    let enemyOrginalSpeed = enemy.speed;
                     enemy.buffs.slow = 0.5;
                     enemy.speed = enemy.speed / 2;
-                    setGameTimeout(()=> enemy.speed *= 2, 1500)
+                    setGameTimeout(()=> enemy.speed += (enemyOrginalSpeed/2), 1500)
                 }, 25, false, false, false, true));
             }
         } else {
