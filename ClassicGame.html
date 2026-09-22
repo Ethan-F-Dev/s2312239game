@@ -1019,7 +1019,17 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             this.hitTargets = [];
         }
         update() {
-            if (this.isTrap) { this.life -= 0.0055 * timeScale; this.trapTick += 16 * timeScale; const enemy = this.owner.target; if(Math.hypot(this.x - enemy.x, this.y - enemy.y) < enemy.radius + 20) { if (this.trapTick >= 1000) { enemy.takeDamage(36, this.owner.charIdx); this.trapTick = 0; floatTexts.push(new FloatText(enemy.x, enemy.y - 60, "-36", "#ffff00")); } enemy.applyStatus('slow', 200); enemy.buffs.slow = Math.min(enemy.buffs.slow, 0.9); } return; }
+            if (this.isTrap) { 
+                this.life -= 0.0055 * timeScale; this.trapTick += 16 * timeScale;
+                const enemy = this.owner.target; 
+                if(Math.hypot(this.x - enemy.x, this.y - enemy.y) < enemy.radius + 20) {
+                    if (this.trapTick >= 1000) {
+                        enemy.takeDamage(36, this.owner.charIdx); 
+                        this.trapTick = 0;
+                        floatTexts.push(new FloatText(enemy.x, enemy.y - 60, "-36", "#ffff00")); 
+                    } enemy.applyStatus('slow', 200); enemy.buffs.slow = Math.min(enemy.buffs.slow, 0.9);
+                } return;
+            }
 	// Clovis Flying S2 Split
             if (this.isClovisFlyingS2) {
                 this.splitTimer -= 16 * timeScale;
@@ -4680,7 +4690,7 @@ if (this.charIdx === 31) {
                     let enemyOrginalSpeed = enemy.speed;
                     enemy.buffs.slow = 0.5;
                     enemy.speed = enemy.speed / 2;
-                    setGameTimeout(()=> enemy.speed += (enemyOrginalSpeed/2), 1500)
+                    setGameTimeout(()=> enemy.speed = enemyOrginalSpeed, 1500)
                 }, 25, false, false, false, true));
             }
         } else {
