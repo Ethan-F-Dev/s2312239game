@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Security-Policy" content="media-src * data: blob:;">
-    <title>巔峰對決 - 當心身後 </title>
+    <title>巔峰對決 - 數學奧秘 </title>
     <style>
         :root { --p1-ui: #3498db; --p2-ui: #e74c3c; --font-main: 'Noto Sans TC', sans-serif; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; user-select: none; 
@@ -218,7 +218,8 @@
         // page 9
         { name: "茵", hp: 3100, atk: 20, speed: 3.4, color: "#E37332", s1Cd: 6000, s2Cd: 12000, s3Cd: 40000, atkInt: 100 },
         { name: "瑞艾斯", hp: 2450, atk: 160, speed: 3.6, color: "#DEDEDE", s1Cd: 5000, s2Cd: 8000, s3Cd: 30000, atkInt: 400 },
-        { name: "武爾杳杳", hp: 2550, atk: 110, speed: 4.0, color: "#FCDF6F", s1Cd: 500, s2Cd: 500, s3Cd: 500, atkInt: 850 }
+        { name: "武爾杳杳", hp: 2550, atk: 110, speed: 4.0, color: "#FCDF6F", s1Cd: 500, s2Cd: 500, s3Cd: 500, atkInt: 850 },
+        { name: "麥克大師", hp: 2500, atk: 110, speed: 3.5, color: "#B09B9B", s1Cd: 8000, s2Cd: 15000, s3Cd: 45000, atkInt: 1200 }
         
     ]);
     function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
@@ -917,6 +918,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                 const bw = 100;
                 if(p.charIdx !== 49 || p.riseTrans !== true) {ctx.fillStyle = "#333"; ctx.fillRect(p.x - bw/2, p.y - 65, bw, 10); ctx.fillStyle = "#2ecc71"; ctx.fillRect(p.x - bw/2, p.y - 65, bw * (p.hp/p.maxHp), 10); }
                 if(p.shield > 0) { ctx.fillStyle = "white"; ctx.fillRect(p.x - bw/2, p.y - 67, Math.min(bw, bw * p.shield/p.maxHp), 4); }
+                if(p.charIdx === 51) { ctx.fillStyle = "blue"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.makCount/3), 5); }
                 if(p.charIdx === 50) { ctx.fillStyle = "yellow"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.moonPower/100), 5); }
                 if(p.charIdx === 48) { ctx.fillStyle = "red"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.yinFuel/100), 5); }
                 if(p.charIdx === 45) { ctx.fillStyle = "gray"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.jEnergy/2), 5); }
@@ -1443,6 +1445,8 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             // Moon (50)
             this.moonPower = 0;
             this.moonPassive = false;
+            // Mak (51)
+            this.makCount = 0;
         }
         triggerClovisPassive() {
             if (this.charIdx !== 35 || this.clovisPassiveCd > 0) return;
@@ -3517,6 +3521,25 @@ if (this.charIdx === 31) {
         const joy = p.id === 1 ? p1Touch : p2Touch;
         if(p.cd.atk > 0 || p.isLock || p.hp <= 0 || p.status.losegrip > 0) return; 
     
+    if(p.charIdx === 51){
+        if(p.makCount == 3){
+            projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 250, p, "⏱️", 1.5, false, (e) => {
+            p.makCount = 0;
+            e.cd.s1 += 2000;
+            e.cd.s2 += 2000;
+            e.cd.s3 += 2000;
+            shakeAmount = 30;
+            for(let i=0; i<5; i++){ 
+                particles.push(new Particle(e.x, e.y, "gray", "normal", "😵‍💫"));
+            };     
+        }, 25));
+        } else {
+            projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 110, p, "⏱️", 1.5, false, (e) => {
+            p.makCount += 1;
+        }, 25));
+      }
+    }
+
     if(p.charIdx === 50){
         projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 95, p, "🌕", 1, 250, (e) => {
             p.moonPower += 10
@@ -7325,9 +7348,9 @@ if (p.charIdx === 31) {
                 let dy = (p.target.y - p.y) / (51 - d);
                 p.isCasting = true;
                 p.x += dx; p.y += dy}, 1);
-                let de = setGameInterval(()=> {if(d == 50){p.divineS2 = 1; clearInterval(df); p.target.takeDamage(200);p.target.applyStatus("divineMark", 0); p.isCasting = false; p.target.applyStatus("stunned", 800);p.heal(300);p.divineS3 = 2;clearInterval(de);}},1)
+                let de = setGameInterval(()=> {if(d == 50){p.divineS2 = 1; clearInterval(df); p.target.takeDamage(150 * p.divineAtk);p.target.applyStatus("divineMark", 0); p.isCasting = false; p.target.applyStatus("stunned", 800);p.heal(300);p.divineS3 = 2;clearInterval(de);}},1)
                 let c = 0;
-                let sf = setGameInterval(()=> {if(p.divineS3 == 2){c++;p.activeWarning = { type:'circle', r:200, x: tx, y: ty, color: 'rgba(255,255,0,0.6)' };if(dist({x: tx, y: ty}, enemy) < 200){ enemy.takeDamage(30 * p.divineAtk , 1); shakeAmount=5;} }}, 150)
+                let sf = setGameInterval(()=> {if(p.divineS3 == 2){c++;p.activeWarning = { type:'circle', r:200, x: tx, y: ty, color: 'rgba(255,255,0,0.6)' };if(dist({x: tx, y: ty}, enemy) < 200){ enemy.takeDamage(20 * p.divineAtk , 1); shakeAmount=5;} }}, 150)
                 let se = setGameInterval(()=> {if(c >= 10){clearInterval(sf); p.divineEnh += 3; p.divineAtk += 0.25;clearInterval(se); p.divineS3 = 3;}},1)
                 let be = setGameInterval(()=> {if(p.divineS3 == 3){p.activeWarning = null; projectiles.push(new Projectile(p.x, p.y, p.angle, 35, "gray", 0, p, "🟡", 1.6, null, (e)=>{for(let i=0; i<15; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "🟡", 10.0));shakeAmount = 20; enemy.applyStatus("glitter", 3500)}, 20, false, false, false, false));setGameTimeout(()=> {p.divineAtk -= 0.25; p.divineS3 = 1;}, 3000);clearInterval(be);}}, 1)
                 setGameTimeout(()=> {clearInterval(df)}, 5000)
@@ -7340,9 +7363,9 @@ if (p.charIdx === 31) {
                 setGameTimeout(()=>{
                 let e = 0
                 let df = setGameInterval(()=> {e++; p.x += dx; p.y += dy},10);
-                let de = setGameInterval(()=> {if(e >= 10){clearInterval(df);p.target.applyStatus("divineMark", 0);p.isCasting = false;if(dist(p, p.target) < 200){p.target.takeDamage(200 * p.divineAtk);};clearInterval(de);p.divineS3 = 2;}},20)}, 500)
+                let de = setGameInterval(()=> {if(e >= 10){clearInterval(df);p.target.applyStatus("divineMark", 0);p.isCasting = false;if(dist(p, p.target) < 200){p.target.takeDamage(150 * p.divineAtk);};clearInterval(de);p.divineS3 = 2;}},20)}, 500)
                 let c = 0;
-                let sf = setGameInterval(()=> {if(p.divineS3 == 2){c++;p.activeWarning = { type:'circle', r:200, x: tx, y: ty, color: 'rgba(255,255,0,0.6)' };if(dist({x: tx, y: ty}, enemy) < 200){ enemy.takeDamage(30 * p.divineAtk , 1); shakeAmount=5;} }}, 150)
+                let sf = setGameInterval(()=> {if(p.divineS3 == 2){c++;p.activeWarning = { type:'circle', r:200, x: tx, y: ty, color: 'rgba(255,255,0,0.6)' };if(dist({x: tx, y: ty}, enemy) < 200){ enemy.takeDamage(20 * p.divineAtk , 1); shakeAmount=5;} }}, 150)
                 let se = setGameInterval(()=> {if(c >= 10){clearInterval(sf); p.divineEnh += 3; p.divineAtk += 0.15;clearInterval(se); p.divineS3 = 3;}},150)
                 let be = setGameInterval(()=> {if(p.divineS3 == 3){setGameTimeout(()=> {p.divineAtk -= 0.15; p.divineS3 = 1;},5000);clearInterval(be);}}, 150)
                 setGameTimeout(()=> {clearInterval(df)}, 5000)
