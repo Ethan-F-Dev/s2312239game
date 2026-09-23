@@ -168,7 +168,7 @@
         { name: "急鳴", hp: 2650, atk: 66, speed: 4.5, color: "#FFFF00", s1Cd: 4500, s2Cd: 8500, s3Cd: 45000, atkInt: 800 },
         // page 2
         { name: "統帥", hp: 3900, atk: 300, speed: 3.2, color: "#4b0082", s1Cd: 4000, s2Cd: 6000, s3Cd: 40000, atkInt: 800 },
-        { name: "麥卡", hp: 4350, atk: 170, speed: 3.1, color: "#ffd700", s1Cd: 8000, s2Cd: 9000, s3Cd: 35000, atkInt: 800 },
+        { name: "麥卡", hp: 4050, atk: 170, speed: 3.1, color: "#ffd700", s1Cd: 8000, s2Cd: 9000, s3Cd: 35000, atkInt: 800 },
         { name: "噬靂", hp: 2400, atk: 150, speed: 3.5, color: "#8b0000", s1Cd: 7000, s2Cd: 12000, s3Cd: 25000, atkInt: 500 },
         { name: "博克", hp: 3250, atk: 85, speed: 3.7, color: "#808080", s1Cd: 5000, s2Cd: 10000, s3Cd: 35000, atkInt: 670 },
         { name: "悍涵", hp: 3400, atk: 150, speed: 1.8, color: "#ff69b4", s1Cd: 3000, s2Cd: 8000, s3Cd: 40000, atkInt: 1000 },
@@ -186,7 +186,7 @@
         { name: "杰牢", hp: 4200, atk: 160, speed: 3.7, color: "#2750F5", s1Cd: 6500, s2Cd: 7500, s3Cd: 25000, atkInt: 1400 },
         { name: "帝衛祢", hp: 2500, atk: 100, speed: 3.6, color: "#000080", s1Cd: 6000, s2Cd: 13500, s3Cd: 25000, atkInt: 400 },
         { name: "深柏", hp: 2600, atk: 230, speed: 3.5, color: "#66356E", s1Cd: 6000, s2Cd: 10000, s3Cd: 25000, atkInt: 500 },
-        { name: "宇", hp: 3500, atk: 550, speed: 3.5, color: "#708BFF", s1Cd: 6000, s2Cd: 12000, s3Cd: 35000, atkInt: 1200 },
+        { name: "宇", hp: 3500, atk: 550, speed: 3.5, color: "#708BFF", s1Cd: 6000, s2Cd: 12000, s3Cd: 35000, atkInt: 1500 },
         // page 5
         { name: "仁見狼", hp: 2500, atk: 50, speed: 3.3, color: "#941C04", s1Cd: 6000, s2Cd: 8000, s3Cd: 50000, atkInt: 660 },
         { name: "靜神", hp: 2900, atk: 100, speed: 3.1, color: "#8A2BE2", s1Cd: 7000, s2Cd: 8000, s3Cd: 25000, atkInt: 750 },
@@ -2950,14 +2950,14 @@ if (this.charIdx === 31) {
                     else if(dist(this.target, this.bokeClone) < 100) { // Explode
                         this.target.takeDamage(425, 9); floatTexts.push(new FloatText(this.target.x, this.target.y, "👎", "gray"));
                         this.bokeClone = null;
-                        this.heal(500); 
+                        this.heal(600); 
                     }
                     if(this.bokeClone) this.applyTaunt(this.target, 100);
                 }
                 if(this.target && this.target.activeMarks) {
                     this.target.activeMarks.forEach(m => {
                         if(Date.now() - m.time > 2000 && !m.triggered) {
-                            this.target.takeDamage(367, 9);
+                            this.target.takeDamage(267, 9);
                             m.triggered = true; 
                         }
                     });
@@ -4074,7 +4074,7 @@ if (this.charIdx === 31) {
 	if (p.charIdx === 35) {
             let aimAngle = Math.atan2(p.target.y - p.y, p.target.x - p.x);
             // h: 4 呈現超細線條，顏色為淺螢光綠
-            p.activeWarning = { type: 'rect', l: 600, h: 4, angle: aimAngle, color: 'rgba(152, 251, 152, 0.8)' };
+            p.activeWarning = { type: 'rect', l: 400, h: 4, angle: aimAngle, color: 'rgba(152, 251, 152, 0.8)' };
             
             setGameTimeout(() => {
                 p.activeWarning = null;
@@ -5875,9 +5875,9 @@ if (this.charIdx === 31) {
                     tickTimer -= 100;
                     if (Math.hypot(p.target.x - projX, p.target.y - projY) <= 60 + p.target.radius) {
                         if (stance === 0) {
-                            p.target.takeDamage(80 * p.buffs.atk, 38);
+                            p.target.takeDamage(150 * p.buffs.atk, 38);
                         } else {
-                            p.target.takeDamage(50 * p.buffs.atk, 38);
+                            p.target.takeDamage(80 * p.buffs.atk, 38);
                             p.heal(30);
                         }
                     }
@@ -5920,8 +5920,8 @@ if (this.charIdx === 31) {
                     projectiles.push(m);
                 }
             } else {
-                projectiles.push(new Projectile(p.x, p.y, aimAngle, 22, "red", 350 * dmgBuff, p, "🚀", 1.5, 2000, (e) => {
-                    e.applyStatus('stunned', 1500);
+                projectiles.push(new Projectile(p.x, p.y, aimAngle, 22, "red", 150 * dmgBuff, p, "🚀", 1.5, 2000, (e) => {
+                    e.applyStatus('stunned', 1000);
                     p.clovisEnergy = Math.min(100, p.clovisEnergy + 20);
                     p.heal(100); p.addShield(50);
                     p.cd.s3 = Math.max(0, p.cd.s3 - 2000);
@@ -6810,7 +6810,7 @@ if (p.charIdx === 31) {
             p.cd.s1 = 0; p.cd.s2 = 0; p.ynUltTimer = 6000;
             floatTexts.push(new FloatText(p.x, p.y - 80, "毫無保留！", "orange"));
             
-            if (p.target.hp < 800) {
+            if (p.target.hp < 600) {
                 p.target.isYnS3Execute = true; // 開啟斬殺許可
                 p.target.takeDamage(9999, 39);
                 particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "━", 5.0, 1, 60)); 
