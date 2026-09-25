@@ -176,7 +176,7 @@
         // page 3
         { name: "尼古拉斯", hp: 4000, atk: 150, speed: 3.2, color: "#a0a0a0", s1Cd: 8000, s2Cd: 9000, s3Cd: 30000, atkInt: 1200 },
         { name: "境查", hp: 2850, atk: 130, speed: 3.3, color: "#113388", s1Cd: 7000, s2Cd: 12000, s3Cd: 35000, atkInt: 1300 },
-        { name: "卡爾森", hp: 2550, atk: 20, speed: 3.2, color: "#90EE90", s1Cd: 6000, s2Cd: 6500, s3Cd: 15000, atkInt: 400 },
+        { name: "卡爾森", hp: 2550, atk: 20, speed: 3.2, color: "#90EE90", s1Cd: 6500, s2Cd: 7500, s3Cd: 18000, atkInt: 400 },
         { name: "磐石", hp: 2400, atk: 135, speed: 2.2, color: "#4D4D4D", s1Cd: 5000, s2Cd: 9000, s3Cd: 15000, atkInt: 650 },
         { name: "特維", hp: 3278, atk: 150, speed: 3.1, color: "#025E00", s1Cd: 6800, s2Cd: 5000, s3Cd: 30000, atkInt: 920 },
         { name: "婭", hp: 3600, atk: 90, speed: 3.0, color: "#ffcccc", s1Cd:9000, s2Cd: 16000, s3Cd: 35000, atkInt: 800 },
@@ -3414,7 +3414,7 @@ if (this.charIdx === 31) {
                 if (this.charIdx === 31 && this.yhInSmokeFlag) reduction *= 0.6; 
                 if (this.charIdx === 37 && this.tlS3Active) reduction *= 0.8;
                 if (this.charIdx === 42 && this.slState === 0) reduction *= 0.85;
-                if (this.charIdx === 45 && this.jWeakened === true) reduction *= 0.55;
+                if (this.charIdx === 45 && this.jWeakened === true) reduction *= 0.65;
             } else {
                 if(this.yProtection >= 1){
                 if (this.charIdx === 44 && this.ySuper == true) reduction *= 0.2*(1/(this.yCombo/2));
@@ -4568,7 +4568,7 @@ if (this.charIdx === 31) {
                 let es = setGameInterval(()=>{if(sc > 50){
                     if(p.uniState == 1 || p.uniState == 0){p.uniState = 1}
                     else if(p.uniState == 2){p.uniState = 1; p.cd.s1 = 0;}
-                    p.target.takeDamage(500);p.activeWarning = null; clearInterval(sk);clearInterval(es)
+                    p.target.takeDamage(300);p.activeWarning = null; clearInterval(sk);clearInterval(es)
                    }})
               } else {
                 p.uniAim = false
@@ -5626,7 +5626,7 @@ if (this.charIdx === 31) {
     if(p.charIdx === 45){
         p.jS2 = true
         let c = 0;
-        let j = setGameInterval(()=> {if(p.jS2Alr == false && c <= 99){c++; if(dist(p, p.target) <= 200){p.heal(200); p.addShield(200);p.jS2Alr = true; enemy.applyStatus("stunned", 500); enemy.applyStatus("high", 5000); p.jWeakened = true; setGameTimeout(()=> {p.jWeakened = false; p.jS2Alr = false}, 2000)}}else{clearInterval(j)}},10)
+        let j = setGameInterval(()=> {if(p.jS2Alr == false && c <= 99){c++; if(dist(p, p.target) <= 200){p.heal(100); p.addShield(100);p.jS2Alr = true; enemy.applyStatus("stunned", 500); enemy.applyStatus("high", 5000); p.jWeakened = true; setGameTimeout(()=> {p.jWeakened = false; p.jS2Alr = false}, 2000)}}else{clearInterval(j)}},10)
         setGameTimeout(()=> p.jS2 = false, 1000)
     }
 
@@ -6260,7 +6260,7 @@ if (p.charIdx === 31) {
          
          else if(p.charIdx === 23){
             p.uniState = 3
-            p.addShield(200)
+            p.addShield(150)
             p.cd.atk = 0
          }
 
@@ -6564,7 +6564,7 @@ if (p.charIdx === 31) {
             p.cd.s3 = 0;
             floatTexts.push(new FloatText(p.x, p.y - 80, "無法使用！", "gray"));
         } else {
-        if(dist(p, enemy) < 65){p.jCanCombo = false; p.target.takeDamage(350); if(enemy.status.high >= 1){ p.cd.s3 = 100}; p.heal(60);}
+        if(dist(p, enemy) < 65){p.jCanCombo = false; p.target.takeDamage(250); if(enemy.status.high >= 1){ p.cd.s3 = 100}; p.heal(60);}
         let startX = p.x, startY = p.y; 
         let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*400, ty = p.y + Math.sin(aimAngle)*400; 
         let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2;for(let i=0; i<3; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "⬜️")); };if(dist(p, enemy) < 65 && p.jcanCombo == true){p.jcanCombo = false;p.target.takeDamage(350); if(enemy.status.high >= 1){p.cd.s3 = 100; enemy.applyStatus("high", 0);}}}, 16); setGameTimeout(() => {clearInterval(sInt); if(p.jcanCombo == false){p.jcanCombo = true;}else{p.jcanCombo = true;}}, 150); 
@@ -7271,7 +7271,7 @@ if (p.charIdx === 31) {
         }
         if(p.charIdx === 23){
         if(p.uniState > 0){
-          p.applyStatus("superArmor", 5000)
+          p.applyStatus("superArmor", 3000)
           p.addShield(300)
           if(p.uniState == 1){
           p.uniState = 0;
@@ -7307,7 +7307,7 @@ if (p.charIdx === 31) {
                      let localY = vX * Math.sin(-aimAngle) + vY * Math.cos(-aimAngle);
                      if (localX >= 0 && localX <= 500 && Math.abs(localY) <= 250 + enemy.radius) {
                         enemy.takeDamage(350)
-                        p.heal(200)
+                        p.heal(100)
                      }}},350)
              let eh = setGameInterval(()=> {if(c > 3){p.uniS1 = false; p.isCasting = false; p.activeWarning = null; clearInterval(sh); clearInterval(eh);}}, 200)
             },200)
