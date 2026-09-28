@@ -164,17 +164,17 @@
         { name: "泰", hp: 3400, atk: 100, speed: 3.0, color: "#e67e22", s1Cd: 9000, s2Cd: 10000, s3Cd: 35000, atkInt: 600 },
         { name: "聖昭者", hp: 3350, atk: 94, speed: 3.1, color: "#f1c40f", s1Cd: 5000, s2Cd: 11000, s3Cd: 20000, atkInt: 800 },
         { name: "柳銅逸", hp: 4000, atk: 145, speed: 2.8, color: "#c0392b", s1Cd: 7000, s2Cd: 10500, s3Cd: 35000, atkInt: 900 },
-        { name: "劍客", hp: 2200, atk: 9, speed: 3.68, color: "#00bfff", s1Cd: 4000, s2Cd: 12000, s3Cd: 40000, atkInt: 500 },
+        { name: "劍客", hp: 2200, atk: 9, speed: 3.68, color: "#00bfff", s1Cd: 5500, s2Cd: 12000, s3Cd: 40000, atkInt: 500 },
         { name: "急鳴", hp: 2650, atk: 66, speed: 4.5, color: "#FFFF00", s1Cd: 4500, s2Cd: 8500, s3Cd: 45000, atkInt: 800 },
         // page 2
         { name: "統帥", hp: 3900, atk: 300, speed: 3.2, color: "#4b0082", s1Cd: 4000, s2Cd: 6000, s3Cd: 40000, atkInt: 800 },
-        { name: "麥卡", hp: 4050, atk: 170, speed: 3.1, color: "#ffd700", s1Cd: 8000, s2Cd: 9000, s3Cd: 35000, atkInt: 800 },
+        { name: "麥卡", hp: 4050, atk: 170, speed: 3.1, color: "#ffd700", s1Cd: 8000, s2Cd: 12000, s3Cd: 35000, atkInt: 800 },
         { name: "噬靂", hp: 2400, atk: 150, speed: 3.5, color: "#8b0000", s1Cd: 7000, s2Cd: 12000, s3Cd: 25000, atkInt: 500 },
         { name: "博克", hp: 3250, atk: 85, speed: 3.7, color: "#808080", s1Cd: 5000, s2Cd: 10000, s3Cd: 35000, atkInt: 670 },
-        { name: "悍涵", hp: 3400, atk: 150, speed: 1.8, color: "#ff69b4", s1Cd: 3000, s2Cd: 8000, s3Cd: 40000, atkInt: 1000 },
+        { name: "悍涵", hp: 3400, atk: 150, speed: 1.8, color: "#ff69b4", s1Cd: 3000, s2Cd: 8000, s3Cd: 40000, atkInt: 2000 },
         { name: "火星", hp: 3300, atk: 78, speed: 3.0, color: "#ff4500", s1Cd: 6000, s2Cd: 10000, s3Cd: 40000, atkInt: 1100 },
         // page 3
-        { name: "尼古拉斯", hp: 4000, atk: 150, speed: 3.2, color: "#a0a0a0", s1Cd: 8000, s2Cd: 9000, s3Cd: 30000, atkInt: 1200 },
+        { name: "尼古拉斯", hp: 3100, atk: 150, speed: 3.2, color: "#a0a0a0", s1Cd: 8000, s2Cd: 9000, s3Cd: 30000, atkInt: 1200 },
         { name: "境查", hp: 2850, atk: 130, speed: 3.3, color: "#113388", s1Cd: 7000, s2Cd: 12000, s3Cd: 35000, atkInt: 1300 },
         { name: "卡爾森", hp: 2550, atk: 20, speed: 3.2, color: "#90EE90", s1Cd: 6500, s2Cd: 7500, s3Cd: 18000, atkInt: 400 },
         { name: "磐石", hp: 2400, atk: 135, speed: 2.2, color: "#4D4D4D", s1Cd: 5000, s2Cd: 9000, s3Cd: 15000, atkInt: 650 },
@@ -206,7 +206,7 @@
         { name: "陀羅", hp: 3500, atk: 60, speed: 3.5, color: "#a9a9a9", s1Cd: 6000, s2Cd: 8000, s3Cd: 20000, atkInt: 500 },
         { name: "醫師", hp: 3500, atk: 110, speed: 3.2, color: "#1E3A8A", s1Cd: 6000, s2Cd: 8000, s3Cd: 30000, atkInt: 500 },
         { name: "元能宗師", hp: 3300, atk: 91, speed: 3.0, color: "#ffa500", s1Cd: 8500, s2Cd: 12000, s3Cd: 40000, atkInt: 500 },
-        { name: "智者", hp: 2350, atk: 195, speed: 3.6, color: "#87CEFA", s1Cd: 7000, s2Cd: 12000, s3Cd: 35000, atkInt: 1000 },
+        { name: "智者", hp: 2350, atk: 195, speed: 3.6, color: "#87CEFA", s1Cd: 8000, s2Cd: 12000, s3Cd: 35000, atkInt: 1000 },
         { name: "暗夜獵手", hp: 3050, atk: 1.0, speed: 3.2, color: "#2E2E2E", s1Cd: 5000, s2Cd: 8000, s3Cd: 15000, atkInt: 600 },
         // page 8
         { name: "史萊姆", hp: 2780, atk: 135, speed: 2.5, color: "#32CD32", s1Cd: 2500, s2Cd: 5000, s3Cd: 25000, atkInt: 1500 },
@@ -3399,7 +3399,7 @@ if (this.charIdx === 31) {
             if (this.charIdx === 6) this.commDamageTaken += dmg;
             if (this.charIdx === 7) this.funds = Math.min(100, this.funds + dmg/25); 
             if (this.charIdx === 8) this.damageTakenHistory.push({time: Date.now(), amount: dmg});
-            if (this.charIdx === 10) this.capacity = Math.min(2500, this.capacity + dmg * 0.3); 
+            if (this.charIdx === 10) this.capacity = Math.min(2000, this.capacity + dmg * 0.3); 
             
             if (this.wounds > 0) { dmg *= 1.2; this.woundTimer = 10000; }
             let reduction = 1.0;
