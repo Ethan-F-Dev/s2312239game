@@ -7516,7 +7516,7 @@ if (p.charIdx === 31) {
             tempSA = p.target.status.superArmor; 
             p.target.status.superArmor = 0; // 暫時拔除原生霸體
           }
-          p.target.applyStatus('stunned', 1000); // 使用正確的 stunned
+          p.target.applyStatus('stunned', 100000); // 使用正確的 stunned
           if (tempSA > 0) { 
             p.target.status.superArmor = tempSA; // 歸還霸體
           }
