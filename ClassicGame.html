@@ -7511,26 +7511,24 @@ if (p.charIdx === 31) {
           p.x = p.target.x - Math.cos(p.angle)*60;
           p.y = p.target.y - Math.sin(p.angle)*60; 
           p.activeWarning = { type:'circle', r: 150, color: 'rgba(75,0,130,0.5)' }; 
-          setGameTimeout(() => {
-            let tempSA = 0;
-            if (p.target.status && p.target.superArmor > 0) { 
+          let tempSA = 0;
+          if (p.target.status && p.target.superArmor > 0) { 
             tempSA = p.target.status.superArmor; 
             p.target.status.superArmor = 0; // 暫時拔除原生霸體
-            }
-            p.target.applyStatus('stunned', 1000); // 使用正確的 stunned
-            if (tempSA > 0) { 
-              p.target.status.superArmor = tempSA; // 歸還霸體
-            }
-            let c = 0; let si = setGameInterval(() => { 
-              c++; 
-              let act = p.target.takeDamage(400, 0); 
-              p.heal(act.hpDmg + act.shieldDmg*0.5); 
-              shakeAmount = 20; 
-              if(c >= 3) { 
-                clearInterval(si); p.isCasting = false; p.activeWarning = null;
-              } 
-            }, 350); 
-          }, 100); 
+          }
+          p.target.applyStatus('stunned', 1000); // 使用正確的 stunned
+          if (tempSA > 0) { 
+            p.target.status.superArmor = tempSA; // 歸還霸體
+          }
+          let c = 0; let si = setGameInterval(() => { 
+            c++; 
+            let act = p.target.takeDamage(400, 0); 
+            p.heal(act.hpDmg + act.shieldDmg*0.5); 
+            shakeAmount = 20; 
+            if(c >= 3) { 
+              clearInterval(si); p.isCasting = false; p.activeWarning = null;
+            } 
+          }, 350); 
         }
         else if(p.charIdx === 1) { if(!p.taiS1Active){p.isUntouchable = true; p.isCasting = true; p.buffs.speed = 4.0; p.activeWarning = { type:'circle', r:120, color:'rgba(255,165,0,0.4)' }; let c = 0; let iInt = setGameInterval(() => { c++; p.x += (p.id===1?p1Touch.joyX:p2Touch.joyX)*p.speed*4; p.y += (p.id===1?p1Touch.joyY:p2Touch.joyY)*p.speed*4; if(c%30===0 && dist(p, p.target)<120) {p.target.takeDamage(80, 1);p.flame += 10} if(c > 200) { clearInterval(iInt); p.isUntouchable = false; p.isCasting = false; p.stateTimer = 8000; p.buffs.atk = 1.2; p.taiUltActive = true; p.cd.s1 = 0; p.cd.s2 = 0; floatTexts.push(new FloatText(p.x, p.y-100, "Refreshed!", "gold")); } }, 16); }else{p.cd.s3 = 0;}}
         else if(p.charIdx === 2) { const tx = p.target.x, ty = p.target.y; p.activeWarning = { type:'circle', r:120, x: tx, y: ty, color: 'rgba(255,255,0,0.6)' }; setGameTimeout(() => { for(let i=0; i<15; i++) particles.push(new Particle(tx, ty, "gold", "normal", "⚡", 1.0, 2.0)); if(dist({x: tx, y: ty}, p.target) < 120) { p.target.takeDamage(600, 2); p.applySlow(0.4); p.cd.s1 = 0; p.cd.s2 = 0; shakeAmount = 20; floatTexts.push(new FloatText(p.x, p.y-80, "Refreshed!", "gold")); } p.activeWarning = null; }, 1000); }
