@@ -7514,7 +7514,7 @@ if (p.charIdx === 31) {
           p.x = p.target.x - Math.cos(p.angle)*60;
           p.y = p.target.y - Math.sin(p.angle)*60; 
           p.activeWarning = { type:'circle', r: 150, color: 'rgba(75,0,130,0.5)' }; 
-          p.target.applyStatus('superStunned', 10000); // 使用正確的 stunned
+          p.target.applyStatus('superStunned', 1100); // 使用正確的 stunned
           let c = 0; let si = setGameInterval(() => { 
             c++; 
             let act = p.target.takeDamage(400, 0); 
