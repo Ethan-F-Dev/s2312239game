@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Security-Policy" content="media-src * data: blob:;">
-    <title>巔峰對決 - 數學奧秘 </title>
+    <title>巔峰對決 - 飛墨之藝 </title>
     <style>
         :root { --p1-ui: #3498db; --p2-ui: #e74c3c; --font-main: 'Noto Sans TC', sans-serif; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; user-select: none; 
@@ -219,7 +219,8 @@
         { name: "茵", hp: 3100, atk: 20, speed: 3.4, color: "#E37332", s1Cd: 6000, s2Cd: 12000, s3Cd: 40000, atkInt: 100 },
         { name: "瑞艾斯", hp: 2450, atk: 160, speed: 3.6, color: "#DEDEDE", s1Cd: 5000, s2Cd: 8000, s3Cd: 30000, atkInt: 400 },
         { name: "武爾杳杳", hp: 2550, atk: 110, speed: 3.0, color: "#FCDF6F", s1Cd: 500, s2Cd: 500, s3Cd: 500, atkInt: 950 },
-        { name: "麥克大師", hp: 2500, atk: 110, speed: 3.5, color: "#B09B9B", s1Cd: 8000, s2Cd: 15000, s3Cd: 45000, atkInt: 1200 }
+        { name: "麥克大師", hp: 2500, atk: 110, speed: 3.5, color: "#B09B9B", s1Cd: 8000, s2Cd: 15000, s3Cd: 45000, atkInt: 1200 },
+        { name: "琬", hp: 2480, atk: 128, speed: 3.25, color: "#FFC9E4", s1Cd: 6000, s2Cd: 6000, s3Cd: 8000, atkInt: 1000 }
         
     ]);
     function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
@@ -641,6 +642,12 @@
                 ctx.beginPath(); ctx.arc(0,0,80,0,Math.PI*2); ctx.strokeStyle="red"; ctx.stroke();
                 ctx.restore();
             }
+            
+            if(p.charIdx === 51 && p.makShowcase == true){
+                ctx.save(); ctx.translate(p.x, p.y); 
+                ctx.beginPath(); ctx.arc(0,0,p.makRa,0,Math.PI*2); ctx.strokeStyle="gold";  ctx.lineWidth = 5; ctx.stroke();
+                ctx.restore();
+            }
 
             if (p.charIdx === 21 && p.divineWarning) {
                 ctx.save(); ctx.translate(p.target.x, p.target.y); 
@@ -887,6 +894,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                 if(p.charIdx === 44 && p.ySuper == true) { ctx.shadowBlur = 50; ctx.shadowColor = "blue"; }
                 if(p.charIdx === 21 && p.shine == true) { ctx.shadowBlur = 30; ctx.shadowColor = "gold"; };
                 if(p.charIdx === 21 && p.divineS3 == 3) { ctx.shadowBlur = 50; ctx.shadowColor = "orange"; }
+                if(p.charIdx === 51 && p.makS3State == true) { ctx.shadowBlur = 50; ctx.shadowColor = "gold"; }
                 if(p.charIdx === 21 && p.isTransparent) ctx.globalAlpha = 0.5;
                 if(p.charIdx === 20 && p.jLauUlt == true) { ctx.shadowBlur = 30; ctx.shadowColor = "orange"; }
                 if(p.status.frozen > 0) { ctx.fillStyle = "rgba(0,100,255,0.5)"; ctx.fillRect(-35, -35, 70, 70); }
@@ -927,6 +935,8 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                 if(p.charIdx === 7) { ctx.fillStyle = "gold"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.funds/100), 5); ctx.fillStyle = "black"; ctx.fillRect(p.x, p.y-75, 1, 5); }
                 if(p.charIdx === 19) {ctx.fillStyle = "gray"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.leoEnAtk/3),5);}
                 if(p.charIdx === 24) {ctx.fillStyle = "red"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.blood/3),5);}
+                
+                if(p.charIdx === 51 && p.makS2State == true){ctx.fillStyle = "purple"; ctx.fillRect(p.x - bw/2, p.y + 35, bw * (p.makTimer/5000),5);}
                 if(p.charIdx === 19) {ctx.fillStyle = "brown"; ctx.fillRect(p.x - bw/2, p.y + 35, bw * (p.soundAmount/500),5);}
                 if(p.charIdx === 3) {ctx.fillStyle = "purple"; ctx.fillRect(p.x - bw/2, p.y + 55, bw * (p.rageEnhTimer/5000),5);}
                 if(p.charIdx === 44) {ctx.fillStyle = "blue"; ctx.fillRect(p.x - bw/2, p.y + 35, bw * (p.yCombo/8),5);}
@@ -974,6 +984,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
         });
         [p1, p2].forEach(p => { 
         if(p.candleClone) { ctx.save(); ctx.translate(p.candleClone.x, p.candleClone.y); ctx.font = "40px Arial"; ctx.fillText("🕯️", -20, 20); ctx.restore(); }
+        if(p.timerClone) { ctx.save(); ctx.translate(p.timerClone.x, p.timerClone.y); ctx.font = "60px Arial"; ctx.fillText("🕜", -20, 20); ctx.restore(); }
         if(p.bokeClone) { ctx.save(); ctx.translate(p.bokeClone.x, p.bokeClone.y); ctx.font = "40px Arial"; ctx.fillText("👤", -20, 20); ctx.restore(); }
         if(p.sunClone) { ctx.save(); ctx.translate(p.sunClone.x, p.sunClone.y); ctx.font = "40px Arial"; ctx.fillText("🌞", -20, 20); ctx.restore(); } 
         if (p.status.bound > 0) {
@@ -1447,6 +1458,15 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             this.moonPassive = false;
             // Mak (51)
             this.makCount = 0;
+            this.makRandom = 0;
+            this.timerClone = null;
+            this.makHp = 0;
+            this.makS2 = 1;
+            this.makS2State = false;
+            this.makTimer = 5000;
+            this.makShowcase = false;
+            this.makRa = 50;
+            this.makS3State = false;
         }
         triggerClovisPassive() {
             if (this.charIdx !== 35 || this.clovisPassiveCd > 0) return;
@@ -2913,6 +2933,10 @@ if (this.charIdx === 31) {
                        }
             }
             
+            if(this.charIdx === 51){
+                this.makTimer -= dt * timeScale;
+            }
+
             if(this.charIdx === 17){
                 this.chillTimer -= dt * timeScale;
                 if(this.chillTimer < 0){
@@ -3474,7 +3498,7 @@ if (this.charIdx === 31) {
             
             this.mimPuppetDmgDealt = 0;
             this.cd.s3 = CHAR_DATA[33].s3Cd; // 開始計算大招冷卻
-            this.color = CHAR_DATA[33].color;
+            this.color = CHAR_DATA[33].color;tk$0
             this.speed = CHAR_DATA[33].speed;
             
             shakeAmount = 20;
@@ -3526,7 +3550,10 @@ if (this.charIdx === 31) {
     
     if(p.charIdx === 51){
         if(p.makCount == 3){
-            projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 250, p, "⏱️", 1.5, false, (e) => {
+            if(p.makS3State == true){
+            p.cd.atk = 600;
+             }
+            projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 250 * p.buffs.atk, p, "⏱️", 1.5, false, (e) => {
             p.makCount = 0;
             e.cd.s1 += 2000;
             e.cd.s2 += 2000;
@@ -3537,7 +3564,10 @@ if (this.charIdx === 31) {
             };     
         }, 25));
         } else {
-            projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 110, p, "⏱️", 1.5, false, (e) => {
+            if(p.makS3State == true){
+            p.cd.atk = 600;
+            }
+            projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 110 * p.buffs.atk, p, "⏱️", 1.5, false, (e) => {
             p.makCount += 1;
         }, 25));
       }
@@ -4702,6 +4732,13 @@ if (this.charIdx === 31) {
         if(p.charIdx === 6 && p.commanderMode) p.cd.s1 = 4000;
         const joy = p.id === 1 ? p1Touch : p2Touch;
     
+    if(p.charIdx === 51){
+        if(p.makS3State == true){p.cd.s1 = 3200}
+        setGameTimeout(() => { projectiles.push(new Projectile(p.x, p.y, p.angle, 35, "gold", 200 * p.buffs.atk, p, "", 100, null, (e)=>{e.buffs.slow = 0.2}, false, false, false, false, true)); }, 50);
+        let makRandom = Math.floor(Math.random() * (300 - 100 + 1)) + 100;
+        setGameTimeout(()=> enemy.takeDamage(makRandom * p.buffs.atk), 2000)
+    }
+
     if(p.charIdx === 50){
         if(p.moonPower >= 15){
             if(p.moonPower < 50){
@@ -5555,7 +5592,27 @@ if (this.charIdx === 31) {
         const joy = p.id === 1 ? p1Touch : p2Touch;
         if(p.cd.s2 > 0 || p.isLock || p.status.disarmed > 0 || p.hp <= 0) return;
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
-    
+    if(p.charIdx === 51){
+         if(p.makS2 == 1){
+            p.makTimer = 5000;
+            p.timerClone = { x: p.x, y: p.y, life: 10000}
+            p.makHp = p.hp;
+            p.cd.s2 = 0;
+            p.makS2 = 2;
+            p.makS2State = true;
+            let m = 1
+            let mh = setGameInterval(()=>{if(p.makS2State == true){if(m <= 4){m++; p.heal(50);} else {p.makS2 = 1; p.cd.s2 = 15000; p.heal(500); p.timerClone = null; p.makS2State = false;}}else{clearInterval(mh)}},1000)
+         } else {
+            p.makS2 = 1;
+            if(p.makHp - p.hp > 1000){p.cd.s2 = 25000} else {p.cd.s2 = 15000}
+            p.hp = p.makHp;
+            p.x = p.timerClone.x; p.y = p.timerClone.y
+            p.makS2State = false;
+            p.timerClone = null;
+
+         }
+    }
+
     if(p.charIdx === 50){
         if(p.moonPower >= 20){
            if(p.moonPower < 50){
@@ -6471,6 +6528,28 @@ if (p.charIdx === 31) {
         if(p.status.stunned > 0 || p.status.disarmed > 0) return;
         p.cd.s3 = CHAR_DATA[p.charIdx].s3Cd;
     
+    if(p.charIdx === 51){
+       setGameTimeout(()=>{
+        p.makRa = 50;
+        p.makS3State = true;
+        p.cd.s1 *= 0.4
+        p.heal((p.maxHp - p.hp)*0.3)
+        p.makShowcase = true
+        enemy.isCasting = true;
+        p.speed = 4.2;
+        enemy.cd.s1 += 5000;
+        enemy.cd.s2 += 5000;
+        enemy.cd.s3 += 5000;
+        p.buffs.atk = 1.3;
+        let k = 1
+        let mr = setGameInterval(()=>{if(k <= 49){p.makRa += 50;}else{clearInterval(mr)}},20)
+        setGameTimeout(()=>{p.makS3State = false;
+                            p.makShowcase = false;
+                            enemy.isCasting = false;
+                            p.buffs.atk = 1.0;}, 5000)
+       },1000)
+    }
+
     if(p.charIdx === 50){
      if(p.moonPower >= 50){
          p.moonPower -= 40;
