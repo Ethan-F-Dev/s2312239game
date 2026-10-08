@@ -4734,7 +4734,7 @@ if (this.charIdx === 31) {
     
     if(p.charIdx === 51){
         if(p.makS3State == true){p.cd.s1 = 2000}
-        setGameTimeout(() => { projectiles.push(new Projectile(p.x, p.y, p.angle, 55, "gold", 200 * p.buffs.atk, p, "", 300, null, (e)=>{e.buffs.slow = 0.2}, false, false, false, false, true)); }, 50);
+        setGameTimeout(() => { projectiles.push(new Projectile(p.x, p.y, p.angle, 55, "gold", 200 * p.buffs.atk, p, "", 300, null, (e)=>{e.buffs.slow = 0.4}, false, false, false, false, true)); }, 50);
         let makRandom = Math.floor(Math.random() * (100 - 50 + 1)) + 100;
         setGameTimeout(()=> enemy.takeDamage(makRandom * p.buffs.atk), 2000)
     }
