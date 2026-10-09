@@ -163,7 +163,7 @@
         { name: "駭爪", hp: 2300, atk: 95, speed: 3.5, color: "#9b59b6", s1Cd: 6000, s2Cd: 9000, s3Cd: 30000, atkInt: 1000 },
         { name: "泰", hp: 3400, atk: 100, speed: 3.0, color: "#e67e22", s1Cd: 9000, s2Cd: 10000, s3Cd: 35000, atkInt: 600 },
         { name: "聖昭者", hp: 3050, atk: 94, speed: 3.1, color: "#f1c40f", s1Cd: 5000, s2Cd: 11000, s3Cd: 28000, atkInt: 900 },
-        { name: "柳銅逸", hp: 4000, atk: 145, speed: 2.8, color: "#c0392b", s1Cd: 7000, s2Cd: 10500, s3Cd: 35000, atkInt: 900 },
+        { name: "柳銅逸", hp: 3800, atk: 145, speed: 2.5, color: "#c0392b", s1Cd: 7000, s2Cd: 10500, s3Cd: 35000, atkInt: 900 },
         { name: "劍客", hp: 2200, atk: 9, speed: 3.68, color: "#00bfff", s1Cd: 5500, s2Cd: 12000, s3Cd: 40000, atkInt: 500 },
         { name: "急鳴", hp: 2650, atk: 66, speed: 4.5, color: "#FFFF00", s1Cd: 4500, s2Cd: 8500, s3Cd: 50000, atkInt: 800 },
         // page 2
@@ -210,7 +210,7 @@
         { name: "暗夜獵手", hp: 3000, atk: 1.0, speed: 3.2, color: "#2E2E2E", s1Cd: 5000, s2Cd: 8000, s3Cd: 15000, atkInt: 600 },
         // page 8
         { name: "史萊姆", hp: 2780, atk: 135, speed: 2.5, color: "#32CD32", s1Cd: 2500, s2Cd: 5000, s3Cd: 25000, atkInt: 1500 },
-        { name: "刀俠", hp: 2670, atk: 145, speed: 3.5, color: "#8B0000", s1Cd: 3000, s2Cd: 5000, s3Cd: 25000, atkInt: 800 },
+        { name: "刀俠", hp: 2670, atk: 145, speed: 3.5, color: "#8B0000", s1Cd: 3500, s2Cd: 6000, s3Cd: 30000, atkInt: 800 },
         { name: "凌汐", hp: 1000, atk: 22, speed: 3.4, color: "#27C5F5", s1Cd: 3000, s2Cd: 8000, s3Cd: 35000, atkInt: 300 },
         { name: "鹿冠", hp: 2800, atk: 91, speed: 3.2, color: "#8B4513", s1Cd: 4000, s2Cd: 7800, s3Cd: 25000, atkInt: 600 },
         { name: "戮", hp: 3500, atk: 90, speed: 3.5, color: "#FF2A00", s1Cd: 7000, s2Cd: 8000, s3Cd: 15000, atkInt: 1000 },
@@ -3791,7 +3791,7 @@ if (this.charIdx === 31) {
                     p.activeWarning = null;
                     if (dist(p, p.target) <= 100 + p.target.radius) {
                         p.target.takeDamage(80 * p.buffs.atk, 43);
-                        p.heal(100); 
+                        p.heal(50); 
                         p.cd.s1 = Math.max(0, p.cd.s1 - 1000); 
                         p.cd.s2 = Math.max(0, p.cd.s2 - 1000);
                         p.cd.s3 = Math.max(0, p.cd.s3 - 3000);
