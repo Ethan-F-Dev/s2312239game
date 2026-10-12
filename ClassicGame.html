@@ -165,7 +165,7 @@
         { name: "聖昭者", hp: 3050, atk: 94, speed: 3.1, color: "#f1c40f", s1Cd: 5000, s2Cd: 11000, s3Cd: 28000, atkInt: 900 },
         { name: "柳銅逸", hp: 3800, atk: 145, speed: 2.5, color: "#c0392b", s1Cd: 7000, s2Cd: 10500, s3Cd: 35000, atkInt: 900 },
         { name: "劍客", hp: 2200, atk: 9, speed: 3.68, color: "#00bfff", s1Cd: 5500, s2Cd: 12000, s3Cd: 40000, atkInt: 500 },
-        { name: "急鳴", hp: 2650, atk: 66, speed: 4.5, color: "#FFFF00", s1Cd: 4500, s2Cd: 8500, s3Cd: 50000, atkInt: 800 },
+        { name: "急鳴", hp: 2650, atk: 66, speed: 4.3, color: "#FFFF00", s1Cd: 6000, s2Cd: 8500, s3Cd: 55000, atkInt: 800 },
         // page 2
         { name: "統帥", hp: 3900, atk: 300, speed: 3.2, color: "#4b0082", s1Cd: 4000, s2Cd: 6000, s3Cd: 40000, atkInt: 800 },
         { name: "麥卡", hp: 4050, atk: 170, speed: 3.1, color: "#ffd700", s1Cd: 8000, s2Cd: 12000, s3Cd: 35000, atkInt: 800 },
@@ -193,7 +193,7 @@
         { name: "玉杉", hp: 3200, atk: 140, speed: 3.2, color: "#228B22", s1Cd: 7000, s2Cd: 14000, s3Cd: 35000, atkInt: 1000 },
         { name: "康絲特斯", hp: 2800, atk: 165, speed: 3.2, color: "#FF69B4", s1Cd: 6500, s2Cd: 10000, s3Cd: 35000, atkInt: 500 },
         { name: "玟亢", hp: 3450, atk: 190, speed: 3.0, color: "#D4AF37", s1Cd: 5000, s2Cd: 10000, s3Cd: 20000, atkInt: 1000 },
-        { name: "翼峰", hp: 2500, atk: 69, speed: 3.6, color: "#D3D3D3", s1Cd: 7000, s2Cd: 13000, s3Cd: 25000, atkInt: 600 },
+        { name: "翼峰", hp: 2300, atk: 69, speed: 3.6, color: "#D3D3D3", s1Cd: 8000, s2Cd: 16000, s3Cd: 27000, atkInt: 600 },
         // page 6
         { name: "鎖鏈", hp: 3650, atk: 150, speed: 3.0, color: "#808080", s1Cd: 3500, s2Cd: 10000, s3Cd: 30000, atkInt: 1000 },
         { name: "雨昊", hp: 3200, atk: 105, speed: 3.4, color: "#A9A9A9", s1Cd: 5000, s2Cd: 8000, s3Cd: 35000, atkInt: 500 },
@@ -210,7 +210,7 @@
         { name: "暗夜獵手", hp: 3000, atk: 1.0, speed: 3.2, color: "#2E2E2E", s1Cd: 5000, s2Cd: 8000, s3Cd: 15000, atkInt: 600 },
         // page 8
         { name: "史萊姆", hp: 2780, atk: 135, speed: 2.5, color: "#32CD32", s1Cd: 2500, s2Cd: 5000, s3Cd: 25000, atkInt: 1500 },
-        { name: "刀俠", hp: 2670, atk: 145, speed: 3.3, color: "#8B0000", s1Cd: 3500, s2Cd: 6000, s3Cd: 30000, atkInt: 800 },
+        { name: "刀俠", hp: 2670, atk: 145, speed: 3.3, color: "#8B0000", s1Cd: 3000, s2Cd: 6500, s3Cd: 33000, atkInt: 800 },
         { name: "凌汐", hp: 1000, atk: 22, speed: 3.4, color: "#27C5F5", s1Cd: 3000, s2Cd: 8000, s3Cd: 35000, atkInt: 300 },
         { name: "鹿冠", hp: 2800, atk: 91, speed: 3.2, color: "#8B4513", s1Cd: 4000, s2Cd: 7800, s3Cd: 25000, atkInt: 600 },
         { name: "戮", hp: 3500, atk: 90, speed: 3.5, color: "#FF2A00", s1Cd: 7000, s2Cd: 8000, s3Cd: 15000, atkInt: 1000 },
@@ -2472,7 +2472,7 @@ if (this.charIdx === 31) {
                 this.activeWarning = { type: 'circle', r: 150, color: 'rgba(200,200,200,0.5)', x: this.x, y: this.y };
                 if (this.yfFlyTimer <= 0) {
                     this.yfFlying = false; this.isUntouchable = false; this.isCasting = false;
-                    this.activeWarning = null; shakeAmount = 30; this.heal(1800);
+                    this.activeWarning = null; shakeAmount = 30; this.heal(1100);
                     // 修復：改用 target 計算距離並扣血
                     if (Math.hypot(this.target.x - this.x, this.target.y - this.y) <= 150) this.target.takeDamage(500, 29);
                     for(let i=0; i<20; i++) particles.push(new Particle(this.x, this.y, "white", "normal", "💨", 2.0));
@@ -4327,7 +4327,7 @@ if (this.charIdx === 31) {
                     if(diff > Math.PI) diff = 2*Math.PI - diff;
                     if(diff < Math.PI/4) {
                         p.target.takeDamage(69 * p.buffs.atk, 29);
-                        p.cd.s1 = Math.max(0, p.cd.s1 - 1000); p.cd.s2 = Math.max(0, p.cd.s2 - 1000); p.cd.s3 = Math.max(0, p.cd.s3 - 1000);
+                        p.cd.s1 = Math.max(0, p.cd.s1 - 500); p.cd.s2 = Math.max(0, p.cd.s2 - 500); p.cd.s3 = Math.max(0, p.cd.s3 - 1000);
                     }
                 }
             };
@@ -5344,7 +5344,7 @@ if (this.charIdx === 31) {
                 let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2; }, 16);
                 setGameTimeout(() => { 
                     clearInterval(sInt); p.isCasting = false; p.yfNest = { x: p.x, y: p.y, timer: 15000 };
-                    if (Math.hypot(p.target.x - p.x, p.target.y - p.y) <= 120 + p.target.radius) p.target.takeDamage(200, 29);
+                    if (Math.hypot(p.target.x - p.x, p.target.y - p.y) <= 120 + p.target.radius) p.target.takeDamage(50, 29);
                 }, 150);
             }
             return;
@@ -5696,7 +5696,7 @@ if (this.charIdx === 31) {
             p.cd.s2 = 0;
             floatTexts.push(new FloatText(p.x, p.y - 80, "無法使用！", "gray"));
         } else {
-        if(dist(p, enemy) < 60){p.ycanCombo = false; p.target.takeDamage(121); p.cd.s1 = 0; p.cd.s2 = 300; if(p.yCombo <= 7){p.yCombo += 1;} if(p.yProtection <= 99){p.yProtection += 10;}else{p.yProtection = 100;}}
+        if(dist(p, enemy) < 60){p.ycanCombo = false; p.target.takeDamage(101); p.cd.s1 = 0; p.cd.s2 = 300; if(p.yCombo <= 7){p.yCombo += 1;} if(p.yProtection <= 99){p.yProtection += 10;}else{p.yProtection = 100;}}
         let startX = p.x, startY = p.y; 
         let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*400, ty = p.y + Math.sin(aimAngle)*400; 
         let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2;for(let i=0; i<3; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "💦")); };if(dist(p, enemy) < 52 && p.ycanCombo == true){p.ycanCombo = false; if(p.yCombo <= 7){p.yCombo += 1;} p.target.takeDamage(121); if(p.yProtection <= 99){p.yProtection += 10;}else{p.yProtection = 100;} p.cd.s1 = 0; p.cd.s2 = 300;}}, 16); setGameTimeout(() => {clearInterval(sInt); if(p.ycanCombo == false){p.ycanCombo = true;}else{p.ycanCombo = true; if(p.ySuper == false){p.yCombo = 0}}}, 150); 
