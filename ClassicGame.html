@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Security-Policy" content="media-src * data: blob:;">
-    <title>巔峰對決 - 飛墨之藝 </title>
+    <title>巔峰對決 - 狂妄之舞 </title>
     <style>
         :root { --p1-ui: #3498db; --p2-ui: #e74c3c; --font-main: 'Noto Sans TC', sans-serif; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; user-select: none; 
@@ -220,6 +220,7 @@
         { name: "瑞艾斯", hp: 2450, atk: 160, speed: 3.6, color: "#DEDEDE", s1Cd: 5000, s2Cd: 8000, s3Cd: 30000, atkInt: 400 },
         { name: "武爾杳杳", hp: 2550, atk: 110, speed: 3.0, color: "#FCDF6F", s1Cd: 500, s2Cd: 500, s3Cd: 500, atkInt: 950 },
         { name: "麥克大師", hp: 2600, atk: 110, speed: 2.6, color: "#B09B9B", s1Cd: 5000, s2Cd: 15000, s3Cd: 45000, atkInt: 1100 },
+        { name: "布萊奧", hp: 2050, atk: 77, speed: 4.0, color: "#00610D", s1Cd: 8000, s2Cd: 8000, s3Cd: 10000, atkInt: 800 },
         { name: "琬", hp: 2480, atk: 128, speed: 3.25, color: "#FFC9E4", s1Cd: 6000, s2Cd: 6000, s3Cd: 8000, atkInt: 1000 }
         
     ]);
@@ -984,6 +985,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
         });
         [p1, p2].forEach(p => { 
         if(p.candleClone) { ctx.save(); ctx.translate(p.candleClone.x, p.candleClone.y); ctx.font = "40px Arial"; ctx.fillText("🕯️", -20, 20); ctx.restore(); }
+        if(p.flowerClone) { ctx.save(); ctx.translate(p.flowerClone.x, p.flowerClone.y); ctx.font = "60px Arial"; ctx.fillText("🏵️", -20, 20); ctx.restore(); }
         if(p.timerClone) { ctx.save(); ctx.translate(p.timerClone.x, p.timerClone.y); ctx.font = "60px Arial"; ctx.fillText("🕜", -20, 20); ctx.restore(); }
         if(p.bokeClone) { ctx.save(); ctx.translate(p.bokeClone.x, p.bokeClone.y); ctx.font = "40px Arial"; ctx.fillText("👤", -20, 20); ctx.restore(); }
         if(p.sunClone) { ctx.save(); ctx.translate(p.sunClone.x, p.sunClone.y); ctx.font = "40px Arial"; ctx.fillText("🌞", -20, 20); ctx.restore(); } 
@@ -1467,6 +1469,9 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             this.makShowcase = false;
             this.makRa = 50;
             this.makS3State = false;
+            // Bailao (52)
+            this.flowerClone = null;
+            this.bCD = false;
         }
         triggerClovisPassive() {
             if (this.charIdx !== 35 || this.clovisPassiveCd > 0) return;
@@ -3318,6 +3323,19 @@ if (this.charIdx === 31) {
                 floatTexts.push(new FloatText(this.x, this.y-80, "隱身狀態被打斷", "red"));
                }
             }
+            if(this.charIdx === 52){
+                if(dmg >= 0 && this.bCD == false){
+                    this.bCD = true
+                    this.cd.atk += 1000;
+                    setGameTimeout(()=> this.bCD = false, 300)
+
+                if(dmg >= this.hp){
+                  floatTexts.push(new FloatText(this.x, this.y-80, "熱舞狂潮!", "red"));
+                  this.hp = 1;
+                  return { hpDmg: 0, shieldDmg: 0 };
+                }
+                }
+            }
 
             if(this.charIdx === 19){
             if(this.respectState == true){
@@ -3548,6 +3566,14 @@ if (this.charIdx === 31) {
         const joy = p.id === 1 ? p1Touch : p2Touch;
         if(p.cd.atk > 0 || p.isLock || p.hp <= 0 || p.status.losegrip > 0) return; 
     
+    if(p.charIdx === 52){
+        projectiles.push(new Projectile(p.x, p.y, p.angle, 28, "gray", 77, p, "🪩", 1.2, false, (e) => {
+            p.heal(50);
+            p.cd.s3 = 0;    
+            p.flowerClone = { x: p.x, y: p.y, life: 10000}
+        }, 25));
+    }
+
     if(p.charIdx === 51){
         if(p.makCount == 3){
             if(p.makS3State == true){
@@ -4732,6 +4758,14 @@ if (this.charIdx === 31) {
         if(p.charIdx === 6 && p.commanderMode) p.cd.s1 = 4000;
         const joy = p.id === 1 ? p1Touch : p2Touch;
     
+    if(p.charIdx === 52){
+        p.heal(30)
+        p.addShield(30)
+         projectiles.push(new Projectile(p.x, p.y, p.angle, 28, "gray", 122, p, "🎉", 1.5, false, (e) => {    
+             p.applyTaunt(p.target, 800);
+        }, 25));
+    }
+
     if(p.charIdx === 51){
         if(p.makS3State == true){p.cd.s1 = 2000}
         setGameTimeout(() => { projectiles.push(new Projectile(p.x, p.y, p.angle, 55, "gold", 200 * p.buffs.atk, p, "", 300, null, (e)=>{e.buffs.slow = 0.4}, false, false, false, false, true)); }, 50);
@@ -5592,6 +5626,19 @@ if (this.charIdx === 31) {
         const joy = p.id === 1 ? p1Touch : p2Touch;
         if(p.cd.s2 > 0 || p.isLock || p.status.disarmed > 0 || p.hp <= 0) return;
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
+
+    if(p.charIdx === 52){
+         if(p.flowerClone != null){
+            p.heal(30);
+            p.addShield(30);
+            enemy.x = p.flowerClone.x;
+            enemy.y = p.flowerClone.y
+            p.flowerClone = null
+         } else {
+            p.cd.s2 = 0;
+         }
+    } 
+
     if(p.charIdx === 51){
          if(p.makS2 == 1){
             p.makTimer = 5000;
@@ -6528,6 +6575,17 @@ if (p.charIdx === 31) {
         if(p.status.stunned > 0 || p.status.disarmed > 0) return;
         p.cd.s3 = CHAR_DATA[p.charIdx].s3Cd;
     
+    if(p.charIdx === 52){
+        p.cd.s1 -= 1000
+        p.cd.s2 -= 1000
+        p.heal(20)
+        let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1)
+                 aimAngle = Math.atan2(joy.joyY, joy.joyX);p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*250, ty = p.y + Math.sin(aimAngle)*250; let sInt = setGameInterval(() => {p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2; }, 16); setGameTimeout(() => {clearInterval(sInt)}, 150);
+                 shakeAmount = 20;
+                 for(let i=0; i<20; i++) particles.push(new Particle(p.x, p.y, "lime", "normal", "💃", 1.5));
+                 floatTexts.push(new FloatText(p.x, p.y-80, "傲人舞步！", "blue"));
+    }
+
     if(p.charIdx === 51){
        setGameTimeout(()=>{
         p.makRa = 50;
