@@ -160,23 +160,23 @@
     let gameIntervals = [], gameTimeouts = [];
     const CHAR_DATA = Object.freeze([
         // page 1
-        { name: "駭爪", hp: 2300, atk: 95, speed: 3.5, color: "#9b59b6", s1Cd: 6000, s2Cd: 9000, s3Cd: 30000, atkInt: 1000 },
+        { name: "駭爪", hp: 2300, atk: 95, speed: 3.35, color: "#9b59b6", s1Cd: 6000, s2Cd: 11000, s3Cd: 35000, atkInt: 1000 },
         { name: "泰", hp: 3400, atk: 100, speed: 3.0, color: "#e67e22", s1Cd: 9000, s2Cd: 10000, s3Cd: 35000, atkInt: 600 },
         { name: "聖昭者", hp: 3050, atk: 94, speed: 3.1, color: "#f1c40f", s1Cd: 5000, s2Cd: 11000, s3Cd: 28000, atkInt: 900 },
-        { name: "柳銅逸", hp: 3800, atk: 145, speed: 2.5, color: "#c0392b", s1Cd: 7000, s2Cd: 10500, s3Cd: 35000, atkInt: 900 },
+        { name: "柳銅逸", hp: 3700, atk: 145, speed: 2.25, color: "#c0392b", s1Cd: 7000, s2Cd: 10500, s3Cd: 35000, atkInt: 900 },
         { name: "劍客", hp: 2200, atk: 9, speed: 3.68, color: "#00bfff", s1Cd: 5500, s2Cd: 12000, s3Cd: 40000, atkInt: 500 },
         { name: "急鳴", hp: 2650, atk: 66, speed: 4.3, color: "#FFFF00", s1Cd: 6000, s2Cd: 8500, s3Cd: 55000, atkInt: 800 },
         // page 2
         { name: "統帥", hp: 3900, atk: 300, speed: 3.2, color: "#4b0082", s1Cd: 4000, s2Cd: 6000, s3Cd: 40000, atkInt: 800 },
         { name: "麥卡", hp: 4050, atk: 170, speed: 3.1, color: "#ffd700", s1Cd: 8000, s2Cd: 12000, s3Cd: 35000, atkInt: 800 },
-        { name: "噬靂", hp: 2400, atk: 150, speed: 3.5, color: "#8b0000", s1Cd: 7000, s2Cd: 12000, s3Cd: 25000, atkInt: 500 },
-        { name: "博克", hp: 3250, atk: 85, speed: 3.7, color: "#808080", s1Cd: 5000, s2Cd: 10000, s3Cd: 35000, atkInt: 670 },
+        { name: "噬靂", hp: 2400, atk: 150, speed: 3.2, color: "#8b0000", s1Cd: 7000, s2Cd: 12000, s3Cd: 25000, atkInt: 500 },
+        { name: "博克", hp: 3250, atk: 85, speed: 3.5, color: "#808080", s1Cd: 5000, s2Cd: 10000, s3Cd: 35000, atkInt: 670 },
         { name: "悍涵", hp: 3400, atk: 150, speed: 1.8, color: "#ff69b4", s1Cd: 3000, s2Cd: 8000, s3Cd: 40000, atkInt: 2000 },
         { name: "火星", hp: 3300, atk: 78, speed: 3.0, color: "#ff4500", s1Cd: 6000, s2Cd: 10000, s3Cd: 40000, atkInt: 1100 },
         // page 3
         { name: "尼古拉斯", hp: 3100, atk: 150, speed: 3.0, color: "#a0a0a0", s1Cd: 8000, s2Cd: 9000, s3Cd: 30000, atkInt: 1200 },
         { name: "境查", hp: 2850, atk: 130, speed: 3.3, color: "#113388", s1Cd: 7000, s2Cd: 15000, s3Cd: 35000, atkInt: 1300 },
-        { name: "卡爾森", hp: 2550, atk: 20, speed: 3.2, color: "#90EE90", s1Cd: 6500, s2Cd: 7500, s3Cd: 18000, atkInt: 400 },
+        { name: "卡爾森", hp: 2550, atk: 20, speed: 3.7, color: "#90EE90", s1Cd: 6500, s2Cd: 7500, s3Cd: 18000, atkInt: 400 },
         { name: "磐石", hp: 2400, atk: 135, speed: 2.2, color: "#4D4D4D", s1Cd: 5000, s2Cd: 9000, s3Cd: 15000, atkInt: 650 },
         { name: "特維", hp: 3278, atk: 150, speed: 3.0, color: "#025E00", s1Cd: 7000, s2Cd: 6000, s3Cd: 30000, atkInt: 920 },
         { name: "婭", hp: 3600, atk: 90, speed: 3.0, color: "#ffcccc", s1Cd:9000, s2Cd: 16000, s3Cd: 35000, atkInt: 800 },
@@ -210,7 +210,7 @@
         { name: "暗夜獵手", hp: 3000, atk: 1.0, speed: 3.2, color: "#2E2E2E", s1Cd: 5000, s2Cd: 8000, s3Cd: 15000, atkInt: 600 },
         // page 8
         { name: "史萊姆", hp: 2780, atk: 135, speed: 2.5, color: "#32CD32", s1Cd: 2500, s2Cd: 5000, s3Cd: 25000, atkInt: 1500 },
-        { name: "刀俠", hp: 2670, atk: 145, speed: 3.3, color: "#8B0000", s1Cd: 3000, s2Cd: 6500, s3Cd: 33000, atkInt: 800 },
+        { name: "刀俠", hp: 2670, atk: 145, speed: 3.3, color: "#8B0000", s1Cd: 2000, s2Cd: 9500, s3Cd: 39000, atkInt: 800 },
         { name: "凌汐", hp: 1000, atk: 22, speed: 3.4, color: "#27C5F5", s1Cd: 3000, s2Cd: 8000, s3Cd: 35000, atkInt: 300 },
         { name: "鹿冠", hp: 2800, atk: 91, speed: 3.2, color: "#8B4513", s1Cd: 4000, s2Cd: 7800, s3Cd: 25000, atkInt: 600 },
         { name: "戮", hp: 3500, atk: 90, speed: 3.5, color: "#FF2A00", s1Cd: 7000, s2Cd: 8000, s3Cd: 15000, atkInt: 1000 },
