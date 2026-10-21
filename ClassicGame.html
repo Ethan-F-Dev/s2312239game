@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Security-Policy" content="media-src * data: blob:;">
-    <title>巔峰對決 - 飛墨之藝 </title>
+    <title>巔峰對決 - 狂妄之舞 </title>
     <style>
         :root { --p1-ui: #3498db; --p2-ui: #e74c3c; --font-main: 'Noto Sans TC', sans-serif; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; user-select: none; 
@@ -220,7 +220,7 @@
         { name: "瑞艾斯", hp: 2450, atk: 160, speed: 3.6, color: "#DEDEDE", s1Cd: 5000, s2Cd: 8000, s3Cd: 30000, atkInt: 400 },
         { name: "武爾杳杳", hp: 2550, atk: 110, speed: 3.0, color: "#FCDF6F", s1Cd: 500, s2Cd: 500, s3Cd: 500, atkInt: 950 },
         { name: "麥克大師", hp: 2600, atk: 110, speed: 2.6, color: "#B09B9B", s1Cd: 5000, s2Cd: 15000, s3Cd: 45000, atkInt: 1100 },
-        { name: "布萊奧", hp: 2050, atk: 77, speed: 4.0, color: "#00610D", s1Cd: 8000, s2Cd: 8000, s3Cd: 10000, atkInt: 600 },
+        { name: "布萊奧", hp: 2050, atk: 77, speed: 4.0, color: "#00610D", s1Cd: 8000, s2Cd: 8000, s3Cd: 10000, atkInt: 800 },
         { name: "琬", hp: 2480, atk: 128, speed: 3.25, color: "#FFC9E4", s1Cd: 6000, s2Cd: 6000, s3Cd: 8000, atkInt: 1000 }
         
     ]);
@@ -1472,8 +1472,6 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             // Bailao (52)
             this.flowerClone = null;
             this.bCD = false;
-			this.bTaunt = false;
-			this.bCanHit = true;
         }
         triggerClovisPassive() {
             if (this.charIdx !== 35 || this.clovisPassiveCd > 0) return;
@@ -3331,7 +3329,7 @@ if (this.charIdx === 31) {
                     this.cd.atk += 1000;
                     setGameTimeout(()=> this.bCD = false, 300)
 
-                if(dmg >= this.hp && this.target.status.taunt > 0){
+                if(dmg >= this.hp){
                   floatTexts.push(new FloatText(this.x, this.y-80, "熱舞狂潮!", "red"));
                   this.hp = 1;
                   return { hpDmg: 0, shieldDmg: 0 };
@@ -3569,7 +3567,7 @@ if (this.charIdx === 31) {
         if(p.cd.atk > 0 || p.isLock || p.hp <= 0 || p.status.losegrip > 0) return; 
     
     if(p.charIdx === 52){
-        projectiles.push(new Projectile(p.x, p.y, p.angle, 28, "gray", 31, p, "🪩", 1.2, false, (e) => {
+        projectiles.push(new Projectile(p.x, p.y, p.angle, 28, "gray", 77, p, "🪩", 1.2, false, (e) => {
             p.heal(50);
             p.cd.s3 = 0;    
             p.flowerClone = { x: p.x, y: p.y, life: 10000}
@@ -4764,10 +4762,7 @@ if (this.charIdx === 31) {
         p.heal(30)
         p.addShield(30)
          projectiles.push(new Projectile(p.x, p.y, p.angle, 28, "gray", 122, p, "🎉", 1.5, false, (e) => {    
-             p.applyTaunt(p.target, 1000);
-			 p.cd.atk = 0;
-			 p.bTaunt = true;
-			 setGameTimeout(()=> p.bTaunt = false, 1000)
+             p.applyTaunt(p.target, 800);
         }, 25));
     }
 
@@ -5633,7 +5628,7 @@ if (this.charIdx === 31) {
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
 
     if(p.charIdx === 52){
-         if(p.flowerClone != null && p.bTaunt == true){
+         if(p.flowerClone != null){
             p.heal(30);
             p.addShield(30);
             enemy.x = p.flowerClone.x;
@@ -5641,7 +5636,7 @@ if (this.charIdx === 31) {
             p.flowerClone = null
          } else {
             p.cd.s2 = 0;
-		 }
+         }
     } 
 
     if(p.charIdx === 51){
@@ -6584,9 +6579,8 @@ if (p.charIdx === 31) {
         p.cd.s1 -= 1000
         p.cd.s2 -= 1000
         p.heal(20)
-        if(dist(p, p.target) < 45){if(p.bCanHit == true && p.bTaunt == true){p.target.takeDamage(223); p.bCanHit = false;}}
         let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1)
-                 aimAngle = Math.atan2(joy.joyY, joy.joyX);p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*250, ty = p.y + Math.sin(aimAngle)*250; let sInt = setGameInterval(() => {if(dist(p, p.target) < 45){if(p.bCanHit == true && p.bTaunt == true){p.target.takeDamage(223); p.bCanHit = false}} ;p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2; }, 16); setGameTimeout(() => {clearInterval(sInt); p.bCanHit = true;}, 150);
+                 aimAngle = Math.atan2(joy.joyY, joy.joyX);p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*250, ty = p.y + Math.sin(aimAngle)*250; let sInt = setGameInterval(() => {p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2; }, 16); setGameTimeout(() => {clearInterval(sInt)}, 150);
                  shakeAmount = 20;
                  for(let i=0; i<20; i++) particles.push(new Particle(p.x, p.y, "lime", "normal", "💃", 1.5));
                  floatTexts.push(new FloatText(p.x, p.y-80, "傲人舞步！", "blue"));
