@@ -427,7 +427,7 @@
                 p1PlayProgress = 1
                 p2PlayProgress = 1
                 setGameTimeout(() => { 
-                    document.getElementById('winner-text').innerText = (p1.hp > 0 ? "玩家 1" : "玩家 2") + " 獲勝！"; 
+                    document.getElementById('winner-text').innerText = (p1.hp > 0 ? "玩家 1" : "玩家 2") + " 吃雞巴！"; 
                     document.getElementById('game-over').style.display = 'flex'; 
                 }, 2000);
             }else{
@@ -1472,6 +1472,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             // Bailao (52)
             this.flowerClone = null;
             this.bCD = false;
+			this.bTaunt = false;
         }
         triggerClovisPassive() {
             if (this.charIdx !== 35 || this.clovisPassiveCd > 0) return;
@@ -4764,6 +4765,8 @@ if (this.charIdx === 31) {
          projectiles.push(new Projectile(p.x, p.y, p.angle, 28, "gray", 122, p, "🎉", 1.5, false, (e) => {    
              p.applyTaunt(p.target, 1000);
 			 p.cd.atk = 0;
+			 p.bTaunt = true:
+			 setGameTimeout(()=> p.bTaunt = false, 1000)
         }, 25));
     }
 
@@ -5629,7 +5632,7 @@ if (this.charIdx === 31) {
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
 
     if(p.charIdx === 52){
-         if(p.flowerClone != null && p.target.status.taunt > 0){
+         if(p.flowerClone != null && p.bTaunt > 0){
             p.heal(30);
             p.addShield(30);
             enemy.x = p.flowerClone.x;
