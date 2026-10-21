@@ -4762,7 +4762,8 @@ if (this.charIdx === 31) {
         p.heal(30)
         p.addShield(30)
          projectiles.push(new Projectile(p.x, p.y, p.angle, 28, "gray", 122, p, "🎉", 1.5, false, (e) => {    
-             p.applyTaunt(p.target, 1500);
+             p.applyTaunt(p.target, 1000);
+			 p.cd.atk = 0;
         }, 25));
     }
 
@@ -5628,8 +5629,7 @@ if (this.charIdx === 31) {
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
 
     if(p.charIdx === 52){
-		if(enemy.status.taunt > 0){
-         if(p.flowerClone != null){
+         if(p.flowerClone != null && p.target.status.taunt > 0){
             p.heal(30);
             p.addShield(30);
             enemy.x = p.flowerClone.x;
@@ -5637,10 +5637,7 @@ if (this.charIdx === 31) {
             p.flowerClone = null
          } else {
             p.cd.s2 = 0;
-         }
-		} else {
-			p.heal(124)
-		}
+		 }
     } 
 
     if(p.charIdx === 51){
