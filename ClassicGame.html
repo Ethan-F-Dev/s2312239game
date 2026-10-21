@@ -3567,7 +3567,7 @@ if (this.charIdx === 31) {
         if(p.cd.atk > 0 || p.isLock || p.hp <= 0 || p.status.losegrip > 0) return; 
     
     if(p.charIdx === 52){
-        projectiles.push(new Projectile(p.x, p.y, p.angle, 28, "gray", 77, p, "🪩", 1.2, false, (e) => {
+        projectiles.push(new Projectile(p.x, p.y, p.angle, 28, "gray", 31, p, "🪩", 1.2, false, (e) => {
             p.heal(50);
             p.cd.s3 = 0;    
             p.flowerClone = { x: p.x, y: p.y, life: 10000}
@@ -4762,7 +4762,7 @@ if (this.charIdx === 31) {
         p.heal(30)
         p.addShield(30)
          projectiles.push(new Projectile(p.x, p.y, p.angle, 28, "gray", 122, p, "🎉", 1.5, false, (e) => {    
-             p.applyTaunt(p.target, 800);
+             p.applyTaunt(p.target, 1500);
         }, 25));
     }
 
