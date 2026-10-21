@@ -4765,7 +4765,7 @@ if (this.charIdx === 31) {
          projectiles.push(new Projectile(p.x, p.y, p.angle, 28, "gray", 122, p, "🎉", 1.5, false, (e) => {    
              p.applyTaunt(p.target, 1000);
 			 p.cd.atk = 0;
-			 p.bTaunt = true:
+			 p.bTaunt = true;
 			 setGameTimeout(()=> p.bTaunt = false, 1000)
         }, 25));
     }
@@ -5632,7 +5632,7 @@ if (this.charIdx === 31) {
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
 
     if(p.charIdx === 52){
-         if(p.flowerClone != null){
+         if(p.flowerClone != null && p.bTaunt == true){
             p.heal(30);
             p.addShield(30);
             enemy.x = p.flowerClone.x;
