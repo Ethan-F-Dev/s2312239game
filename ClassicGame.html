@@ -160,28 +160,28 @@
     let gameIntervals = [], gameTimeouts = [];
     const CHAR_DATA = Object.freeze([
         // page 1
-        { name: "駭爪", hp: 2300, atk: 95, speed: 3.5, color: "#9b59b6", s1Cd: 6000, s2Cd: 9000, s3Cd: 30000, atkInt: 1000 },
+        { name: "駭爪", hp: 2300, atk: 95, speed: 3.35, color: "#9b59b6", s1Cd: 6000, s2Cd: 11000, s3Cd: 55000, atkInt: 1000 },
         { name: "泰", hp: 3400, atk: 100, speed: 3.0, color: "#e67e22", s1Cd: 9000, s2Cd: 10000, s3Cd: 35000, atkInt: 600 },
         { name: "聖昭者", hp: 3050, atk: 94, speed: 3.1, color: "#f1c40f", s1Cd: 5000, s2Cd: 11000, s3Cd: 28000, atkInt: 900 },
-        { name: "柳銅逸", hp: 3800, atk: 145, speed: 2.5, color: "#c0392b", s1Cd: 7000, s2Cd: 10500, s3Cd: 35000, atkInt: 900 },
+        { name: "柳銅逸", hp: 3700, atk: 145, speed: 2.25, color: "#c0392b", s1Cd: 7000, s2Cd: 10500, s3Cd: 35000, atkInt: 900 },
         { name: "劍客", hp: 2200, atk: 9, speed: 3.68, color: "#00bfff", s1Cd: 5500, s2Cd: 12000, s3Cd: 40000, atkInt: 500 },
         { name: "急鳴", hp: 2650, atk: 66, speed: 4.3, color: "#FFFF00", s1Cd: 6000, s2Cd: 8500, s3Cd: 55000, atkInt: 800 },
         // page 2
         { name: "統帥", hp: 3900, atk: 300, speed: 3.2, color: "#4b0082", s1Cd: 4000, s2Cd: 6000, s3Cd: 40000, atkInt: 800 },
         { name: "麥卡", hp: 4050, atk: 170, speed: 3.1, color: "#ffd700", s1Cd: 8000, s2Cd: 12000, s3Cd: 35000, atkInt: 800 },
-        { name: "噬靂", hp: 2400, atk: 150, speed: 3.5, color: "#8b0000", s1Cd: 7000, s2Cd: 12000, s3Cd: 25000, atkInt: 500 },
-        { name: "博克", hp: 3250, atk: 85, speed: 3.7, color: "#808080", s1Cd: 5000, s2Cd: 10000, s3Cd: 35000, atkInt: 670 },
+        { name: "噬靂", hp: 2400, atk: 150, speed: 3.0, color: "#8b0000", s1Cd: 7000, s2Cd: 12000, s3Cd: 25000, atkInt: 500 },
+        { name: "博克", hp: 3250, atk: 85, speed: 3.5, color: "#808080", s1Cd: 5000, s2Cd: 10000, s3Cd: 35000, atkInt: 670 },
         { name: "悍涵", hp: 3400, atk: 150, speed: 1.8, color: "#ff69b4", s1Cd: 3000, s2Cd: 8000, s3Cd: 40000, atkInt: 2000 },
         { name: "火星", hp: 3300, atk: 78, speed: 3.0, color: "#ff4500", s1Cd: 6000, s2Cd: 10000, s3Cd: 40000, atkInt: 1100 },
         // page 3
-        { name: "尼古拉斯", hp: 3100, atk: 150, speed: 3.0, color: "#a0a0a0", s1Cd: 8000, s2Cd: 9000, s3Cd: 30000, atkInt: 1200 },
-        { name: "境查", hp: 2850, atk: 130, speed: 3.3, color: "#113388", s1Cd: 7000, s2Cd: 15000, s3Cd: 35000, atkInt: 1300 },
-        { name: "卡爾森", hp: 2550, atk: 20, speed: 3.2, color: "#90EE90", s1Cd: 6500, s2Cd: 7500, s3Cd: 18000, atkInt: 400 },
-        { name: "磐石", hp: 2400, atk: 135, speed: 2.2, color: "#4D4D4D", s1Cd: 5000, s2Cd: 9000, s3Cd: 15000, atkInt: 650 },
+        { name: "尼古拉斯", hp: 3100, atk: 150, speed: 2.2, color: "#a0a0a0", s1Cd: 8000, s2Cd: 9000, s3Cd: 30000, atkInt: 1200 },
+        { name: "境查", hp: 2550, atk: 130, speed: 3.1, color: "#113388", s1Cd: 7000, s2Cd: 15000, s3Cd: 35000, atkInt: 1300 },
+        { name: "卡爾森", hp: 2550, atk: 20, speed: 3.7, color: "#90EE90", s1Cd: 6500, s2Cd: 7500, s3Cd: 18000, atkInt: 400 },
+        { name: "磐石", hp: 2400, atk: 135, speed: 2.0, color: "#4D4D4D", s1Cd: 5000, s2Cd: 9000, s3Cd: 15000, atkInt: 650 },
         { name: "特維", hp: 3278, atk: 150, speed: 3.0, color: "#025E00", s1Cd: 7000, s2Cd: 6000, s3Cd: 30000, atkInt: 920 },
         { name: "婭", hp: 3600, atk: 90, speed: 3.0, color: "#ffcccc", s1Cd:9000, s2Cd: 16000, s3Cd: 35000, atkInt: 800 },
         // page 4
-        { name: "寒朔", hp: 2600, atk: 150, speed: 3.5, color: "#e6e6e6", s1Cd: 10000, s2Cd: 12000, s3Cd: 30000, atkInt: 800 },
+        { name: "寒朔", hp: 2600, atk: 150, speed: 3.5, color: "#e6e6e6", s1Cd: 10000, s2Cd: 12000, s3Cd: 50000, atkInt: 800 },
         { name: "離奧", hp: 3500, atk: 199, speed: 2.5, color: "#613D00", s1Cd: 10000, s2Cd: 15000, s3Cd: 35000, atkInt: 1000 },
         { name: "杰牢", hp: 4200, atk: 160, speed: 3.7, color: "#2750F5", s1Cd: 6500, s2Cd: 7500, s3Cd: 25000, atkInt: 1400 },
         { name: "帝衛祢", hp: 2600, atk: 100, speed: 3.6, color: "#000080", s1Cd: 6000, s2Cd: 12500, s3Cd: 25000, atkInt: 400 },
@@ -189,10 +189,10 @@
         { name: "宇", hp: 3300, atk: 550, speed: 3.5, color: "#708BFF", s1Cd: 6000, s2Cd: 12000, s3Cd: 35000, atkInt: 1500 },
         // page 5
         { name: "仁見狼", hp: 2100, atk: 50, speed: 3.1, color: "#941C04", s1Cd: 6000, s2Cd: 8000, s3Cd: 50000, atkInt: 860 },
-        { name: "靜神", hp: 2700, atk: 100, speed: 3.1, color: "#8A2BE2", s1Cd: 7000, s2Cd: 8000, s3Cd: 45000, atkInt: 750 },
+        { name: "靜神", hp: 2700, atk: 100, speed: 3.0, color: "#8A2BE2", s1Cd: 7000, s2Cd: 8000, s3Cd: 45000, atkInt: 750 },
         { name: "玉杉", hp: 3200, atk: 140, speed: 3.2, color: "#228B22", s1Cd: 7000, s2Cd: 14000, s3Cd: 35000, atkInt: 1000 },
-        { name: "康絲特斯", hp: 2800, atk: 165, speed: 3.2, color: "#FF69B4", s1Cd: 6500, s2Cd: 10000, s3Cd: 35000, atkInt: 500 },
-        { name: "玟亢", hp: 3450, atk: 190, speed: 3.0, color: "#D4AF37", s1Cd: 5000, s2Cd: 10000, s3Cd: 20000, atkInt: 1000 },
+        { name: "康絲特斯", hp: 2400, atk: 165, speed: 3.0, color: "#FF69B4", s1Cd: 7500, s2Cd: 12000, s3Cd: 35000, atkInt: 500 },
+        { name: "玟亢", hp: 3450, atk: 190, speed: 3.0, color: "#D4AF37", s1Cd: 5000, s2Cd: 10000, s3Cd: 20000, atkInt: 1100 },
         { name: "翼峰", hp: 2300, atk: 69, speed: 3.6, color: "#D3D3D3", s1Cd: 8000, s2Cd: 16000, s3Cd: 27000, atkInt: 600 },
         // page 6
         { name: "鎖鏈", hp: 3650, atk: 150, speed: 3.0, color: "#808080", s1Cd: 3500, s2Cd: 10000, s3Cd: 30000, atkInt: 1000 },
@@ -210,13 +210,13 @@
         { name: "暗夜獵手", hp: 3000, atk: 1.0, speed: 3.2, color: "#2E2E2E", s1Cd: 5000, s2Cd: 8000, s3Cd: 15000, atkInt: 600 },
         // page 8
         { name: "史萊姆", hp: 2780, atk: 135, speed: 2.5, color: "#32CD32", s1Cd: 2500, s2Cd: 5000, s3Cd: 25000, atkInt: 1500 },
-        { name: "刀俠", hp: 2670, atk: 145, speed: 3.3, color: "#8B0000", s1Cd: 3000, s2Cd: 6500, s3Cd: 33000, atkInt: 800 },
+        { name: "刀俠", hp: 2670, atk: 145, speed: 3.3, color: "#8B0000", s1Cd: 2000, s2Cd: 9500, s3Cd: 45000, atkInt: 800 },
         { name: "凌汐", hp: 1000, atk: 22, speed: 3.4, color: "#27C5F5", s1Cd: 3000, s2Cd: 8000, s3Cd: 35000, atkInt: 300 },
         { name: "鹿冠", hp: 2800, atk: 91, speed: 3.2, color: "#8B4513", s1Cd: 4000, s2Cd: 7800, s3Cd: 25000, atkInt: 600 },
         { name: "戮", hp: 3500, atk: 90, speed: 3.5, color: "#FF2A00", s1Cd: 7000, s2Cd: 8000, s3Cd: 15000, atkInt: 1000 },
-        { name: "韵淇", hp: 2600, atk: 80, speed: 3.7, color: "#E48FFF", s1Cd: 4000, s2Cd: 6000, s3Cd: 35000, atkInt: 800 },
+        { name: "韵淇", hp: 2100, atk: 80, speed: 3.2, color: "#E48FFF", s1Cd: 5000, s2Cd: 7000, s3Cd: 40000, atkInt: 800 },
         // page 9
-        { name: "茵", hp: 3100, atk: 20, speed: 3.4, color: "#E37332", s1Cd: 6000, s2Cd: 12000, s3Cd: 40000, atkInt: 100 },
+        { name: "茵", hp: 3100, atk: 20, speed: 3.4, color: "#E37332", s1Cd: 5000, s2Cd: 12000, s3Cd: 33000, atkInt: 100 },
         { name: "瑞艾斯", hp: 2450, atk: 160, speed: 3.6, color: "#DEDEDE", s1Cd: 5000, s2Cd: 8000, s3Cd: 30000, atkInt: 400 },
         { name: "武爾杳杳", hp: 2550, atk: 110, speed: 3.0, color: "#FCDF6F", s1Cd: 500, s2Cd: 500, s3Cd: 500, atkInt: 950 },
         { name: "麥克大師", hp: 2600, atk: 110, speed: 2.6, color: "#B09B9B", s1Cd: 5000, s2Cd: 15000, s3Cd: 45000, atkInt: 1100 },
@@ -427,7 +427,7 @@
                 p1PlayProgress = 1
                 p2PlayProgress = 1
                 setGameTimeout(() => { 
-                    document.getElementById('winner-text').innerText = (p1.hp > 0 ? "玩家 1" : "玩家 2") + " 獲勝！"; 
+                    document.getElementById('winner-text').innerText = (p1.hp > 0 ? "玩家 1" : "玩家 2") + "獲勝！"; 
                     document.getElementById('game-over').style.display = 'flex'; 
                 }, 2000);
             }else{
@@ -2511,7 +2511,7 @@ if (this.charIdx === 31) {
                     if (this.hp >= this.maxHp / 2) {
                         this.consRegenActive = false;
                     } else {
-                        this.heal(100 * (dt / 1000));
+                        this.heal(80 * (dt / 1000));
                     }
                 }
                 if (this.hp < 1500 && this.hp > 0) {
@@ -2962,9 +2962,9 @@ if (this.charIdx === 31) {
                    if(this.candleClone.life <= 0) { this.candleClone = null; }  
                    else if(dist(this, this.candleClone) < 50) {
                         this.yinFuel += 15;
-                        this.heal(170);
-                        this.speed *= 1.4;
-                        setGameTimeout(()=> this.speed = this.speed/1.4, 2000)
+                        this.heal(200);
+                        this.speed *= 1.5;
+                        setGameTimeout(()=> this.speed = this.speed/1.5, 2000)
                         this.candleClone = null;
                         floatTexts.push(new FloatText(this.x, this.y, "蠟燭已被拾取！", "gray"));
                     }
@@ -3637,12 +3637,12 @@ if (this.charIdx === 31) {
     if(p.charIdx === 48){
         if(p.yinFuel >= 5){
         let i = 0;
-        p.buffs.speed += 0.3
+        p.buffs.speed += 0.35
         p.yinFuel -= (5 / p.yinCost);
         if(p.target.status.dusted >= 1){
-            let syf = setGameInterval(()=> {if(i<2){i++; projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gray", (15 * p.buffs.atk) * 1.5, p, "🔥", 1.0, 200 + p.yinLength, null, 20, false, false, false, false));} else {clearInterval(syf); i=0}},200)
+            let syf = setGameInterval(()=> {if(i<2){i++; projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gray", (10 * p.buffs.atk) * 1.5, p, "🔥", 1.0, 200 + p.yinLength, null, 20, false, false, false, false));} else {clearInterval(syf); i=0}},200)
         } else {
-            let yf = setGameInterval(()=> {if(i<2){i++; projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gray", 15 * p.buffs.atk, p, "🔥", 1.0, 200 + p.yinLength, null, 20, false, false, false, false));} else {clearInterval(yf); i=0}},200)}
+            let yf = setGameInterval(()=> {if(i<2){i++; projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "gray", 10 * p.buffs.atk, p, "🔥", 1.0, 200 + p.yinLength, null, 20, false, false, false, false));} else {clearInterval(yf); i=0}},200)}
         }
     }
 
@@ -3792,9 +3792,9 @@ if (this.charIdx === 31) {
 
     if(p.charIdx === 44){
         projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 0, p, "💧", 0.85, 600, (e) => {
-                        let dmg = 41
+                        let dmg = 21
                         p.yProtection += 1
-                        e.takeDamage(dmg, 41);
+                        e.takeDamage(dmg, 21);
                         if(p.ySuper){
                           p.cd.atk = 10;
                         }
@@ -4814,7 +4814,7 @@ if (this.charIdx === 31) {
 
     if(p.charIdx === 48){
         p.activeWarning = { type:'rect', l: 250, h: 60}; 
-        setGameTimeout(() => { if(dist(p, enemy) < 250) { let startX = enemy.x, startY = enemy.y; for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "💥")); }; enemy.applyStatus("stunned", 1000); enemy.takeDamage(200 + (p.yinFuel * 1.1), 1);shakeAmount=5;} p.activeWarning = null; }, 100); 
+        setGameTimeout(() => { if(dist(p, enemy) < 350) { let startX = enemy.x, startY = enemy.y; for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "💥")); }; enemy.applyStatus("stunned", 1000); enemy.takeDamage(200 + (p.yinFuel * 1.1), 1);shakeAmount=5;} p.activeWarning = null; }, 100); 
     }
 
     if(p.charIdx === 47){
@@ -5743,10 +5743,10 @@ if (this.charIdx === 31) {
             p.cd.s2 = 0;
             floatTexts.push(new FloatText(p.x, p.y - 80, "無法使用！", "gray"));
         } else {
-        if(dist(p, enemy) < 60){p.ycanCombo = false; p.target.takeDamage(101); p.cd.s1 = 0; p.cd.s2 = 300; if(p.yCombo <= 7){p.yCombo += 1;} if(p.yProtection <= 99){p.yProtection += 10;}else{p.yProtection = 100;}}
+        if(dist(p, enemy) < 60){p.ycanCombo = false; p.target.takeDamage(91); p.cd.s1 = 0; p.cd.s2 = 300; if(p.yCombo <= 7){p.yCombo += 1;} if(p.yProtection <= 99){p.yProtection += 10;}else{p.yProtection = 100;}}
         let startX = p.x, startY = p.y; 
         let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*400, ty = p.y + Math.sin(aimAngle)*400; 
-        let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2;for(let i=0; i<3; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "💦")); };if(dist(p, enemy) < 52 && p.ycanCombo == true){p.ycanCombo = false; if(p.yCombo <= 7){p.yCombo += 1;} p.target.takeDamage(121); if(p.yProtection <= 99){p.yProtection += 10;}else{p.yProtection = 100;} p.cd.s1 = 0; p.cd.s2 = 300;}}, 16); setGameTimeout(() => {clearInterval(sInt); if(p.ycanCombo == false){p.ycanCombo = true;}else{p.ycanCombo = true; if(p.ySuper == false){p.yCombo = 0}}}, 150); 
+        let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2;for(let i=0; i<3; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "💦")); };if(dist(p, enemy) < 52 && p.ycanCombo == true){p.ycanCombo = false; if(p.yCombo <= 7){p.yCombo += 1;} p.target.takeDamage(91); if(p.yProtection <= 99){p.yProtection += 10;}else{p.yProtection = 100;} p.cd.s1 = 0; p.cd.s2 = 300;}}, 16); setGameTimeout(() => {clearInterval(sInt); if(p.ycanCombo == false){p.ycanCombo = true;}else{p.ycanCombo = true; if(p.ySuper == false){p.yCombo = 0}}}, 150); 
        }
     }
 
@@ -6488,7 +6488,7 @@ if (p.charIdx === 31) {
         else if(p.charIdx === 19){if(p.leoUlt == false){floatTexts.push(new FloatText(p.x, p.y-100, "吵夠未啊？！", "white"));p.respectState = true; setGameTimeout(()=> p.respectState = false, 3000);}else if(p.leoUlt == true){p.leoUlt = false;floatTexts.push(new FloatText(p.x, p.y-100, "大技能强制取消", "white"));p.cd.s2 = 0;}}
         else if(p.charIdx === 18) {if(p.autoaim == false){p.addShield(150); p.autoaim = true; floatTexts.push(new FloatText(p.x, p.y-100, "自動瞄準已準備！", "white")); setGameTimeout(() => p.autoaim = false, 3500)} else{p.cd.s2 = 0;}}
         else if(p.charIdx === 4) { p.activeWarning = { type:'sector', r: 171, ap: Math.PI*1.2, color: 'rgba(0,191,255,0.2)' }; let dmg = 25; let cr = p.calculateCrit(dmg); if(p.critStacks < 2) { p.critStacks++; floatTexts.push(new FloatText(p.x, p.y - 80, "+🗡️", "cyan")); } setGameTimeout(() => { if(dist(p, p.target) < 171) { p.target.takeDamage(cr.damage, 4, cr.isCrit); p.addShield(100); p.heal(150); p.target.applyStatus('stunned', 50); p.target.buffs.slow = 0.1; setGameTimeout(() => p.target.buffs.slow = 1.0, 1200); for(let i=0; i<10; i++) particles.push(new Particle(p.target.x, p.target.y, "cyan", "normal", "🩵", 1.0, 1.0)); p.cd.s1 = 0; p.addCombo(); } p.activeWarning = null; }, 50); }
-        else if(p.charIdx === 0) { if(dist(p, p.target) > 250) { p.cd.s2 = 0; floatTexts.push(new FloatText(p.x, p.y-80, "No Target!", "gray")); return; } p.isCasting = true; p.isUntouchable = true; p.target.applyStatus('stunned', 1000); let angleTo = Math.atan2(p.target.y - p.y, p.target.x - p.x); p.x = p.target.x - 60 * Math.cos(angleTo); p.y = p.target.y - 60 * Math.sin(angleTo); shakeAmount = 15; let count = 0; let si = setGameInterval(() => { count++; if(p.hp > 0 && p.target.hp > 0) { let act = p.target.takeDamage(110, 0); let healAmt = (act.hpDmg + act.shieldDmg) * 0.7; p.heal(healAmt); floatTexts.push(new FloatText(p.x, p.y-80, `+${Math.round(healAmt)} HP`, "magenta")); particles.push(new Particle(p.target.x, p.target.y, "magenta", "normal", "⚔️", 1.2)); } if(count >= 3) { clearInterval(si); p.isCasting = false; p.isUntouchable = false; } }, 200); }
+        else if(p.charIdx === 0) { if(dist(p, p.target) > 250) { p.cd.s2 = 0; floatTexts.push(new FloatText(p.x, p.y-80, "No Target!", "gray")); return; } p.isCasting = true; p.target.applyStatus('stunned', 1000); let angleTo = Math.atan2(p.target.y - p.y, p.target.x - p.x); p.x = p.target.x - 60 * Math.cos(angleTo); p.y = p.target.y - 60 * Math.sin(angleTo); shakeAmount = 15; let count = 0; let si = setGameInterval(() => { count++; if(p.hp > 0 && p.target.hp > 0) { let act = p.target.takeDamage(110, 0); let healAmt = (act.hpDmg + act.shieldDmg) * 0.7; p.heal(healAmt); floatTexts.push(new FloatText(p.x, p.y-80, `+${Math.round(healAmt)} HP`, "magenta")); particles.push(new Particle(p.target.x, p.target.y, "magenta", "normal", "⚔️", 1.2)); } if(count >= 3) { clearInterval(si); p.isCasting = false; p.isUntouchable = false; } }, 200); }
         else if(p.charIdx === 14) { let aimAngle = p.angle; if(Math.abs(joy.joyX)>0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); let startX = p.x, startY = p.y; p.x += Math.cos(aimAngle)*200; p.y += Math.sin(aimAngle)*200; for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "🍃")); } if(dist(p.target, {x:(startX+p.x)/2, y:(startY+p.y)/2}) < 100); shakeAmount = 0;setGameTimeout(() => { if(dist(p, enemy) < 175) {enemy.takeDamage(99 * p.buffs.atk, 1); p.heal(12 * p.healBuff);p.target.buffs.disarmed = 5000; p.target.applyStatus('disarmed', 200)} p.activeWarning = null;}, 0); if (p.luckStacks < 6){p.luckStacks += 1;}p.forestAtk = true; p.update(14);}
         else if(p.charIdx === 2) { // Saint S2 Fix
              p.isCasting = true; p.isVisible = false; p.isUntouchable = true; p.isSaintInvisible = true;
@@ -6643,9 +6643,9 @@ if (p.charIdx === 31) {
     if(p.charIdx === 48){
        let startX = p.x, startY = p.y; for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "⛽️")); };
        floatTexts.push(new FloatText(p.x, p.y - 80, "後備能源啓動！", "orange"));
-       p.yinFuel = 100;
+       p.yinFuel = 70;
        p.heal(500);
-       p.buffs.atk *= 1.8;
+       p.buffs.atk *= 1.45;
        p.yinLength = 150;
        p.yinCost = 2;
        setGameTimeout(()=> {
@@ -6704,10 +6704,10 @@ if (p.charIdx === 31) {
             p.cd.s3 = 0;
             floatTexts.push(new FloatText(p.x, p.y - 80, "無法使用！", "gray"));
         } else {
-        if(dist(p, enemy) < 65){p.jCanCombo = false; p.target.takeDamage(250); if(enemy.status.high >= 1){ p.cd.s3 = 100}; p.heal(60);}
+        if(dist(p, enemy) < 65){p.jCanCombo = false; p.target.takeDamage(225); if(enemy.status.high >= 1){ p.cd.s3 = 100}; p.heal(60);}
         let startX = p.x, startY = p.y; 
         let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*400, ty = p.y + Math.sin(aimAngle)*400; 
-        let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2;for(let i=0; i<3; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "⬜️")); };if(dist(p, enemy) < 65 && p.jcanCombo == true){p.jcanCombo = false;p.target.takeDamage(350); if(enemy.status.high >= 1){p.cd.s3 = 100; enemy.applyStatus("high", 0);}}}, 16); setGameTimeout(() => {clearInterval(sInt); if(p.jcanCombo == false){p.jcanCombo = true;}else{p.jcanCombo = true;}}, 150); 
+        let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2;for(let i=0; i<3; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "⬜️")); };if(dist(p, enemy) < 65 && p.jcanCombo == true){p.jcanCombo = false;p.target.takeDamage(225); if(enemy.status.high >= 1){p.cd.s3 = 100; enemy.applyStatus("high", 0);}}}, 16); setGameTimeout(() => {clearInterval(sInt); if(p.jcanCombo == false){p.jcanCombo = true;}else{p.jcanCombo = true;}}, 150); 
        }
        
     }
