@@ -427,7 +427,7 @@
                 p1PlayProgress = 1
                 p2PlayProgress = 1
                 setGameTimeout(() => { 
-                    document.getElementById('winner-text').innerText = (p1.hp > 0 ? "玩家 1" : "玩家 2") + " 吃雞巴！"; 
+                    document.getElementById('winner-text').innerText = (p1.hp > 0 ? "玩家 1" : "玩家 2") + "獲勝！"; 
                     document.getElementById('game-over').style.display = 'flex'; 
                 }, 2000);
             }else{
