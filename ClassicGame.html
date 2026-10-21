@@ -3329,7 +3329,7 @@ if (this.charIdx === 31) {
                     this.cd.atk += 1000;
                     setGameTimeout(()=> this.bCD = false, 300)
 
-                if(dmg >= this.hp){
+                if(dmg >= this.hp && this.target.status.taunt > 0){
                   floatTexts.push(new FloatText(this.x, this.y-80, "熱舞狂潮!", "red"));
                   this.hp = 1;
                   return { hpDmg: 0, shieldDmg: 0 };
