@@ -1,4 +1,4 @@
-const GITHUB_BASE_URL = "https://raw.githubusercontent.com/s2312239-sketch/s2312239game/main/";
+const GITHUB_BASE_URL = "https://raw.githubusercontent.com/s2312239-sketch/s2312239game/2.0/";
 
 /**
  * Helper function to fetch raw file contents from GitHub
