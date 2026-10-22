@@ -1,0 +1,25 @@
+{
+  "repository": {
+    "owner": "Ethan-F-Dev",
+    "repo": "Ys2312239game",
+    "branch": "2.0"
+  },
+  "index_path": "github_index.json",
+  "files": [
+    {
+      "id": "index_html",
+      "path": "src/index.html",
+      "type": "html"
+    },
+    {
+      "id": "styles_css",
+      "path": "src/styles.css",
+      "type": "css"
+    },
+    {
+      "id": "app_js",
+      "path": "src/app.js",
+      "type": "js"
+    }
+  ]
+}
