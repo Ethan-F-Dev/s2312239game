@@ -2,9 +2,9 @@
  * Configuration & Constants
  */
 const CONFIG = {
-  GITHUB_OWNER: 'YOUR_GITHUB_USERNAME',
-  GITHUB_REPO: 'YOUR_REPOSITORY_NAME',
-  GITHUB_BRANCH: 'main',
+  GITHUB_OWNER: 'Ethan-F-Dev',
+  GITHUB_REPO: 's2312239game',
+  GITHUB_BRANCH: '2.0',
   INDEX_FILE_PATH: 'github_index.json',
   CACHE_EXPIRATION_SEC: 21600, // 6 hours (Max allowed by CacheService)
   USE_CACHE: true
