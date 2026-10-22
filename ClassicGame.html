@@ -3979,7 +3979,7 @@ if (this.charIdx === 31) {
                 // 強化普攻 (大範圍、極速、真傷、暈眩)
                 p.zzS2EnhancedAtk = false;
                 projectiles.push(new Projectile(p.x, p.y, aimAngle, 35, "cyan", 0, p, "▬", 3.0, 900, (e) => {
-                    let dmg = 150* 1.5 * p.buffs.atk; // 強化給予倍率真傷
+                    let dmg = 180* 1.5 * p.buffs.atk; // 強化給予倍率真傷
                     e.hp -= dmg;
                     if(e.hp <= 0) { e.hp = 1; e.takeDamage(9999, 40); }
                     else { floatTexts.push(new FloatText(e.x, e.y - 40, `-${Math.round(dmg)}`, "white")); }
@@ -6898,7 +6898,7 @@ if (p.charIdx === 31) {
                         shots++;
                         let ballAng = Math.atan2(e.y - p.y, e.x - p.x) + (Math.random() - 0.5);
                         let proj = new Projectile(p.x, p.y, ballAng, 12, "cyan", 0, p, "🔹", 1.5, 1500, (hitE) => {
-                            if(p.target.charIdx == 44){e.takeDamage(250)}else{hitE.hp -= 250;}
+                            if(p.target.charIdx == 44){e.takeDamage(200)}else{hitE.hp -= 200;}
                             if(hitE.hp <= 0) { hitE.hp = 1; hitE.takeDamage(9999, 40); }
                             else { if(p.target.charIdx === 44){}else{floatTexts.push(new FloatText(hitE.x, hitE.y - 40, "-250", "white")); }}
                             shakeAmount = 10;
