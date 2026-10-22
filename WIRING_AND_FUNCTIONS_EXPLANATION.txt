@@ -1,0 +1,88 @@
+===============================================================================
+               GOOGLE APPS SCRIPT <-> GITHUB AUTO-UPDATE ARCHITECTURE
+===============================================================================
+
+1. OVERVIEW & WORKFLOW
+-------------------------------------------------------------------------------
+This setup connects a Google Apps Script project (code.gs) to a GitHub repository 
+so that web app source files (HTML, CSS, JS, templates) can be edited in GitHub 
+and automatically fetched/served by Google Apps Script without manual copy-pasting.
+
+The execution flow:
+  1. User accesses GAS Web App URL -> `doGet(e)` is called.
+  2. `doGet(e)` invokes `syncGithubFiles()`.
+  3. `syncGithubFiles()` downloads `github_index.json` from GitHub.
+  4. It loops through the defined file list, pulls raw file contents, and caches them.
+  5. `injectDependencies()` replaces `<link>` and `<script>` source tags with inline
+     CSS/JS.
+  6. Final processed HTML is output to the client browser.
+
+
+2. CORE FUNCTION REFERENCE & WIRING MATRIX
+-------------------------------------------------------------------------------
+
+[Function] CONFIG
+- Purpose: Holds repository credentials, index path, and cache time.
+- Wiring: Used by `fetchFileIndex()`, `fetchFromGithubRaw()`, and `syncGithubFiles()`.
+
+[Function] fetchFileIndex()
+- Purpose: Downloads and parses `github_index.json` from GitHub Raw URL.
+- Returns: Object containing `repository` details and `files` array.
+- Wiring: Called by `syncGithubFiles()` and `doPost()`.
+
+[Function] fetchFromGithubRaw(url)
+- Purpose: Handles HTTP GET request via `UrlFetchApp.fetch()`. Checks ScriptProperties
+  for `GITHUB_PAT` (Personal Access Token) if accessing private repositories.
+- Wiring: Used by `fetchFileIndex()` and `syncGithubFiles()`.
+
+[Function] syncGithubFiles()
+- Purpose: Syncs all assets defined in `github_index.json`. Checks `CacheService`
+  first. If cache expired or missing, fetches raw code from GitHub and stores it in
+  `CacheService` (or `ScriptProperties` if > 100KB).
+- Returns: Object containing mapped file contents `{ file_id: "content string" }`.
+- Wiring: Called inside `doGet()` and triggered by `setupAutoUpdateTrigger()`.
+
+[Function] injectDependencies(html, filesMap)
+- Purpose: Replaces standard HTML tags like `<link rel="stylesheet" href="src/styles.css">`
+  and `<script src="src/app.js"></script>` with embedded inline content.
+- Wiring: Called inside `doGet()` before returning `HtmlOutput`.
+
+[Function] doPost(e)
+- Purpose: Acts as a Webhook listener. Receives HTTP POST push events from GitHub.
+- Wiring: Invalidate local script cache immediately upon git push, forcing the next
+  web request to pull fresh code.
+
+[Function] setupAutoUpdateTrigger()
+- Purpose: Installs an automated background timer in Apps Script to run `syncGithubFiles()`
+  every 1 hour.
+- Wiring: Run manually once from the Apps Script IDE editor.
+
+
+3. WIRING UP WITH EXTERNAL PARTS
+-------------------------------------------------------------------------------
+
+A. CONFIGURING PRIVATE REPOSITORIES (IF APPLICABLE):
+   1. In Google Apps Script Editor -> Project Settings -> Script Properties.
+   2. Add property key: `GITHUB_PAT`
+   3. Add property value: `ghp_yourPersonalAccessTokenHere...`
+
+B. LINKING FRONTEND ASSETS IN GITHUB:
+   In your `src/index.html` file in GitHub, reference assets using relative paths:
+     <link rel="stylesheet" href="src/styles.css">
+     <script src="src/app.js"></script>
+   `injectDependencies()` in `code.gs` will automatically intercept these tags
+   and replace them with the fetched content.
+
+C. SETTING UP AUTOMATIC SYNC VIA GITHUB WEBHOOK (OPTION 1):
+   1. Deploy your Google Apps Script as a Web App (Execute as: Me, Access: Anyone).
+   2. Copy the Web App URL (`https://script.google.com/macros/s/.../exec`).
+   3. Go to GitHub Repo -> Settings -> Webhooks -> Add webhook.
+   4. Payload URL: Paste the Apps Script Web App URL.
+   5. Content type: `application/json`.
+   6. Event: Push events.
+
+D. SETTING UP TIME-DRIVEN POLLING (OPTION 2):
+   1. Open `code.gs` in Apps Script Editor.
+   2. Select `setupAutoUpdateTrigger` from the function dropdown.
+   3. Click "Run" to establish hourly automatic updates without needing webhooks.
+===============================================================================
