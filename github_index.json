@@ -1,6 +1,15 @@
 {
-  "files": [
+  "index page": [
+    "index.html",
     "style.css",
     "script.js"
+  ],
+  "game page": [
+    "game.css",
+    "game.js"
+  ],
+  "shop page": [
+    "shop.css",
+    "shop.js"
   ]
 }
