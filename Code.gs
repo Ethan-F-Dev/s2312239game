@@ -238,8 +238,8 @@ function verifyCode(email, inputCode) {
 }
 
 /**
- * 4. Create Player on Players Sheet
- * Checks if account already exists before creating new entry.
+ * 4. Create Player & Generate Individual Player Sheet
+ * Opens a dedicated sheet tab for the player containing all tables and lists.
  * @param {string} username Desired player username
  * @param {string} email Validated email
  * @param {string} password Account password
@@ -258,8 +258,9 @@ function createPlayer(username, email, password) {
     return { success: false, message: "Invalid email domain. Allowed: @gmail.com or @ccsc.edu.hk" };
   }
 
-  const sheet = getOrCreateSheet(DB_SHEET_PLAYERS, ["Player ID", "Username", "Email", "Password", "Created At"]);
-  const data = sheet.getDataRange().getValues();
+  const ss = SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.create("GameDatabase");
+  const mainSheet = getOrCreateSheet(DB_SHEET_PLAYERS, ["Player ID", "Username", "Email", "Password", "Created At"]);
+  const data = mainSheet.getDataRange().getValues();
 
   // Check if Username or Email already exists
   for (let i = 1; i < data.length; i++) {
@@ -274,15 +275,136 @@ function createPlayer(username, email, password) {
     }
   }
 
-  // Generate unique Player ID and stamp player record
+  // Generate unique Player ID
   const playerId = "PLR-" + Utilities.getUuid().substring(0, 8);
   const createdAt = new Date();
 
-  sheet.appendRow([playerId, cleanUsername, cleanEmail, cleanPassword, createdAt]);
+  // 1. Stamp in Main Players Registry Sheet
+  mainSheet.appendRow([playerId, cleanUsername, cleanEmail, cleanPassword, createdAt]);
+
+  // 2. Create and setup individual sheet for this player
+  setupIndividualPlayerSheet(ss, cleanUsername, cleanPassword, cleanEmail, createdAt);
 
   return {
     success: true,
-    message: "Player account created successfully!",
+    message: "Player account and personal sheet created successfully!",
     playerId: playerId
   };
+}
+
+/**
+ * Creates and formats a dedicated individual sheet tab for a player
+ * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss Spreadsheet instance
+ * @param {string} username Player username
+ * @param {string} password Player password
+ * @param {string} email Player email
+ * @param {Date} createdAt Creation timestamp
+ */
+function setupIndividualPlayerSheet(ss, username, password, email, createdAt) {
+  const sheetName = "P_" + username; // Sheet named e.g. "P_PlayerName"
+  let sheet = ss.getSheetByName(sheetName);
+
+  if (sheet) {
+    return sheet; // Return if sheet already exists
+  }
+
+  sheet = ss.insertSheet(sheetName);
+
+  // Helper styles
+  const headerBg = "#2B579A";
+  const headerFont = "#FFFFFF";
+  const subHeaderBg = "#D9E1F2";
+
+  // =========================================================================
+  // TABLE 1: BASIC INFORMATION
+  // =========================================================================
+  sheet.getRange("A1:F1").merge()
+    .setValue("TABLE 1: BASIC INFORMATION")
+    .setFontWeight("bold").setBackground(headerBg).setFontColor(headerFont);
+
+  sheet.getRange("A2:F2")
+    .setValues([["Player Name", "Password", "1v1 Ranking", "2v2 Ranking", "Email", "Created At"]])
+    .setFontWeight("bold").setBackground(subHeaderBg);
+
+  sheet.getRange("A3:F3")
+    .setValues([[username, password, 1000, 1000, email, createdAt]]);
+
+  // =========================================================================
+  // SOCIAL & ACHIEVEMENTS (LIST 1, LIST 2, LIST 3)
+  // =========================================================================
+  // List 1: Friends
+  sheet.getRange("A5:B5").merge()
+    .setValue("LIST 1: FRIENDS")
+    .setFontWeight("bold").setBackground(headerBg).setFontColor(headerFont);
+  sheet.getRange("A6:B6")
+    .setValues([["Friend Username", "Status"]])
+    .setFontWeight("bold").setBackground(subHeaderBg);
+
+  // List 2: Friend Requests
+  sheet.getRange("D5:E5").merge()
+    .setValue("LIST 2: FRIEND REQUESTS")
+    .setFontWeight("bold").setBackground(headerBg).setFontColor(headerFont);
+  sheet.getRange("D6:E6")
+    .setValues([["Username", "Type (Incoming/Outgoing)"]])
+    .setFontWeight("bold").setBackground(subHeaderBg);
+
+  // List 3: Titles / Achievements Unlocked
+  sheet.getRange("G5:I5").merge()
+    .setValue("LIST 3: TITLES / ACHIEVEMENTS UNLOCKED")
+    .setFontWeight("bold").setBackground(headerBg).setFontColor(headerFont);
+  sheet.getRange("G6:I6")
+    .setValues([["Title / Achievement", "Date Unlocked", "Description"]])
+    .setFontWeight("bold").setBackground(subHeaderBg);
+
+  // =========================================================================
+  // TABLE 2: CHARACTERS
+  // =========================================================================
+  sheet.getRange("A15:I15").merge()
+    .setValue("TABLE 2: CHARACTERS")
+    .setFontWeight("bold").setBackground(headerBg).setFontColor(headerFont);
+
+  sheet.getRange("A16:I16")
+    .setValues([[
+      "Char #", "Character", "Status", "Used Time (s)",
+      "Special Slot 1 Count", "Special Slot 2 Count",
+      "Skin 1 Status", "Skin 2 Status", "Skin 3 Status"
+    ]])
+    .setFontWeight("bold").setBackground(subHeaderBg);
+
+  // Default starter character rows
+  const initialCharacters = [
+    [1, "Warrior", "Unlocked", 0, 0, 0, "Unlocked", "Locked", "Locked"],
+    [2, "Mage", "Unlocked", 0, 0, 0, "Unlocked", "Locked", "Locked"],
+    [3, "Archer", "Locked", 0, 0, 0, "Locked", "Locked", "Locked"]
+  ];
+  sheet.getRange(17, 1, initialCharacters.length, 9).setValues(initialCharacters);
+
+  // =========================================================================
+  // MATCH HISTORIES (LIST 4, LIST 5, LIST 6)
+  // =========================================================================
+  // List 4: Recent 10 match of 1v1
+  sheet.getRange("A22:F22").merge()
+    .setValue("LIST 4: RECENT 10 MATCHES (1v1)")
+    .setFontWeight("bold").setBackground(headerBg).setFontColor(headerFont);
+  sheet.getRange("A23:F23")
+    .setValues([["Opponent", "Opponent Ranking", "Match Rank", "Win / Lose", "Date", "Time"]])
+    .setFontWeight("bold").setBackground(subHeaderBg);
+
+  // List 5: Recent 10 match of 2v2
+  sheet.getRange("A36:F36").merge()
+    .setValue("LIST 5: RECENT 10 MATCHES (2v2)")
+    .setFontWeight("bold").setBackground(headerBg).setFontColor(headerFont);
+  sheet.getRange("A37:F37")
+    .setValues([["Opponent(s)", "Opponent Ranking", "Match Rank", "Win / Lose", "Date", "Time"]])
+    .setFontWeight("bold").setBackground(subHeaderBg);
+
+  // List 6: Recent 30 match of any mode
+  sheet.getRange("A50:G50").merge()
+    .setValue("LIST 6: RECENT 30 MATCHES (ALL MODES)")
+    .setFontWeight("bold").setBackground(headerBg).setFontColor(headerFont);
+  sheet.getRange("A51:G51")
+    .setValues([["Mode", "Opponent(s)", "Opponent Ranking", "Match Rank", "Win / Lose", "Date", "Time"]])
+    .setFontWeight("bold").setBackground(subHeaderBg);
+
+  return sheet;
 }
