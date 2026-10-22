@@ -6900,7 +6900,7 @@ if (p.charIdx === 31) {
                         let proj = new Projectile(p.x, p.y, ballAng, 12, "cyan", 0, p, "🔹", 1.5, 1500, (hitE) => {
                             if(p.target.charIdx == 44){e.takeDamage(200)}else{hitE.hp -= 200;}
                             if(hitE.hp <= 0) { hitE.hp = 1; hitE.takeDamage(9999, 40); }
-                            else { if(p.target.charIdx === 44){}else{floatTexts.push(new FloatText(hitE.x, hitE.y - 40, "-250", "white")); }}
+                            else { if(p.target.charIdx === 44){}else{floatTexts.push(new FloatText(hitE.x, hitE.y - 40, "-200", "white")); }}
                             shakeAmount = 10;
                         }, 25);
                         proj.trackingTarget = e;
