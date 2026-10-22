@@ -1,4 +1,4 @@
-const GITHUB_BASE_URL = "https://raw.githubusercontent.com/s2312239-sketch/s2312239game/2.0/";
+const GITHUB_BASE_URL = "https://raw.githubusercontent.com/s2312239-sketch/s2312239game/main/";
 
 /**
  * Helper function to fetch raw file contents from GitHub
@@ -21,64 +21,28 @@ function fetchGithubFile(fileName) {
 }
 
 /**
- * Loads and returns index data parsed as JSON object
- */
-function getGithubIndex() {
-  const indexRaw = fetchGithubFile("github_index.json");
-  try {
-    return JSON.parse(indexRaw);
-  } catch (err) {
-    return null;
-  }
-}
-
-/**
- * Web App Entry Point: Loads ONLY "index page" files initially
- */
-function doGet() {
-  const indexData = getGithubIndex();
-
-  if (!indexData || !indexData["index page"]) {
-    return HtmlService.createHtmlOutput("Failed to load or parse github_index.json");
-  }
-
-  // 1. Fetch primary HTML from the index page list
-  let htmlContent = fetchGithubFile("index.html");
-
-  if (htmlContent.includes("GitHub Fetch Error")) {
-    return HtmlService.createHtmlOutput(htmlContent);
-  }
-
-  // 2. Load CSS and JS listed under "index page" only
-  const initialFiles = indexData["index page"];
-  initialFiles.forEach((fileName) => {
-    if (fileName === "index.html") return; // Skip index.html since it's already loaded
-
-    const fileContent = fetchGithubFile(fileName);
-
-    if (fileName.endsWith(".css")) {
-      htmlContent += `\n<style id="style-${fileName}">\n${fileContent}\n</style>`;
-    } else if (fileName.endsWith(".js")) {
-      htmlContent += `\n<script id="script-${fileName}">\n${fileContent}\n</script>`;
-    }
-  });
-
-  return HtmlService.createHtmlOutput(htmlContent)
-    .setTitle("GitHub Web App")
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-}
-
-/**
- * Callable from Client-Side JS (e.g. google.script.run.loadPageModule("game page"))
- * Fetches assets for a specific page key on demand.
+ * Combined function: Fetches github_index.json and loads assets for any specified pageKey.
+ * Callable from doGet() on initial load or from client-side JS via google.script.run.
  */
 function loadPageModule(pageKey) {
-  const indexData = getGithubIndex();
+  // 1. Fetch and parse index directly inside module loader
+  const indexRaw = fetchGithubFile("github_index.json");
+  if (indexRaw.includes("GitHub Fetch Error")) {
+    return { error: indexRaw };
+  }
+
+  let indexData;
+  try {
+    indexData = JSON.parse(indexRaw);
+  } catch (err) {
+    return { error: `Failed to parse github_index.json: ${err.message}` };
+  }
 
   if (!indexData || !indexData[pageKey]) {
     return { error: `Page key "${pageKey}" not found in github_index.json` };
   }
 
+  // 2. Fetch assets for the given key
   const moduleAssets = {
     css: [],
     js: [],
@@ -99,4 +63,39 @@ function loadPageModule(pageKey) {
   });
 
   return moduleAssets;
+}
+
+/**
+ * Web App Entry Point: Loads "index page" using loadPageModule()
+ */
+function doGet() {
+  const initialModule = loadPageModule("index page");
+
+  if (initialModule.error) {
+    return HtmlService.createHtmlOutput(initialModule.error);
+  }
+
+  // Combine HTML files
+  let htmlContent = "";
+  initialModule.html.forEach((item) => {
+    htmlContent += item.content + "\n";
+  });
+
+  if (!htmlContent) {
+    return HtmlService.createHtmlOutput("No HTML file found in 'index page'.");
+  }
+
+  // Inject CSS
+  initialModule.css.forEach((file) => {
+    htmlContent += `\n<style id="style-${file.name}">\n${file.content}\n</style>`;
+  });
+
+  // Inject JS
+  initialModule.js.forEach((file) => {
+    htmlContent += `\n<script id="script-${file.name}">\n${file.content}\n</script>`;
+  });
+
+  return HtmlService.createHtmlOutput(htmlContent)
+    .setTitle("GitHub Web App")
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
