@@ -374,3 +374,211 @@ function checkLogin(usernameOrEmail, password) {
 
   return { success: false, message: "Account not found with provided username or email." };
 }
+
+/** ===========================================================================
+ * PART C: MATCHMAKING SYSTEM (ALL-IN-ONE WAITING ROOM)
+ * =========================================================================== */
+
+const DB_SHEET_WAITING_ROOM = "WaitingRoom";
+
+/**
+ * Helper: Gets or creates the single WaitingRoom sheet tab
+ */
+function getWaitingRoomSheet() {
+  return getOrCreateSheet(DB_SHEET_WAITING_ROOM, [
+    "Player ID", "Username", "Mode", "ELO", "Status", "Match ID", "Joined At", "Matched At"
+  ]);
+}
+
+/**
+ * 15. Join Matchmaking Queue
+ * Adds player to the WaitingRoom sheet and attempts immediate match pairing.
+ * @param {string} usernameOrId Player username or Player ID
+ * @param {string} mode Game mode ("1v1" or "2v2")
+ * @returns {Object} { success: boolean, message: string, status: string, matchId?: string }
+ */
+function joinMatchmaking(usernameOrId, mode) {
+  const cleanMode = (mode || "").trim();
+  if (cleanMode !== "1v1" && cleanMode !== "2v2") {
+    return { success: false, message: "Invalid mode. Allowed modes: '1v1', '2v2'." };
+  }
+
+  // Get player data to fetch current ELO
+  let playerData, username, playerId;
+  try {
+    playerData = getPlayerData(usernameOrId);
+    username = usernameOrId;
+    
+    // Find basic account details from Players sheet
+    const mainSheet = getGameSpreadsheet().getSheetByName(DB_SHEET_PLAYERS);
+    const rowIdx = findPlayerRow(mainSheet, usernameOrId);
+    const rowData = mainSheet.getRange(rowIdx, 1, 1, 2).getValues()[0];
+    playerId = rowData[0];
+    username = rowData[1];
+  } catch (err) {
+    return { success: false, message: `Failed to join queue: ${err.message}` };
+  }
+
+  const sheet = getWaitingRoomSheet();
+  const data = sheet.getDataRange().getValues();
+
+  // Check if player is already waiting or matched
+  for (let i = 1; i < data.length; i++) {
+    const rowPlayerId = String(data[i][0]);
+    const rowStatus = String(data[i][4]);
+
+    if (rowPlayerId === playerId) {
+      if (rowStatus === "WAITING") {
+        // Update mode and re-attempt matching
+        sheet.getRange(i + 1, 3).setValue(cleanMode);
+        sheet.getRange(i + 1, 7).setValue(new Date());
+        tryCreateMatches(cleanMode);
+        return { success: true, message: "Updated existing queue ticket.", status: "WAITING" };
+      } else if (rowStatus === "MATCHED") {
+        return { 
+          success: true, 
+          message: "Match already found!", 
+          status: "MATCHED", 
+          matchId: String(data[i][5]) 
+        };
+      }
+    }
+  }
+
+  // Get ELO for selected mode
+  const currentElo = (playerData.elo && playerData.elo[cleanMode]) ? playerData.elo[cleanMode] : 1000;
+  const joinedAt = new Date();
+
+  // Stamp queue row: [Player ID, Username, Mode, ELO, Status, Match ID, Joined At, Matched At]
+  sheet.appendRow([playerId, username, cleanMode, currentElo, "WAITING", "", joinedAt, ""]);
+
+  // Trigger match creation check immediately
+  const matchResult = tryCreateMatches(cleanMode);
+
+  return {
+    success: true,
+    message: "Joined matchmaking queue successfully.",
+    status: matchResult.matchedPlayerIds.includes(playerId) ? "MATCHED" : "WAITING",
+    matchId: matchResult.matchId || null
+  };
+}
+
+/**
+ * 16. Leave Matchmaking Queue
+ * Cancels active waiting status in the queue.
+ * @param {string} usernameOrId Player username or Player ID
+ * @returns {Object} { success: boolean, message: string }
+ */
+function leaveMatchmaking(usernameOrId) {
+  const sheet = getWaitingRoomSheet();
+  const data = sheet.getDataRange().getValues();
+  const cleanInput = String(usernameOrId || "").trim().toLowerCase();
+
+  for (let i = 1; i < data.length; i++) {
+    const rowPlayerId = String(data[i][0]).toLowerCase();
+    const rowUsername = String(data[i][1]).toLowerCase();
+    const rowStatus = String(data[i][4]);
+
+    if ((cleanInput === rowPlayerId || cleanInput === rowUsername) && rowStatus === "WAITING") {
+      sheet.getRange(i + 1, 5).setValue("CANCELLED");
+      return { success: true, message: "Left matchmaking queue successfully." };
+    }
+  }
+
+  return { success: false, message: "No active waiting ticket found to cancel." };
+}
+
+/**
+ * 17. Check Matchmaking Status
+ * Polling function called by frontend to check if player has been matched.
+ * @param {string} usernameOrId Player username or Player ID
+ * @returns {Object} Queue status and match details
+ */
+function checkMatchmakingStatus(usernameOrId) {
+  const sheet = getWaitingRoomSheet();
+  const data = sheet.getDataRange().getValues();
+  const cleanInput = String(usernameOrId || "").trim().toLowerCase();
+
+  for (let i = 1; i < data.length; i++) {
+    const rowPlayerId = String(data[i][0]).toLowerCase();
+    const rowUsername = String(data[i][1]).toLowerCase();
+    const rowStatus = String(data[i][4]);
+    const rowMode = String(data[i][2]);
+
+    if (cleanInput === rowPlayerId || cleanInput === rowUsername) {
+      if (rowStatus === "WAITING") {
+        // Trigger matching attempt in case another player joined
+        tryCreateMatches(rowMode);
+      }
+
+      // Re-read status after potential matching
+      const currentStatus = sheet.getRange(i + 1, 5).getValue();
+      const matchId = sheet.getRange(i + 1, 6).getValue();
+
+      return {
+        success: true,
+        inQueue: currentStatus === "WAITING",
+        status: currentStatus,
+        matchId: matchId || null,
+        mode: rowMode
+      };
+    }
+  }
+
+  return { success: true, inQueue: false, status: "NONE", matchId: null };
+}
+
+/**
+ * 18. Match Generator Logic (Internal Helper)
+ * Pairs waiting players together when minimum group count is met (2 for 1v1, 4 for 2v2).
+ * @param {string} mode Game mode ("1v1" or "2v2")
+ * @returns {Object} { matchedPlayerIds: Array, matchId?: string }
+ */
+function tryCreateMatches(mode) {
+  const sheet = getWaitingRoomSheet();
+  const data = sheet.getDataRange().getValues();
+  const requiredPlayers = mode === "1v1" ? 2 : 4;
+
+  const waitingRows = [];
+
+  // Gather waiting players for target mode
+  for (let i = 1; i < data.length; i++) {
+    const rowStatus = String(data[i][4]);
+    const rowMode = String(data[i][2]);
+
+    if (rowStatus === "WAITING" && rowMode === mode) {
+      waitingRows.push({
+        rowIndex: i + 1,
+        playerId: data[i][0],
+        username: data[i][1],
+        elo: data[i][3]
+      });
+    }
+  }
+
+  // Check if enough players are waiting
+  if (waitingRows.length < requiredPlayers) {
+    return { matchedPlayerIds: [] };
+  }
+
+  // Generate unique Match ID
+  const matchId = "MATCH-" + Utilities.getUuid().substring(0, 8);
+  const matchedAt = new Date();
+  const matchedPlayerIds = [];
+
+  // Pair top candidates
+  for (let k = 0; k < requiredPlayers; k++) {
+    const candidate = waitingRows[k];
+    matchedPlayerIds.push(candidate.playerId);
+
+    // Update WaitingRoom row status to MATCHED and assign Match ID
+    sheet.getRange(candidate.rowIndex, 5).setValue("MATCHED");
+    sheet.getRange(candidate.rowIndex, 6).setValue(matchId);
+    sheet.getRange(candidate.rowIndex, 8).setValue(matchedAt);
+  }
+
+  return {
+    matchedPlayerIds: matchedPlayerIds,
+    matchId: matchId
+  };
+}
