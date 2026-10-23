@@ -3675,6 +3675,9 @@ if (this.charIdx === 31) {
     }
 
     if(p.charIdx === 46){
+	    if(p.bloodBlade == true){
+			p.cd.atk = 300
+	}
         if(p.kaState == 1){
 
            p.activeWarning = { type:'rect', l: 150, h: 20, color:'purple'}; 
@@ -4772,9 +4775,8 @@ if (this.charIdx === 31) {
 
     if(p.charIdx === 51){
         if(p.makS3State == true){p.cd.s1 = 2000}
-        setGameTimeout(() => { projectiles.push(new Projectile(p.x, p.y, p.angle, 55, "gold", 200 * p.buffs.atk, p, "", 300, null, (e)=>{e.buffs.slow = 0.4}, false, false, false, false, true)); }, 50);
+        setGameTimeout(() => { projectiles.push(new Projectile(p.x, p.y, p.angle, 55, "gold", 200 * p.buffs.atk, p, "", 300, null, (e)=>{e.buffs.slow = 0.4; setGameTimeout(()=> enemy.takeDamage(makRandom * p.buffs.atk), 2000)}, false, false, false, false, true)); }, 50);
         let makRandom = Math.floor(Math.random() * (100 - 50 + 1)) + 100;
-        setGameTimeout(()=> enemy.takeDamage(makRandom * p.buffs.atk), 2000)
     }
 
     if(p.charIdx === 50){
@@ -5708,28 +5710,10 @@ if (this.charIdx === 31) {
     }
 
     if(p.charIdx === 46){
-        if(p.ksState == 1){
-        p.ksState = 2;
-        p.activeWarning = { type:'circle', r: 100, x: p.x, y: p.y, color: 'red' }; 
-        setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 100) {if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(30)}; p.target.takeDamage(212, 10); p.applyStatus("insane", 6000); if(p.status.calm > 0){ p.applyStatus("calm", 0)}} }, 100); }
-        else {
-        p.ksState = 1;
-        let wave = 0;
-            p.applyStatus("disarmed",2000)
-             let wi = setGameInterval(() => {
-                 wave++;
-                 if(wave <= 4) {
-                     projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 188, p, "🩸", 1.5, 600, (e) => {
-                        if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(30)}                
+        projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 212, p, "🩸", 1.5, null, (e) => {
+                        p.bloodBlade = true
+		                setGameTimeout(()=> p.bloodBlade = false, 3000)
                     }, 25));
-                 } 
-                 else if(wave == 5){
-                     clearInterval(wi);
-                     
-
-                 }
-             }, 500);
-        }
     }
 
     if(p.charIdx === 45){
