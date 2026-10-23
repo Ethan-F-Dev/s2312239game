@@ -4826,32 +4826,12 @@ if (this.charIdx === 31) {
     }
 
     if(p.charIdx === 46){
-      if(p.ksState == 1){
-        p.ksState = 2;
-        const joy = p.id===1?p1Touch:p2Touch; 
-        if(Math.abs(joy.joyX) < 0.1 && Math.abs(joy.joyY) < 0.1){
-        p.cd.s1 = 0;
-        floatTexts.push(new FloatText(p.x, p.y - 80, "無法使用！", "gray"));
-        } else {
-        p.kaState = 2;
-        if(dist(p, enemy) < 60){if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(30)};p.kcanCombo = false; p.target.takeDamage(230);if(p.status.insane > 0){ p.applyStatus("insane", 0)}; p.applyStatus("calm", 6000)}
-        let startX = p.x, startY = p.y; 
-        let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*400, ty = p.y + Math.sin(aimAngle)*400; 
-        let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.02; p.y += (ty - p.y)*0.02;if(dist(p, enemy) < 52 && p.kcanCombo == true){if(p.status.insane > 0){ p.applyStatus("insane", 0)}; if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(230)};p.kcanCombo = false;p.applyStatus("calm", 6000); p.target.takeDamage(230);}}, 16); setGameTimeout(() => {clearInterval(sInt); p.kaState = 1; if(p.kcanCombo == false){p.kcanCombo = true;}else{p.kcanCombo = true; if(p.kSuper == false){p.kCombo = 0}}}, 500); 
-       }
-      } else {
-        p.ksState = 1;
-        const joy = p.id===1?p1Touch:p2Touch; 
-        if(Math.abs(joy.joyX) < 0.1 && Math.abs(joy.joyY) < 0.1){
-        p.cd.s1 = 0;
-        floatTexts.push(new FloatText(p.x, p.y - 80, "無法使用！", "gray"));
-        } else {
-        if(dist(p, enemy) < 60){let aimAngle = p.angle; if(Math.abs(joy.joyX)>0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); let startX = p.x, startY = p.y; enemy.x = p.x + Math.cos(aimAngle)*300; enemy.y = p.y + Math.sin(aimAngle)*300;  if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(303)};p.kcanCombo = false; p.target.takeDamage(120);;}
-        let startX = p.x, startY = p.y; 
-        let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*400, ty = p.y + Math.sin(aimAngle)*400; 
-        let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.1; p.y += (ty - p.y)*0.1;if(dist(p, enemy) < 52 && p.kcanCombo == true){let aimAngle = p.angle; if(Math.abs(joy.joyX)>0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); let startX = p.x, startY = p.y; enemy.x = p.x + Math.cos(aimAngle)*300; enemy.y = p.y + Math.sin(aimAngle)*300; if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(30)};p.kcanCombo = false; p.target.takeDamage(303);}}, 16); setGameTimeout(() => {clearInterval(sInt);if(p.kcanCombo == false){p.kcanCombo = true;}else{p.kcanCombo = true; if(p.kSuper == false){p.kCombo = 0}}}, 300); 
-       }
-      }
+      let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1)
+      aimAngle = Math.atan2(joy.joyY, joy.joyX); 
+	  p.angle = aimAngle; 
+	  let tx = p.x + Math.cos(aimAngle)*250, ty = p.y + Math.sin(aimAngle)*250; 
+	  let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.05; p.y += (ty - p.y)*0.05; }, 16); 
+	  setGameTimeout(() => {clearInterval(sInt)}, 150);
     }
 
     if(p.charIdx === 45){
