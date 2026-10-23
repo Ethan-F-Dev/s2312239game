@@ -964,6 +964,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                 if(p.charIdx === 9 && p.activeMarks.length > 0) sTxt += "⏱️";
                 if(p.charIdx === 12 && p.chewing) sTxt += p.chewingState === 'vomit' ? "🤮" : (p.chewingState==='yummy'?"😋":"👅");
                 if(p.status.taunted > 0) sTxt += "🤬";
+				if(p.target.kCanHeal == false) sTxt += "🤕"
                 if(p.status.losegrip > 0) sTxt += "🙌"
                 if(p.status.disarmed > 0) sTxt += "⛓️";
                 if(p.status.frozen > 0) sTxt += "💀";
@@ -1440,6 +1441,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             this.kaState = 1;
             this.kcanHeal = true;
             this.kcanCombo = true;
+			this.bloodBlade = false;
             // Kiki (47)
             this.musicNotes = 0;
             this.musicCooldown = false;
