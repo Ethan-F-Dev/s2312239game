@@ -3677,7 +3677,6 @@ if (this.charIdx === 31) {
     }
 
     if(p.charIdx === 46){
-		p.cd.s2 -= 1000;
 	    if(p.bloodBlade == true){
 			p.cd.atk = 300;
 	}
@@ -3685,6 +3684,7 @@ if (this.charIdx === 31) {
            p.activeWarning = { type:'rect', l: 150, h: 20, color:'purple'}; 
 		   if(p.bloodBlade == true){p.cd.atk = 300;}
         setGameTimeout(() => { if(dist(p, enemy) < 150) {
+			p.cd.s2 -= 1000;
         if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(30)} 
         if(p.hp > 1750){
         enemy.takeDamage(50 * p.buffs.atk, 1);}
@@ -3755,6 +3755,7 @@ if (this.charIdx === 31) {
 
         p.activeWarning = { type:'rect', l: 200, h: 80, color: 'red'}; 
         setGameTimeout(() => { if(dist(p, enemy) < 200) {
+		p.cd.s2 -= 1000;
         enemy.applyStatus("stunned", 600)
         p.kaState = 1;
         if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(30)} 
