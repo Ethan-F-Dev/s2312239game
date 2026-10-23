@@ -3167,14 +3167,14 @@ if (this.charIdx === 31) {
         }
         takeDamage(dmg, attackerCharIdx = -1, isCrit = false) {
             if(this.isUntouchable) return { hpDmg: 0, shieldDmg: 0 };
-// 刀俠 (43) 雙刀大絕：所有傷害轉換為真傷，吸血量增加30%
+// 刀俠 (43) 雙刀大絕：所有傷害轉換為真傷，吸血量增加50%
             let atkP = (attackerCharIdx !== -1 && p1.charIdx === attackerCharIdx) ? p1 : (p2.charIdx === attackerCharIdx ? p2 : null);
             if (atkP && atkP.charIdx === 43 && atkP.dxS3DualTimer > 0 && dmg > 0) {
                 this.hp -= dmg;
                 if (this.hp <= 0) { this.hp = 1; this.takeDamage(9999, 43); }
                 else floatTexts.push(new FloatText(this.x, this.y - 40, `-${Math.round(dmg)}`, "white"));
                 
-                atkP.heal(dmg * 0.30); // 額外30%吸血
+                atkP.heal(dmg * 0.50); // 額外50%吸血
                 return { hpDmg: dmg, shieldDmg: 0 };
             }
 // 智者 (40) 二技能預判攔截：免疫傷害與控制，觸發反擊
@@ -3183,12 +3183,13 @@ if (this.charIdx === 31) {
                 this.cd.s2 = Math.max(0, this.cd.s2 - 5000); // 減5秒冷卻
                 this.heal(dmg * 0.2); // 20% 傷害轉化為恢復
                 this.zzS2EnhancedAtk = true; // 獲得強化普攻
+                this.cd.atk = 0;
                 this.zzS2Active = false; this.zzS2Timer = 0; // 觸發後關閉護盾
                 
                 // 短暫給予無敵，用來淨化同幀打上來的負面控制效果
                 this.isUntouchable = true;
                 setTimeout(() => this.isUntouchable = false, 50);
-                this.status.stunned = 0; this.status.frozen = 0; this.status.bound = 0; this.status.taunted = 0;
+                this.status.stunned = 0; this.status.disarmed = 0; this.status.frozen = 0; this.status.bound = 0; this.status.taunted = 0;
                 
                 shakeAmount = 20;
                 for(let i=0; i<20; i++) particles.push(new Particle(this.x, this.y, "cyan", "normal", "🛡️", 1.5));
@@ -4873,7 +4874,7 @@ if (this.charIdx === 31) {
     }
 
 	if (p.charIdx === 43) {
-            p.cd.s1 = 5000;
+            p.cd.s1 = 5500;
             p.dxEnhancedAtk += 1; 
             
             const joy = p.id === 1 ? p1Touch : p2Touch;
@@ -5759,7 +5760,7 @@ if (this.charIdx === 31) {
             if (p.dxState === 0) {
                 // 單刀：劍氣
                 let aimAngle = Math.atan2(p.target.y - p.y, p.target.x - p.x);
-                projectiles.push(new Projectile(p.x, p.y, aimAngle, 25, "red", 250 * p.buffs.atk, p, "〰️", 2.0, 800, (e) => {
+                projectiles.push(new Projectile(p.x, p.y, aimAngle, 25, "red", 200 * p.buffs.atk, p, "〰️", 2.0, 800, (e) => {
                     p.dxS2PermDmg += 0.05; 
                     floatTexts.push(new FloatText(p.x, p.y - 80, "傷害+5%", "red"));
                     shakeAmount = 15;
@@ -6736,7 +6737,7 @@ if (p.charIdx === 31) {
                 floatTexts.push(new FloatText(p.target.x, p.target.y - 80, "❗️", "red", 40));
                 
                 let tx = p.target.x, ty = p.target.y;
-                let steps = 0, maxSteps = 10; 
+                let steps = 0, maxSteps = 15; 
                 let dx = (tx - p.x) / maxSteps;
                 let dy = (ty - p.y) / maxSteps;
                 
@@ -6748,10 +6749,10 @@ if (p.charIdx === 31) {
                         clearInterval(flyInt); 
                         p.isCasting = false; p.isUntouchable = false;
                         
-                        p.target.takeDamage(300 * p.buffs.atk, 43);
+                        p.target.takeDamage(250 * p.buffs.atk, 43);
                         p.target.applyStatus('disarmed', 2000);
                         p.cd.s1 = 0; p.cd.s2 = 0; 
-                        p.heal(500);
+                        p.heal(200);
                         p.dxS3SingleTimer = 5000; 
                         
                         shakeAmount = 30;
