@@ -3677,6 +3677,7 @@ if (this.charIdx === 31) {
     }
 
     if(p.charIdx === 46){
+		p.cd.s1 -= 1000;
 	    if(p.bloodBlade == true){
 			p.cd.atk = 300;
 	}
@@ -4840,10 +4841,10 @@ if (this.charIdx === 31) {
 	  setGameTimeout(() => {clearInterval(sInt)}, 150);
 
 		setGameTimeout(()=>{
-			p.activeWarning = { type:'sector', r: 120, ap: Math.PI/1, color: 'rgba(255, 0, 0, 0.6)' }; 
+			p.activeWarning = { type:'sector', r: 175, ap: Math.PI/1, color: 'rgba(255, 0, 0, 0.6)' }; 
             setGameTimeout(() => { 
                 p.activeWarning = null; 
-                if(dist(p, enemy) < 120) { 
+                if(dist(p, enemy) < 175) { 
                     let ang = Math.atan2(enemy.y-p.y, enemy.x-p.x); 
                     let diff = Math.abs(ang - p.angle); 
                     if(diff > Math.PI) diff = 2*Math.PI - diff; 
@@ -5713,16 +5714,16 @@ if (this.charIdx === 31) {
     }
 
     if(p.charIdx === 46){
-		if(p.hp < 1750){
+		if(p.hp < 1500){
 		for (let i = -1; i <= 1; i++) {
-                    projectiles.push(new Projectile(p.x, p.y, p.angle + i*0.2, 25, "lightgreen", 212 * p.buffs.atk, p, "🩸", 1.5, 600, (e) => {
+                    projectiles.push(new Projectile(p.x, p.y, p.angle + i*0.2, 25, "lightgreen", 127 * p.buffs.atk, p, "🩸", 1.5, 600, (e) => {
                         p.bloodBlade = true
 						p.heal(100)
 		                setGameTimeout(()=> p.bloodBlade = false, 2000)
                     }, 20, false, false, false, true)); // true 為穿透
                 }
 		} else {
-        projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 343, p, "🩸", 1.5, null, (e) => {
+        projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 212, p, "🩸", 1.5, null, (e) => {
                         p.bloodBlade = true
 			            p.heal(100)
 		                setGameTimeout(()=> p.bloodBlade = false, 2000)
