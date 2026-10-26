@@ -3543,7 +3543,7 @@ if (this.charIdx === 31) {
         triggerJimingDodge() { if(this.charIdx !== 5) return; this.isUntouchable = true; setGameTimeout(() => this.isUntouchable = false, 200); }
         calculateCrit(dmg) { if (this.charIdx !== 4) return { damage: dmg, isCrit: false }; let chance = 0.5 + (this.critStacks * 0.2); if (Math.random() < chance) return { damage: dmg * 2, isCrit: true }; return { damage: dmg, isCrit: false }; }
         applyStatus(type, dur) { 
-            if(this.isUntouchable || (this.status.superArmor > 0 && type ==! 'superStunned')) return; 
+            if(this.isUntouchable || this.status.superArmor > 0) return; 
             else if(this.status.chill > 0){this.status.chill = 0;this.heal(300);return;};
 
             // 溝比斯被動：超過 2 秒的暈眩
