@@ -723,10 +723,9 @@
         const isPortrait = window.innerHeight > window.innerWidth;
         const warning = document.getElementById('orientation-warning');
     
-        //if (warning) {
-            //warning.style.display = isPortrait ? 'flex' : 'none';
-        //}
-		warning.style.display = 'none';
+        if (warning) {
+            warning.style.display = isPortrait ? 'flex' : 'none';
+        }
     
         // Only update canvas dimensions when in landscape mode
         if (!isPortrait) {
