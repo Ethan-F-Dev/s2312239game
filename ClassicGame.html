@@ -936,7 +936,9 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                 if(p.charIdx === 7) { ctx.fillStyle = "gold"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.funds/100), 5); ctx.fillStyle = "black"; ctx.fillRect(p.x, p.y-75, 1, 5); }
                 if(p.charIdx === 19) {ctx.fillStyle = "gray"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.leoEnAtk/3),5);}
                 if(p.charIdx === 24) {ctx.fillStyle = "red"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.blood/3),5);}
-                
+
+                if(p.charIdx === 53) {ctx.fillStyle = "yellow"; ctx.fillRect(p.x - bw/2, p.y + 55, bw * (p.mbTimer/5000),5);}
+                if(p.charIdx === 53) {ctx.fillStyle = "orange"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.mbMango/5),5);}
                 if(p.charIdx === 51 && p.makS2State == true){ctx.fillStyle = "purple"; ctx.fillRect(p.x - bw/2, p.y + 35, bw * (p.makTimer/5000),5);}
                 if(p.charIdx === 19) {ctx.fillStyle = "brown"; ctx.fillRect(p.x - bw/2, p.y + 35, bw * (p.soundAmount/500),5);}
                 if(p.charIdx === 3) {ctx.fillStyle = "purple"; ctx.fillRect(p.x - bw/2, p.y + 55, bw * (p.rageEnhTimer/5000),5);}
@@ -981,6 +983,8 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                 if (p.status.dusted > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("🌫️", p.x - 20, p.y - 110); }
                 if (p.status.calm > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("😶", p.x - 20, p.y - 110); }
                 if (p.status.insane > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("😡", p.x - 20, p.y - 110); }
+                if (p.target.mbMango > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("🥭", p.x - 20, p.y - 110); }
+                if (p.target.mbPineapple == true) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("🍍", p.x - 20, p.y - 110); }
                 if (p.status.high > 0) { ctx.font = "40px Arial"; ctx.fillStyle = "white"; ctx.fillText("🥵", p.x - 20, p.y - 110); }
             } else if(p.isDying) { for(let i=0; i<1; i++) particles.push(new Particle(p.x+(Math.random()-0.5)*50, p.y+(Math.random()-0.5)*50, "#fff", 'death')); }
         });
@@ -1475,6 +1479,11 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             // Bailao (52)
             this.flowerClone = null;
             this.bCD = false;
+            // Mango 
+            this.mbPineapple = false
+            this.mbMango = 0
+            this.mbState = 1
+            this.mbTimer = 0
         }
         triggerClovisPassive() {
             if (this.charIdx !== 35 || this.clovisPassiveCd > 0) return;
@@ -1527,6 +1536,12 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
         update(dt) {
             if(this.isDying) return;
             this.buffs.speed = 1.0 * this.buffs.slow; 
+// Mango (53) Update Logic
+        if(this.charIdx === 53){
+           setGameInterval(()=> {if(this.mbMango >= 5){this.mbMango = 0; this.mbPineapple = true; this.mbTimer = 5000}},500)
+           setGameInterval(()=> {if(this.mbPineapple == true){this.buffs.atk = 1.3}else{this.buffs.atk = 1.0}},500)
+           setGameInterval(()=> {if(this.mbTimer <= 0){this.mbPineapple = false;}},500) 
+        }
 // Moon (50) Update Logic
         if(this.charIdx === 50){
             setGameInterval(()=> {if(this.moonPower < 0){this.moonPower = 0;}},500)
@@ -2946,6 +2961,10 @@ if (this.charIdx === 31) {
             if(this.charIdx === 51){
                 this.makTimer -= dt * timeScale;
             }
+            
+            if(this.charIdx === 53 && this.mbPineapple){
+                this.mbTimer -= dt * timeScale;
+            }
 
             if(this.charIdx === 17){
                 this.chillTimer -= dt * timeScale;
@@ -3571,6 +3590,14 @@ if (this.charIdx === 31) {
     function castAtk(p) {
         const joy = p.id === 1 ? p1Touch : p2Touch;
         if(p.cd.atk > 0 || p.isLock || p.hp <= 0 || p.status.losegrip > 0) return; 
+    
+    if(p.charIdx === 53){
+        projectiles.push(new Projectile(p.x, p.y, p.angle, 30, "yellow", 130 * p.buffs.atk, p, "", 1.2, false, (e) => {
+            if (p.mbPineapple != true){
+                p.mbMango += 1
+            }
+        }, 25));
+    }
     
     if(p.charIdx === 52){
         projectiles.push(new Projectile(p.x, p.y, p.angle, 28, "gray", 77, p, "🪩", 1.2, false, (e) => {
