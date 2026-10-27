@@ -3592,11 +3592,22 @@ if (this.charIdx === 31) {
         if(p.cd.atk > 0 || p.isLock || p.hp <= 0 || p.status.losegrip > 0) return; 
     
     if(p.charIdx === 53){
+        if(p.mbState == 1){
         projectiles.push(new Projectile(p.x, p.y, p.angle, 30, "yellow", 130 * p.buffs.atk, p, "", 1.2, false, (e) => {
             if (p.mbPineapple != true){
                 p.mbMango += 1
             }
-        }, 25));
+        }, 25))
+       } else {
+           for(let i=0; i<5; i++) {
+                    let ang = p.angle - Math.PI/4 + (Math.PI/2 * (i/5));
+                    projectiles.push(new Projectile(p.x, p.y, ang, 25, "orange", 30 * p.buffs.atk, p, "", 0.5, 200, (e) =>{
+                    if (p.mbPineapple != true){
+                          p.mbMango += 1
+                         }    
+                    }, 15, false, false, false, false));
+                }
+       }
     }
     
     if(p.charIdx === 52){
@@ -4795,6 +4806,22 @@ if (this.charIdx === 31) {
         p.speed = CHAR_DATA[p.charIdx].speed;
         if(p.charIdx === 6 && p.commanderMode) p.cd.s1 = 4000;
         const joy = p.id === 1 ? p1Touch : p2Touch;
+    
+    if(p.charIdx === 53){
+        p.applyStatus("disarmed", 1800)
+        let c = 0
+        let s = setGameInterval(() =>{
+        if(c<10){c++; projectiles.push(new Projectile(p.x, p.y, p.angle, 30, "yellow", 50 * p.buffs.atk, p, "", 1.2, false, (e) => {
+            if (p.mbPineapple != true){
+                p.mbMango += 1
+            }
+            p.heal(15 * p.buffs.atk)
+        }, 25))
+     } else {
+         clearInterval(s)
+     }
+     }, 180)
+    }
     
     if(p.charIdx === 52){
         p.heal(30)
