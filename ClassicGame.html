@@ -1483,7 +1483,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             // Mango 
             this.mbPineapple = false
             this.mbMango = 0
-            this.mbState = 2
+            this.mbState = 1
             this.mbTimer = 0
             this.mbEnh = false
         }
@@ -4824,6 +4824,10 @@ if (this.charIdx === 31) {
         const joy = p.id === 1 ? p1Touch : p2Touch;
     
     if(p.charIdx === 53){
+        const joy = p.id === 1 ? p1Touch : p2Touch;
+            let isStationary = Math.abs(joy.joyX) < 0.1 && Math.abs(joy.joyY) < 0.1;
+            
+        if(! isStationary ){
         if(p.mbState == 1){
         p.applyStatus("disarmed", 1800)
         let c = 0
@@ -4843,6 +4847,15 @@ if (this.charIdx === 31) {
         p.mbEnh = true
         setGameTimeout(()=> p.speed = 3.5, 2000)
     }
+        } else {
+            floatTexts.push(new FloatText(p.x, p.y - 80, p.mbState === 1 ? "切換至霰彈！" : "切換至遠程！", "orange"));
+            p.cd.s1 = 0;
+          if(p.mbState == 1){
+              p.mbState = 2
+          } else {
+              p.mbState =1
+          } 
+        }
     }
     
     if(p.charIdx === 52){
