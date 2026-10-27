@@ -3725,14 +3725,14 @@ if (this.charIdx === 31) {
 			p.cd.s2 -= 1000;
         if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(30)} 
         if(p.hp > 1750){
-        enemy.takeDamage(50 * p.buffs.atk, 1);}
+        enemy.takeDamage(30 * p.buffs.atk, 1);}
         if(p.hp <= 1750 && p.hp > 1050){
             let wave = 0;
              let ln = Math.floor(Math.random() * 3) + 2;
              let lc = setGameInterval(()=> {
              wave++;
              if(wave <= ln){
-              enemy.takeDamage(50 * p.buffs.atk, 1);
+              enemy.takeDamage(30 * p.buffs.atk, 1);
               } else {
                 clearInterval(lc)}
              }, 200)
@@ -3743,7 +3743,7 @@ if (this.charIdx === 31) {
              let lc = setGameInterval(()=> {
              wave++;
              if(wave <= ln){
-              enemy.takeDamage(50 * p.buffs.atk, 1);
+              enemy.takeDamage(30 * p.buffs.atk, 1);
               } else {
                 clearInterval(lc)}
              }, 200)
@@ -3798,14 +3798,14 @@ if (this.charIdx === 31) {
         p.kaState = 1;
         if(p.status.calm > 0){p.heal(50)} if(p.status.insane > 0){p.takeDamage(30)} 
         if(p.hp > 1750){
-        enemy.takeDamage(180 * p.buffs.atk, 1);}
+        enemy.takeDamage(120 * p.buffs.atk, 1);}
         if(p.hp <= 1750 && p.hp > 1050){
             let wave = 0;
              let ln = Math.floor(Math.random() * 3) + 2;
              let lc = setGameInterval(()=> {
              wave++;
              if(wave <= ln){
-              enemy.takeDamage(180 * p.buffs.atk, 1);
+              enemy.takeDamage(120 * p.buffs.atk, 1);
               } else {
                 clearInterval(lc)}
              }, 200)
@@ -3816,7 +3816,7 @@ if (this.charIdx === 31) {
              let lc = setGameInterval(()=> {
              wave++;
              if(wave <= ln){
-              enemy.takeDamage(180 * p.buffs.atk, 1);
+              enemy.takeDamage(120 * p.buffs.atk, 1);
               } else {
                 clearInterval(lc)}
              }, 200)
@@ -4904,7 +4904,7 @@ if (this.charIdx === 31) {
                     let diff = Math.abs(ang - p.angle); 
                     if(diff > Math.PI) diff = 2*Math.PI - diff; 
                     if(diff < Math.PI/2) {
-                        p.target.takeDamage(278)
+                        p.target.takeDamage(221)
 						p.cd.s2 -= 2000;
 						p.kCanHeal = false;
 						floatTexts.push(new FloatText(p.x, p.y - 80, "重傷！", "red"));
@@ -5771,14 +5771,14 @@ if (this.charIdx === 31) {
     if(p.charIdx === 46){
 		if(p.hp < 1500){
 		for (let i = -1; i <= 1; i++) {
-                    projectiles.push(new Projectile(p.x, p.y, p.angle + i*0.2, 25, "lightgreen", 127 * p.buffs.atk, p, "🩸", 1.5, 600, (e) => {
+                    projectiles.push(new Projectile(p.x, p.y, p.angle + i*0.2, 25, "lightgreen", 118 * p.buffs.atk, p, "🩸", 1.5, 600, (e) => {
                         p.bloodBlade = true
-						p.heal(100)
+						p.heal(60)
 		                setGameTimeout(()=> p.bloodBlade = false, 2000)
                     }, 20, false, false, false, true)); // true 為穿透
                 }
 		} else {
-        projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 212, p, "🩸", 1.5, null, (e) => {
+        projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "gray", 172, p, "🩸", 1.5, null, (e) => {
                         p.bloodBlade = true
 			            p.heal(100)
 		                setGameTimeout(()=> p.bloodBlade = false, 2000)
