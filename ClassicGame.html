@@ -419,9 +419,7 @@
     // --- Game Logic ---
     function checkMatchEnd() {
         if((p1.hp <= 0 || p2.hp <= 0) && !gameOver) {
-            if(currentGameMode === "normal" || (p1.hp <= 0 && p1PlayProgress === 3 )||(p2.hp <= 0 && p2PlayProgress === 3)){
-                playSkillSound(9998, 's1')
-                gameOver = true;
+            if(currentGameMode === "normal" || (p1.hp <= 0 && p1PlayProgress === 3 )||(p2.hp <= 0 && p2PlayProgress === 3)){                gameOver = true;
                 p1SelProgress = [1,2,3];
                 p2SelProgress = [1,2,3];
                 p1PlayProgress = 1
@@ -5365,7 +5363,6 @@ if (this.charIdx === 31) {
         }
 
 	if (p.charIdx === 32) {
-	    playSkillSound(32,"s1")
                 let aimAngle = Math.atan2(p.target.y - p.y, p.target.x - p.x);
             
             // 發射巨大 🌊
@@ -7324,7 +7321,6 @@ if (p.charIdx === 31) {
         }
 
 	if (p.charIdx === 32) {
-	    playSkillSound(32, "s3")
             let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX);
             
             p.heal(300);
@@ -8045,62 +8041,7 @@ if (p.charIdx === 31) {
         }
     }
 
-    function castRecover(p) { if(p.cd.recover > 0 || p.hp <= 0) return; playSkillSound(8888, "s1"); p.cd.recover = 45000; p.heal(p.maxHp * 0.05); }
-    // 1. 音效管理系統 (新增)
-    // ==========================================
-    const audioCache = {}; // 音效快取池
-    function playSkillSound(charId, skillName) {
-        const soundUrl = "https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/sounds/char"+String(charId)+"_"+skillName+".mp3"
-        if (!audioCache[soundUrl]) {
-            audioCache[soundUrl] = new Audio(soundUrl);
-            if(skillName === "s3"){
-                audioCache[soundUrl].volume = 1.0; // 設定音量 大件100%
-            }else{
-                audioCache[soundUrl].volume = 0.5; // 設定音量 50%
-            }
-        }
-        const audio = audioCache[soundUrl];
-        audio.currentTime = 0;
-        audio.play().catch(err => console.log("音效播放失敗(可能是瀏覽器限制):"+soundUrl, err));
-    }
-    function drawImage(url, x, y, w, h, angle = null, flip = null) {
-        const canvas = document.getElementById("myCanvas");
-        if (!canvas) return;
-        const ctx = canvas.getContext("2d");
-        
-        const img = new Image();
-        img.crossOrigin = "anonymous"; 
-        
-        img.onload = function() {
-            ctx.save();        
-            ctx.translate(x, y); 
-
-            // Apply rotation if provided (convert degrees to radians)
-            if (angle !== null) {
-                let rotateAngle = angle * Math.PI / 180;
-                ctx.rotate(rotateAngle);
-            }
-
-            // Apply flip if provided
-            if (flip !== null) {
-                if (flip === "horizontal") {
-                    ctx.scale(-1, 1);
-                } else if (flip === "vertical") {
-                    ctx.scale(1, -1);
-                }
-            }
-
-            ctx.drawImage(img, -w / 2, -h / 2, w, h);
-            ctx.restore(); 
-        };
-
-        img.onerror = function() {
-            console.error("The image failed to load. Check the URL or CORS settings.");
-        };
-
-        // Fixed typo: scr -> src
-        img.src = url;
-    }
+    function castRecover(p) { if(p.cd.recover > 0 || p.hp <= 0) return; p.cd.recover = 45000; p.heal(p.maxHp * 0.05); } 
     window.onload = function() {
         const modeButtons = document.querySelectorAll('.mode-btn');
         const gameModeOverlay = document.getElementById('game-mode');
