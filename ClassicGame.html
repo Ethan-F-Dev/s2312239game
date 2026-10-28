@@ -689,12 +689,9 @@
                 ctx.strokeStyle="purple"; ctx.lineWidth=2; ctx.stroke();
                 ctx.restore();
                 
-// Call example:
-drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/photos/plato.webp", p.x, p.y, 5, 5);
             }
 	
-	// 🔴 新增雨昊的煙霧繪製
-        [p1, p2].forEach(p => {
+			// 🔴 新增雨昊的煙霧繪製
             if (p.charIdx === 31 && p.yhSmokes) {
                 p.yhSmokes.forEach(smoke => {
                     ctx.save();
@@ -712,8 +709,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                     ctx.stroke();
                     ctx.restore();
                 });
-            }
-        });
+			}
 	// Seven-Star Marks (🍬)
             if (p.charIdx === 34) {
                 p.qxMarks.forEach(m => {
