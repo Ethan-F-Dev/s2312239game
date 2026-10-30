@@ -447,8 +447,8 @@
             } 
             else if (data.type === 'COORD') {
                 if (typeof p2 !== 'undefined' && p2) {
-                    p2.x = data.x;
-                    p2.y = data.y;
+                    p2.x +=  Math.abs(p2.x - data.x)*0.2
+                    p2.y += Math.abs(p2.y - data.y;)*0.2
                 }
             }
             else if (data.type === 'HP') {
@@ -490,7 +490,7 @@
                 sendGameMove({ type: 'COORD', x: p1.x, y: p1.y });
                 sendGameMove({ type: 'HP', hp: p1.hp });
             }
-        }, 50); // Runs 20 times per second
+        }, 33); // Runs 20 times per second
     }
 
     function stopStateSync() {
