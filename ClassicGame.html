@@ -4823,6 +4823,7 @@ if (this.charIdx === 31) {
 // ------------------------------ 一技能 -----------------------------------------
     function castS1(p) {
         const enemy = p.target;
+        p.color = CHAR_DATA[p.charIdx].color;
         if(p.cd.s1 > 0 || (p.isLock && !p.isChargingUlt) || p.status.disarmed > 0 || p.hp <= 0) return;
         if(p.charIdx === 8 && p.shiliS1Lock) return;
         p.cd.s1 = CHAR_DATA[p.charIdx].s1Cd;
@@ -4860,8 +4861,9 @@ if (this.charIdx === 31) {
             p.cd.s1 = 0;
           if(p.mbState == 1){
               p.mbState = 2
+              p.color = "#F5D356"
           } else {
-              p.mbState =1
+              p.mbState = 1
           } 
         }
     }
@@ -6727,6 +6729,8 @@ if (p.charIdx === 31) {
             p.applyStatus("disarmed", 3000)
             let tt = setGameInterval(()=>{
                 if(c <= 60){
+                    let rN = Math.floor(Math.random() * 360) + 1;
+                    projectiles.push(new Projectile(p.x, p.y, rN, 25, "orange", 0 * p.buffs.atk, p, "", 0.5, 200, (e) =>{}, 15, false, false, false, false));
                     c++
                     p.buffs.slow = 0.2
                     if(dist(p, p.target) < 250){
