@@ -135,7 +135,7 @@
 </div>
 <canvas id="gameCanvas"></canvas>
 <script>
-
+(function() {
     "use strict";
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -219,7 +219,7 @@
         { name: "茵", hp: 3100, atk: 20, speed: 3.4, color: "#E37332", s1Cd: 5000, s2Cd: 12000, s3Cd: 33000, atkInt: 100 },
         { name: "瑞艾斯", hp: 2450, atk: 160, speed: 3.6, color: "#DEDEDE", s1Cd: 5000, s2Cd: 8000, s3Cd: 30000, atkInt: 400 },
         { name: "武爾杳杳", hp: 2450, atk: 110, speed: 2.8, color: "#FCDF6F", s1Cd: 500, s2Cd: 500, s3Cd: 500, atkInt: 950 },
-        { name: "麥克大師", hp: 2400, atk: 110, speed: 2.4, color: "#B09B9B", s1Cd: 8000, s2Cd: 18000, s3Cd: 45000, atkInt: 1200 },
+        { name: "麥克大師", hp: 2600, atk: 110, speed: 2.6, color: "#B09B9B", s1Cd: 5000, s2Cd: 15000, s3Cd: 45000, atkInt: 1100 },
         { name: "布萊奧", hp: 2050, atk: 77, speed: 4.0, color: "#00610D", s1Cd: 8000, s2Cd: 8000, s3Cd: 10000, atkInt: 800 },
         { name: "芒果菠蘿", hp: 2300, atk: 130, speed: 3.5, color: "#EB7344", s1Cd: 5000, s2Cd: 6000, s3Cd: 30000, atkInt: 550 }
         
@@ -419,7 +419,9 @@
     // --- Game Logic ---
     function checkMatchEnd() {
         if((p1.hp <= 0 || p2.hp <= 0) && !gameOver) {
-            if(currentGameMode === "normal" || (p1.hp <= 0 && p1PlayProgress === 3 )||(p2.hp <= 0 && p2PlayProgress === 3)){                gameOver = true;
+            if(currentGameMode === "normal" || (p1.hp <= 0 && p1PlayProgress === 3 )||(p2.hp <= 0 && p2PlayProgress === 3)){
+                playSkillSound(9998, 's1')
+                gameOver = true;
                 p1SelProgress = [1,2,3];
                 p2SelProgress = [1,2,3];
                 p1PlayProgress = 1
@@ -687,9 +689,12 @@
                 ctx.strokeStyle="purple"; ctx.lineWidth=2; ctx.stroke();
                 ctx.restore();
                 
+// Call example:
+drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/photos/plato.webp", p.x, p.y, 5, 5);
             }
 	
-			// 🔴 新增雨昊的煙霧繪製
+	// 🔴 新增雨昊的煙霧繪製
+        [p1, p2].forEach(p => {
             if (p.charIdx === 31 && p.yhSmokes) {
                 p.yhSmokes.forEach(smoke => {
                     ctx.save();
@@ -707,7 +712,8 @@
                     ctx.stroke();
                     ctx.restore();
                 });
-			}
+            }
+        });
 	// Seven-Star Marks (🍬)
             if (p.charIdx === 34) {
                 p.qxMarks.forEach(m => {
@@ -5363,6 +5369,7 @@ if (this.charIdx === 31) {
         }
 
 	if (p.charIdx === 32) {
+	    playSkillSound(32,"s1")
                 let aimAngle = Math.atan2(p.target.y - p.y, p.target.x - p.x);
             
             // 發射巨大 🌊
@@ -6716,7 +6723,23 @@ if (p.charIdx === 31) {
             setGameTimeout(()=> {
             p.mbSuper = true
             let c = 0
-            
+            p.applyStatus("losegrip", 3000)
+            p.applyStatus("disarmed", 3000)
+            let tt = setGameInterval(()=>{
+                if(c <= 60){
+                    c++
+                    p.buffs.slow = 0.2
+                    if(dist(p, p.target) < 250){
+                      enemy.takeDamage(8* p.buffs.atk)
+                      if (!p.mbPineapple){
+                          p.mbMango += 1
+                      }
+                    }
+                } else{
+                    p.mbSuper = false
+                    clearInterval(tt)
+                }
+            },50)
             },500)
         }
     }
@@ -7321,6 +7344,7 @@ if (p.charIdx === 31) {
         }
 
 	if (p.charIdx === 32) {
+	    playSkillSound(32, "s3")
             let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX);
             
             p.heal(300);
@@ -8041,7 +8065,62 @@ if (p.charIdx === 31) {
         }
     }
 
-    function castRecover(p) { if(p.cd.recover > 0 || p.hp <= 0) return; p.cd.recover = 45000; p.heal(p.maxHp * 0.05); } 
+    function castRecover(p) { if(p.cd.recover > 0 || p.hp <= 0) return; playSkillSound(8888, "s1"); p.cd.recover = 45000; p.heal(p.maxHp * 0.05); }
+    // 1. 音效管理系統 (新增)
+    // ==========================================
+    const audioCache = {}; // 音效快取池
+    function playSkillSound(charId, skillName) {
+        const soundUrl = "https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/sounds/char"+String(charId)+"_"+skillName+".mp3"
+        if (!audioCache[soundUrl]) {
+            audioCache[soundUrl] = new Audio(soundUrl);
+            if(skillName === "s3"){
+                audioCache[soundUrl].volume = 1.0; // 設定音量 大件100%
+            }else{
+                audioCache[soundUrl].volume = 0.5; // 設定音量 50%
+            }
+        }
+        const audio = audioCache[soundUrl];
+        audio.currentTime = 0;
+        audio.play().catch(err => console.log("音效播放失敗(可能是瀏覽器限制):"+soundUrl, err));
+    }
+    function drawImage(url, x, y, w, h, angle = null, flip = null) {
+        const canvas = document.getElementById("myCanvas");
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        
+        const img = new Image();
+        img.crossOrigin = "anonymous"; 
+        
+        img.onload = function() {
+            ctx.save();        
+            ctx.translate(x, y); 
+
+            // Apply rotation if provided (convert degrees to radians)
+            if (angle !== null) {
+                let rotateAngle = angle * Math.PI / 180;
+                ctx.rotate(rotateAngle);
+            }
+
+            // Apply flip if provided
+            if (flip !== null) {
+                if (flip === "horizontal") {
+                    ctx.scale(-1, 1);
+                } else if (flip === "vertical") {
+                    ctx.scale(1, -1);
+                }
+            }
+
+            ctx.drawImage(img, -w / 2, -h / 2, w, h);
+            ctx.restore(); 
+        };
+
+        img.onerror = function() {
+            console.error("The image failed to load. Check the URL or CORS settings.");
+        };
+
+        // Fixed typo: scr -> src
+        img.src = url;
+    }
     window.onload = function() {
         const modeButtons = document.querySelectorAll('.mode-btn');
         const gameModeOverlay = document.getElementById('game-mode');
@@ -8141,6 +8220,7 @@ if (p.charIdx === 31) {
         }
         window.addEventListener('resize', resize);
     };
+})();
 
 
 </script>
