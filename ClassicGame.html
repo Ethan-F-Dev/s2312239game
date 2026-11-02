@@ -2879,7 +2879,7 @@ if (this.charIdx === 31) {
                 if(this.isChargingUlt) { this.angle = this.ultLockedAngle; }
                 let speedMod = 0.0; if(this.critStacks >= 2) speedMod += 0.3; if(this.missBuffTimer > 0) speedMod += 0.3; this.buffs.speed += speedMod; 
                 if(this.missBuffTimer > 0) { this.missBuffTimer -= dt * timeScale; this.buffs.atk = 1.1; } else if(this.stateTimer <= 0) { this.buffs.atk = 1.0; }
-                if (this.comboTimer > 0) { this.comboTimer -= dt * timeScale; if (this.comboTimer <= 0) { if (this.comboCount > 0) { let healAmount = this.comboCount * 30; this.heal(healAmount); floatTexts.push(new FloatText(this.x, this.y - 100, `+${healAmount}`, "#2ecc71")); } this.comboCount = 0; } }
+                if (this.comboTimer > 0) { this.comboTimer -= dt * timeScale; if (this.comboTimer <= 0) { if (this.comboCount > 0) { let healAmount = this.comboCount * 15; this.heal(healAmount); floatTexts.push(new FloatText(this.x, this.y - 100, `+${healAmount}`, "#2ecc71")); } this.comboCount = 0; } }
             }
             if(this.charIdx === 3) {
                 if(!this.isRageMode && this.rage >= 3) { this.isRageMode = true; this.rageTimer = 10000; this.buffs.atk = 1.2; }
