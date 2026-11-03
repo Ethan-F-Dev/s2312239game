@@ -1783,9 +1783,9 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                         this.zzPassiveTick -= 1000;
                         this.heal(50);
                         this.addShield(50);
-                        if (this.zzPassiveStacks < 25) { // 25層 * 2% = 50%
+                        if (this.zzPassiveStacks < 10) { // 25層 * 2% = 50%
                             this.zzPassiveStacks++;
-                            floatTexts.push(new FloatText(this.x, this.y - 80, "+2% 能力", "cyan"));
+                            floatTexts.push(new FloatText(this.x, this.y - 80, "+5% 能力", "cyan"));
                         }
                     }
                 }
@@ -1795,7 +1795,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             }
 
             // 應用永久增益 (確保不疊加 Bug)
-            let passiveBuff = this.zzPassiveStacks * 0.02;
+            let passiveBuff = this.zzPassiveStacks * 0.05;
             if (this.zzAppliedBuff === undefined) this.zzAppliedBuff = 0;
             this.buffs.atk -= this.zzAppliedBuff;
             this.buffs.speed -= this.zzAppliedBuff;
@@ -2238,7 +2238,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                         // 消失並恢復 300 血
                         this.mimS1Bird = null;
                         this.mimS1Phase = 1;
-                        this.heal(300);
+                        this.heal(500);
                         floatTexts.push(new FloatText(this.x, this.y - 80, "+300", "green"));
                     }
                 }
@@ -3650,7 +3650,7 @@ if (this.charIdx === 31) {
             p.makCount = 0;
             e.cd.s1 += 1000;
             e.cd.s2 += 1000;
-            e.cd.s3 += 2000;
+            e.cd.s3 += 1000;
             shakeAmount = 30;
             for(let i=0; i<5; i++){ 
                 particles.push(new Particle(e.x, e.y, "gray", "normal", "😵‍💫"));
@@ -4261,7 +4261,7 @@ if (this.charIdx === 31) {
                     p.target.takeDamage(200 * p.buffs.atk, 33);
                     
                     // 命中敵人 50% 機率獲得碎片
-                    if (Math.random() < 0.5 && p.mimPieces < 5) {
+                    if (Math.random() < 0.55 && p.mimPieces < 5) {
                         p.mimPieces++;
                         floatTexts.push(new FloatText(p.x, p.y - 80, "+🧩", "purple"));
                     }
@@ -6269,7 +6269,7 @@ if (p.charIdx === 33) {
                     let localY = vX * Math.sin(-aimAngle) + vY * Math.cos(-aimAngle);
                     
                     if (localX >= 0 && localX <= 250 && Math.abs(localY) <= 10 + p.target.radius) {
-                        p.target.takeDamage(100, 33);
+                        p.target.takeDamage(200, 33);
                         hitCount++;
                         // 小額擊退
                         p.target.x += Math.cos(aimAngle) * 20; p.target.y += Math.sin(aimAngle) * 20;
@@ -6711,7 +6711,7 @@ if (p.charIdx === 31) {
                     let ang = p.angle - Math.PI/4 + (Math.PI/2 * (i/20));
                     projectiles.push(new Projectile(p.x, p.y, ang, 25, "orange", 25 * p.buffs.atk, p, "", 0.5, 200, (e) =>{
                     if (p.mbPineapple != true){
-                          p.heal(18*p.buffs.atk)
+                          p.heal(38*p.buffs.atk)
                           p.mbMango += 1
                          }    
                     }, 15, false, false, false, false));
@@ -6737,7 +6737,7 @@ if (p.charIdx === 31) {
                     c++
                     p.buffs.slow = 0.2
                     if(dist(p, p.target) < 150){
-                      enemy.takeDamage(15 * p.buffs.atk)
+                      enemy.takeDamage(20 * p.buffs.atk)
                       if (!p.mbPineapple){
                           p.mbMango += 1
                       }
@@ -6769,7 +6769,7 @@ if (p.charIdx === 31) {
         p.makRa = 50;
         p.makS3State = true;
         p.cd.s1 *= 0.4
-        p.heal((p.maxHp - p.hp)*0.25)
+        p.heal((p.maxHp - p.hp)*0.35)
         p.makShowcase = true
         p.speed = 3.8;
         p.buffs.atk = 1.3;
@@ -7061,7 +7061,7 @@ if (p.charIdx === 31) {
             
             let wave = new Projectile(p.x, p.y, aimAngle, 25, "cyan", 0, p, "〰️", 2.0, 1000, (e) => {
                 p.isCasting = false;
-                e.takeDamage(300 * p.buffs.atk, 40); // 瞬間 300 傷害
+                e.takeDamage(100 * p.buffs.atk, 40); // 瞬間 300 傷害
                 
                 // 瞬間互換位置
                 let tx = e.x, ty = e.y;
@@ -7079,7 +7079,7 @@ if (p.charIdx === 31) {
                         shots++;
                         let ballAng = Math.atan2(e.y - p.y, e.x - p.x) + (Math.random() - 0.5);
                         let proj = new Projectile(p.x, p.y, ballAng, 12, "cyan", 0, p, "🔹", 1.5, 1500, (hitE) => {
-                            if(p.target.charIdx == 44){e.takeDamage(200)}else{hitE.hp -= 200;}
+                            if(p.target.charIdx == 44){e.takeDamage(180)}else{hitE.hp -= 180;}
                             if(hitE.hp <= 0) { hitE.hp = 1; hitE.takeDamage(9999, 40); }
                             else { if(p.target.charIdx === 44){}else{floatTexts.push(new FloatText(hitE.x, hitE.y - 40, "-200", "white")); }}
                             shakeAmount = 10;
