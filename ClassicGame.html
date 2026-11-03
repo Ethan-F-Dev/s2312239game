@@ -198,7 +198,7 @@
         { name: "鎖鏈", hp: 3650, atk: 150, speed: 3.0, color: "#808080", s1Cd: 3500, s2Cd: 10000, s3Cd: 30000, atkInt: 1000 },
         { name: "雨昊", hp: 3200, atk: 105, speed: 3.4, color: "#A9A9A9", s1Cd: 5000, s2Cd: 8000, s3Cd: 35000, atkInt: 500 },
         { name: "深海", hp: 2610, atk: 95, speed: 3.1, color: "#1E90FF", s1Cd: 7500, s2Cd: 8000, s3Cd: 30000, atkInt: 450 },
-        { name: "模仿者", hp: 2500, atk: 200, speed: 3.8, color: "#E6E6FA", s1Cd: 8000, s2Cd: 12000, s3Cd: 30000, atkInt: 1000 },
+        { name: "模仿者", hp: 2300, atk: 200, speed: 3.8, color: "#E6E6FA", s1Cd: 8000, s2Cd: 12000, s3Cd: 30000, atkInt: 1000 },
         { name: "七星蓮堂", hp: 3000, atk: 105, speed: 3.3, color: "#3cb371", s1Cd: 5000, s2Cd: 6000, s3Cd: 20000, atkInt: 700 },
         { name: "溝比斯", hp: 2600, atk: 125, speed: 3.3, color: "#32CD32", s1Cd: 8000, s2Cd: 10000, s3Cd: 35000, atkInt: 1000 },
         // page 7
@@ -206,7 +206,7 @@
         { name: "陀羅", hp: 3500, atk: 60, speed: 3.5, color: "#a9a9a9", s1Cd: 6000, s2Cd: 8000, s3Cd: 20000, atkInt: 500 },
         { name: "醫師", hp: 3500, atk: 110, speed: 2.5, color: "#1E3A8A", s1Cd: 5000, s2Cd: 5000, s3Cd: 30000, atkInt: 450 },
         { name: "元能宗師", hp: 3300, atk: 91, speed: 3.0, color: "#ffa500", s1Cd: 8500, s2Cd: 12000, s3Cd: 40000, atkInt: 500 },
-        { name: "智者", hp: 2350, atk: 195, speed: 3.6, color: "#87CEFA", s1Cd: 8000, s2Cd: 12000, s3Cd: 35000, atkInt: 1000 },
+        { name: "智者", hp: 2350, atk: 195, speed: 3.6, color: "#87CEFA", s1Cd: 8000, s2Cd: 12000, s3Cd: 35000, atkInt: 1150 },
         { name: "暗夜獵手", hp: 3000, atk: 1.0, speed: 3.2, color: "#2E2E2E", s1Cd: 5000, s2Cd: 8000, s3Cd: 15000, atkInt: 600 },
         // page 8
         { name: "史萊姆", hp: 2780, atk: 135, speed: 2.5, color: "#32CD32", s1Cd: 2500, s2Cd: 5000, s3Cd: 25000, atkInt: 1500 },
@@ -1782,10 +1782,10 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                     if (this.zzPassiveTick >= 1000) {
                         this.zzPassiveTick -= 1000;
                         this.heal(50);
-                        this.addShield(50);
+                        this.addShield(80);
                         if (this.zzPassiveStacks < 25) { // 25層 * 2% = 50%
                             this.zzPassiveStacks++;
-                            floatTexts.push(new FloatText(this.x, this.y - 80, "+2% 能力", "cyan"));
+                            floatTexts.push(new FloatText(this.x, this.y - 80, "+5% 能力", "cyan"));
                         }
                     }
                 }
@@ -1795,7 +1795,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             }
 
             // 應用永久增益 (確保不疊加 Bug)
-            let passiveBuff = this.zzPassiveStacks * 0.02;
+            let passiveBuff = this.zzPassiveStacks * 0.05;
             if (this.zzAppliedBuff === undefined) this.zzAppliedBuff = 0;
             this.buffs.atk -= this.zzAppliedBuff;
             this.buffs.speed -= this.zzAppliedBuff;
@@ -2238,8 +2238,8 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                         // 消失並恢復 300 血
                         this.mimS1Bird = null;
                         this.mimS1Phase = 1;
-                        this.heal(300);
-                        floatTexts.push(new FloatText(this.x, this.y - 80, "+300", "green"));
+                        this.heal(500);
+                        floatTexts.push(new FloatText(this.x, this.y - 80, "+500", "green"));
                     }
                 }
             }
@@ -3213,7 +3213,7 @@ if (this.charIdx === 31) {
             if (this.charIdx === 40 && this.zzS2Active && dmg > 0) {
                 floatTexts.push(new FloatText(this.x, this.y - 100, "解！", "cyan", 30));
                 this.cd.s2 = Math.max(0, this.cd.s2 - 5000); // 減5秒冷卻
-                this.heal(dmg * 0.2); // 20% 傷害轉化為恢復
+                this.heal(dmg * 0.3); // 20% 傷害轉化為恢復
                 this.zzS2EnhancedAtk = true; // 獲得強化普攻
                 this.cd.atk = 0;
                 this.zzS2Active = false; this.zzS2Timer = 0; // 觸發後關閉護盾
@@ -3650,7 +3650,7 @@ if (this.charIdx === 31) {
             p.makCount = 0;
             e.cd.s1 += 1000;
             e.cd.s2 += 1000;
-            e.cd.s3 += 2000;
+            e.cd.s3 += 1000;
             shakeAmount = 30;
             for(let i=0; i<5; i++){ 
                 particles.push(new Particle(e.x, e.y, "gray", "normal", "😵‍💫"));
@@ -4261,7 +4261,7 @@ if (this.charIdx === 31) {
                     p.target.takeDamage(200 * p.buffs.atk, 33);
                     
                     // 命中敵人 50% 機率獲得碎片
-                    if (Math.random() < 0.5 && p.mimPieces < 5) {
+                    if (Math.random() < 0.55 && p.mimPieces < 5) {
                         p.mimPieces++;
                         floatTexts.push(new FloatText(p.x, p.y - 80, "+🧩", "purple"));
                     }
@@ -5102,7 +5102,7 @@ if (this.charIdx === 31) {
                     
                     if (dist(p.target, {x: tx, y: ty}) <= 80 + p.target.radius) {
                         p.target.takeDamage(200 * p.buffs.atk, 40);
-                        p.target.applyStatus('stunned', 1000); // 2秒暈眩
+                        p.target.applyStatus('stunned', 800); // 2秒暈眩
                         shakeAmount = 25;
                     }
                     
@@ -5741,9 +5741,9 @@ if (this.charIdx === 31) {
         if(p.mbState == 1){
             shakeAmount = 20
             p.activeWarning = { type:'circle', r: 200, x: p.x, y: p.y, color: 'orange' }; 
-            setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 200) {p.target.applyStatus("stunned", 1500); } }, 100);   
+            setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 200) {p.target.applyStatus("stunned", 1300); } }, 100);   
         } else {
-            p.addShield(90)
+            p.addShield(190)
             p.mbEnh += 1
             let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1)
             aimAngle = Math.atan2(joy.joyY, joy.joyX); 
@@ -6269,7 +6269,7 @@ if (p.charIdx === 33) {
                     let localY = vX * Math.sin(-aimAngle) + vY * Math.cos(-aimAngle);
                     
                     if (localX >= 0 && localX <= 250 && Math.abs(localY) <= 10 + p.target.radius) {
-                        p.target.takeDamage(100, 33);
+                        p.target.takeDamage(200, 33);
                         hitCount++;
                         // 小額擊退
                         p.target.x += Math.cos(aimAngle) * 20; p.target.y += Math.sin(aimAngle) * 20;
@@ -6697,7 +6697,7 @@ if (p.charIdx === 31) {
     if(p.charIdx === 53){
         if(p.mbState == 1){
             p.color = "#F5D356"
-            p.addShield(500)
+            p.addShield(550)
             p.mbState = 2
             p.mbEnh += 2
             let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1)
@@ -6711,7 +6711,7 @@ if (p.charIdx === 31) {
                     let ang = p.angle - Math.PI/4 + (Math.PI/2 * (i/20));
                     projectiles.push(new Projectile(p.x, p.y, ang, 25, "orange", 25 * p.buffs.atk, p, "", 0.5, 200, (e) =>{
                     if (p.mbPineapple != true){
-                          p.heal(18*p.buffs.atk)
+                          p.heal(35*p.buffs.atk)
                           p.mbMango += 1
                          }    
                     }, 15, false, false, false, false));
@@ -6723,21 +6723,21 @@ if (p.charIdx === 31) {
             let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1)
             aimAngle = Math.atan2(joy.joyY, joy.joyX); 
             p.angle = aimAngle; 
-            let tx = p.x + Math.cos(aimAngle)*250, ty = p.y + Math.sin(aimAngle)*250;
+            let tx = p.x + Math.cos(aimAngle)*150, ty = p.y + Math.sin(aimAngle)*150;
             let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.15; p.y += (ty - p.y)*0.15; }, 16); 
-            setGameTimeout(() => {clearInterval(sInt)}, 150);
+            setGameTimeout(() => {clearInterval(sInt)}, 120);
             setGameTimeout(()=> {
             p.mbSuper = true
             let c = 0
             p.applyStatus("losegrip", 3000)
             let tt = setGameInterval(()=>{
                 if(c <= 60){
-                    let rN = Math.floor(Math.random() * 360) + 1;
-                    projectiles.push(new Projectile(p.x, p.y, rN, 25, "orange", 0 * p.buffs.atk, p, "", 0.5, 200, (e) =>{}, 15, false, false, false, false));
+                    let rN = Math.floor(Math.random() * 150) + 1;
+                    projectiles.push(new Projectile(p.x, p.y, rN, 25, "orange", 0 * p.buffs.atk, p, "", 0.5, 150, (e) =>{}, 15, false, false, false, false));
                     c++
-                    p.buffs.slow = 0.2
-                    if(dist(p, p.target) < 250){
-                      enemy.takeDamage(12 * p.buffs.atk)
+                    p.buffs.slow = 0.1
+                    if(dist(p, p.target) < 150){
+                      enemy.takeDamage(19 * p.buffs.atk)
                       if (!p.mbPineapple){
                           p.mbMango += 1
                       }
@@ -6769,11 +6769,11 @@ if (p.charIdx === 31) {
         p.makRa = 50;
         p.makS3State = true;
         p.cd.s1 *= 0.4
-        p.heal((p.maxHp - p.hp)*0.25)
+        p.heal((p.maxHp - p.hp)*0.35)
         p.makShowcase = true
         p.speed = 3.8;
         p.buffs.atk = 1.3;
-        if(dist(p.target, {x:p.makX, y:p.makY}) < 500){
+        if(dist(p.target, {x:p.makX, y:p.makY}) < 250){
         enemy.isCasting = true;
         enemy.cd.s1 += 5000;
         enemy.cd.s2 += 5000;
@@ -7061,7 +7061,7 @@ if (p.charIdx === 31) {
             
             let wave = new Projectile(p.x, p.y, aimAngle, 25, "cyan", 0, p, "〰️", 2.0, 1000, (e) => {
                 p.isCasting = false;
-                e.takeDamage(300 * p.buffs.atk, 40); // 瞬間 300 傷害
+                e.takeDamage(200 * p.buffs.atk, 40); // 瞬間 300 傷害
                 
                 // 瞬間互換位置
                 let tx = e.x, ty = e.y;
