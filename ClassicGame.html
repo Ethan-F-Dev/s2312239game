@@ -645,7 +645,7 @@
             }
             
             if(p.charIdx === 51 && p.makShowcase == true){
-                ctx.save(); ctx.translate(p.x, p.y); 
+                ctx.save(); ctx.translate(p.makX, p.makY); 
                 ctx.beginPath(); ctx.arc(0,0,p.makRa,0,Math.PI*2); ctx.strokeStyle="gold";  ctx.lineWidth = 5; ctx.stroke();
                 ctx.restore();
             }
@@ -6709,7 +6709,7 @@ if (p.charIdx === 31) {
             setGameTimeout(()=>{
             for(let i=0; i<20; i++) {
                     let ang = p.angle - Math.PI/4 + (Math.PI/2 * (i/20));
-                    projectiles.push(new Projectile(p.x, p.y, ang, 25, "orange", 36 * p.buffs.atk, p, "", 0.5, 200, (e) =>{
+                    projectiles.push(new Projectile(p.x, p.y, ang, 25, "orange", 25 * p.buffs.atk, p, "", 0.5, 200, (e) =>{
                     if (p.mbPineapple != true){
                           p.heal(18*p.buffs.atk)
                           p.mbMango += 1
@@ -6730,7 +6730,6 @@ if (p.charIdx === 31) {
             p.mbSuper = true
             let c = 0
             p.applyStatus("losegrip", 3000)
-            p.applyStatus("disarmed", 3000)
             let tt = setGameInterval(()=>{
                 if(c <= 60){
                     let rN = Math.floor(Math.random() * 360) + 1;
@@ -6738,7 +6737,7 @@ if (p.charIdx === 31) {
                     c++
                     p.buffs.slow = 0.2
                     if(dist(p, p.target) < 250){
-                      enemy.takeDamage(8* p.buffs.atk)
+                      enemy.takeDamage(12 * p.buffs.atk)
                       if (!p.mbPineapple){
                           p.mbMango += 1
                       }
@@ -6765,19 +6764,25 @@ if (p.charIdx === 31) {
 
     if(p.charIdx === 51){
        setGameTimeout(()=>{
+        p.makX = p.x
+        p.makY = p.y
         p.makRa = 50;
         p.makS3State = true;
         p.cd.s1 *= 0.4
         p.heal((p.maxHp - p.hp)*0.25)
         p.makShowcase = true
-        enemy.isCasting = true;
         p.speed = 3.8;
+        p.buffs.atk = 1.3;
+        if(dist(p.target, {x:p.makX, y:p.makY}) < 500){
+        enemy.isCasting = true;
         enemy.cd.s1 += 5000;
         enemy.cd.s2 += 5000;
         enemy.cd.s3 += 5000;
-        p.buffs.atk = 1.3;
+        } else {
+            setGameTimeout(()=> p.makShowcase = false, 1200)
+        }
         let k = 1
-        let mr = setGameInterval(()=>{if(k <= 49){p.makRa += 50;}else{clearInterval(mr)}},30)
+        let mr = setGameInterval(()=>{if(k <= 10){k++; p.makRa += 50;}else{clearInterval(mr)}},30)
         setGameTimeout(()=>{p.makS3State = false;
                             p.makShowcase = false;
                             enemy.isCasting = false;
