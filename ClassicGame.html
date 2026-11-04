@@ -221,7 +221,7 @@
         { name: "武爾杳杳", hp: 2450, atk: 110, speed: 2.8, color: "#FCDF6F", s1Cd: 500, s2Cd: 500, s3Cd: 500, atkInt: 950 },
         { name: "麥克大師", hp: 2600, atk: 110, speed: 2.6, color: "#B09B9B", s1Cd: 5000, s2Cd: 15000, s3Cd: 45000, atkInt: 1100 },
         { name: "布萊奧", hp: 2050, atk: 77, speed: 4.0, color: "#00610D", s1Cd: 8000, s2Cd: 8000, s3Cd: 10000, atkInt: 800 },
-        { name: "芒果菠蘿", hp: 2300, atk: 130, speed: 3.5, color: "#EB7344", s1Cd: 5000, s2Cd: 6000, s3Cd: 30000, atkInt: 550 }
+        { name: "芒果菠蘿", hp: 2300, atk: 130, speed: 3.3, color: "#EB7344", s1Cd: 5000, s2Cd: 6000, s3Cd: 30000, atkInt: 550 }
         
     ]);
     function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
@@ -3602,7 +3602,7 @@ if (this.charIdx === 31) {
     
     if(p.charIdx === 53){
         if(p.mbState == 1){
-        projectiles.push(new Projectile(p.x, p.y, p.angle, 30, "yellow", 130 * p.buffs.atk, p, "", 1.2, false, (e) => {
+        projectiles.push(new Projectile(p.x, p.y, p.angle, 30, "yellow", 90 * p.buffs.atk, p, "", 1.2, false, (e) => {
             if (p.mbPineapple != true){
                 p.mbMango += 1
             }
@@ -3611,7 +3611,7 @@ if (this.charIdx === 31) {
            if(p.mbEnh <= 0){
            for(let i=0; i<5; i++) {
                     let ang = p.angle - Math.PI/4 + (Math.PI/2 * (i/5));
-                    projectiles.push(new Projectile(p.x, p.y, ang, 25, "orange", 30 * p.buffs.atk, p, "", 0.5, 200, (e) =>{
+                    projectiles.push(new Projectile(p.x, p.y, ang, 25, "orange", 26 * p.buffs.atk, p, "", 0.5, 200, (e) =>{
                     if (p.mbPineapple != true){
                           p.mbMango += 1
                          }    
@@ -5741,7 +5741,7 @@ if (this.charIdx === 31) {
         if(p.mbState == 1){
             shakeAmount = 20
             p.activeWarning = { type:'circle', r: 200, x: p.x, y: p.y, color: 'orange' }; 
-            setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 200) {p.target.applyStatus("stunned", 1500); } }, 100);   
+            setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 100) {p.target.applyStatus("stunned", 900); } }, 100);   
         } else {
             p.addShield(90)
             p.mbEnh += 1
@@ -6697,7 +6697,7 @@ if (p.charIdx === 31) {
     if(p.charIdx === 53){
         if(p.mbState == 1){
             p.color = "#F5D356"
-            p.addShield(500)
+            p.addShield(300)
             p.mbState = 2
             p.mbEnh += 2
             let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1)
@@ -6709,9 +6709,9 @@ if (p.charIdx === 31) {
             setGameTimeout(()=>{
             for(let i=0; i<20; i++) {
                     let ang = p.angle - Math.PI/4 + (Math.PI/2 * (i/20));
-                    projectiles.push(new Projectile(p.x, p.y, ang, 25, "orange", 25 * p.buffs.atk, p, "", 0.5, 200, (e) =>{
+                    projectiles.push(new Projectile(p.x, p.y, ang, 25, "orange", 15 * p.buffs.atk, p, "", 0.5, 200, (e) =>{
                     if (p.mbPineapple != true){
-                          p.heal(38*p.buffs.atk)
+                          p.heal(33*p.buffs.atk)
                           p.mbMango += 1
                          }    
                     }, 15, false, false, false, false));
