@@ -3618,7 +3618,8 @@ if (this.charIdx === 31) {
             }
         }
         endJimingUlt() { this.isJimingUlt = false; this.jimingUltZone.active = false; if(this.target) this.target.struggleSpeedStacks = 0; this.heal(this.jimingTotalDmg * 0.48); this.cd.s3 = CHAR_DATA[5].s3Cd; }
-        addCombo() { this.comboCount++; this.comboTimer = 3000; this.heal(this.comboCount * 30); if(this.charIdx===4 && this.comboCount%5===0) this.cd.s3 = Math.max(0, this.cd.s3 - 500); }
+        addCombo() { this.comboCount++; this.comboTimer = 3000; this.heal(50)
+			; if(this.charIdx===4 && this.comboCount%5===0) this.cd.s3 = Math.max(0, this.cd.s3 - 500); }
         addJimingStack() { if(this.charIdx !== 5) return; this.speedStacks = Math.min(4, this.speedStacks + 1); this.speedStackTimer = 10000; }
         triggerJimingDodge() { if(this.charIdx !== 5) return; this.isUntouchable = true; setGameTimeout(() => this.isUntouchable = false, 200); }
         calculateCrit(dmg) { if (this.charIdx !== 4) return { damage: dmg, isCrit: false }; let chance = 0.5 + (this.critStacks * 0.2); if (Math.random() < chance) return { damage: dmg * 2, isCrit: true }; return { damage: dmg, isCrit: false }; }
