@@ -583,10 +583,28 @@
                     }
                 });
                 if (p.clovisFlying) {
-                    ctx.font = "60px Arial"; ctx.fillText("✈️", -30, 20);
+                    ctx.font = "60px Arial"; ctx.fillText("", -30, 20);
                 }
             }
-
+            if(p.charIdx === 54){
+                if (p.nianUlt && p.target && p.target.hp > 0) {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p.target.x, p.target.y);
+                    ctx.strokeStyle = "cyan";
+                    ctx.globalAlpha = 0.5; 
+                    ctx.lineWidth = 5;
+                    ctx.stroke();
+                    ctx.font = "18px Arial";
+                    let dx = p.target.x - p.x;
+                    let dy = p.target.y - p.y;
+                    for(let i=1; i<=12; i++) {
+                        ctx.fillText("", p.x + dx*(i/12) - 9, p.y + dy*(i/12) + 9);
+                    }
+                    ctx.restore();
+                }                 
+            }
             // Constance Draw Features
             if (p.charIdx === 27) {
                 if (p.consTetherActive && p.target && p.target.hp > 0) {
@@ -907,6 +925,11 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                 if(p.charIdx === 21 && p.isTransparent) ctx.globalAlpha = 0.5;
                 if(p.charIdx === 20 && p.jLauUlt == true) { ctx.shadowBlur = 30; ctx.shadowColor = "orange"; }
                 if(p.status.frozen > 0) { ctx.fillStyle = "rgba(0,100,255,0.5)"; ctx.fillRect(-35, -35, 70, 70); }
+                
+                if(p.nianCube1 == true) { ctx.fillStyle = "rgba(0,100,255,0.5)"; ctx.fillRect(-35, -75, 80, 80); }
+                if(p.nianCube2 == true) { ctx.fillStyle = "rgba(0,100,255,0.5)"; ctx.fillRect(-75, -30, 80, 80); }
+                if(p.nianCube3 == true) { ctx.fillStyle = "rgba(0,100,255,0.5)"; ctx.fillRect(5, -15, 80, 80); }
+                                
                 if(p.charIdx === 8 && p.isTransparent) ctx.globalAlpha = 0.5;
                 if(p.charIdx === 49 && p.isTransparent) ctx.globalAlpha = 0;
                 ctx.rotate(p.angle); ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(0,0, p.radius, 0, Math.PI*2); ctx.fill();
@@ -1494,6 +1517,13 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             this.mbTimer = 0
             this.mbEnh = 0
             this.mbSuper = false
+            // Nian
+            this.nianCrit = true
+            this.nianCount = 0
+            this.nianRefresh = true
+            this.nianReS2 = true
+            this.nianUlt = false
+            this.nianBuff = 0;
         }
         triggerClovisPassive() {
             if (this.charIdx !== 35 || this.clovisPassiveCd > 0) return;
@@ -1546,6 +1576,10 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
         update(dt) {
             if(this.isDying) return;
             this.buffs.speed = 1.0 * this.buffs.slow; 
+// Nian (54) UL 
+        if(this.charIdx === 54){
+           setGameInterval(()=> {if(this.target.hp * 2 > this.target.maxHp){this.nianCrit = true} else {this.nianCrit = false}},100)
+        }
 // Mango (53) Update Logic
         if(this.charIdx === 53){
            setGameInterval(()=> {if(this.mbMango >= 5){this.mbMango = 0; this.mbPineapple = true; this.mbTimer = 5000}},500)
@@ -1588,7 +1622,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
            setGameInterval(()=> {if(this.musicNotes < 0){this.musicNotes = 0;}},500)
            setGameInterval(()=> {if(this.musicNotes >= 101){this.musicNotes = 100;}},500)
         }
-// Killl (46) Update Logic
+// Kill (46) Update Logic
 	
 
 // Blade Master (43) Update Logic
@@ -3584,7 +3618,7 @@ if (this.charIdx === 31) {
             }
         }
         endJimingUlt() { this.isJimingUlt = false; this.jimingUltZone.active = false; if(this.target) this.target.struggleSpeedStacks = 0; this.heal(this.jimingTotalDmg * 0.48); this.cd.s3 = CHAR_DATA[5].s3Cd; }
-        addCombo() { this.comboCount++; this.comboTimer = 3000; if(this.charIdx===4 && this.comboCount%5===0) this.cd.s3 = Math.max(0, this.cd.s3 - 500); }
+        addCombo() { this.comboCount++; this.comboTimer = 3000; this.heal(this.comboCount * 30); if(this.charIdx===4 && this.comboCount%5===0) this.cd.s3 = Math.max(0, this.cd.s3 - 500); }
         addJimingStack() { if(this.charIdx !== 5) return; this.speedStacks = Math.min(4, this.speedStacks + 1); this.speedStackTimer = 10000; }
         triggerJimingDodge() { if(this.charIdx !== 5) return; this.isUntouchable = true; setGameTimeout(() => this.isUntouchable = false, 200); }
         calculateCrit(dmg) { if (this.charIdx !== 4) return { damage: dmg, isCrit: false }; let chance = 0.5 + (this.critStacks * 0.2); if (Math.random() < chance) return { damage: dmg * 2, isCrit: true }; return { damage: dmg, isCrit: false }; }
@@ -3617,6 +3651,21 @@ if (this.charIdx === 31) {
     function castAtk(p) {
         const joy = p.id === 1 ? p1Touch : p2Touch;
         if(p.cd.atk > 0 || p.isLock || p.hp <= 0 || p.status.losegrip > 0) return; 
+    
+    if(p.charIdx === 54){
+        projectiles.push(new Projectile(p.x, p.y, p.angle, 30, "yellow", 50 * p.buffs.atk, p, "🌐", 1.3, false, (e) => {
+            enemy.buffs.slow = 0.8
+            if(p.nianCrit == true){
+            if(p.target.charIdx == 44){
+              
+            } else {
+                p.target.hp -= p.target.maxHp * 0.02
+                floatTexts.push(new FloatText(enemy.x, enemy.y - 80, 0 - p.target.maxHp * 0.02, "white"));
+            }
+        }
+        }, 25))
+        
+    }
     
     if(p.charIdx === 53){
         if(p.mbState == 1){
@@ -4938,6 +4987,34 @@ if (this.charIdx === 31) {
         if(p.charIdx === 6 && p.commanderMode) p.cd.s1 = 4000;
         const joy = p.id === 1 ? p1Touch : p2Touch;
     
+    if(p.charIdx === 54){
+        for (let i = -1; i <= 1; i++) {
+                    projectiles.push(new Projectile(p.x, p.y, p.angle + i*0.4, 20, "lightgreen", 100 * p.buffs.atk, p, "💠", 1.5, 600, (e) => {
+                        if(p.nianCrit == true){
+                           if(p.target.charIdx == 44){
+              
+                           } else {
+                           p.target.hp -= p.target.maxHp * 0.02
+                           floatTexts.push(new FloatText(enemy.x, enemy.y - 80, 0 - p.target.maxHp * 0.02, "white"));
+                        }
+                            
+                           }
+                        p.nianCount += 1
+                        if (p.nianCount >= 2){
+                            if(p.nianRefresh == true){
+                                p.nianCount = 0
+                                p.cd.s1 = 500
+                                p.nianRefresh = false
+                            } else {
+                                p.nianCount = 0
+                                p.nianRefresh = true
+                            }
+                        }
+                    }, 20, false, false, false, true)); // true 為穿透
+                }
+                setGameTimeout(()=> p.nianCount = 0, 499)
+    }
+    
     if(p.charIdx === 53){
         const joy = p.id === 1 ? p1Touch : p2Touch;
             let isStationary = Math.abs(joy.joyX) < 0.1 && Math.abs(joy.joyY) < 0.1;
@@ -5843,6 +5920,38 @@ if (this.charIdx === 31) {
         const joy = p.id === 1 ? p1Touch : p2Touch;
         if(p.cd.s2 > 0 || p.isLock || p.status.disarmed > 0 || p.hp <= 0) return;
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
+    
+    if(p.charIdx === 54){
+        if(dist(p, p.target) < 25){
+            enemy.takeDamage(80)
+            p.nianReS2 = false
+            if(p.nianCrit == true){
+                           if(p.target.charIdx == 44){
+              
+                           } else {
+                           p.target.hp -= p.target.maxHp * 0.02
+                           floatTexts.push(new FloatText(enemy.x, enemy.y - 80, 0 - p.target.maxHp * 0.02, "white"));
+                        }
+                            
+                           }
+        }
+        let aimAngle = p.angle; 
+        if(Math.abs(joy.joyX)>0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); 
+        let startX = p.x, startY = p.y; p.x += Math.cos(aimAngle)*200; p.y += Math.sin(aimAngle)*200; 
+        for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "🟦")); } 
+        if(dist(p.target, {x:(startX+p.x)/2, y:(startY+p.y)/2}) < 100);shakeAmount = 0;
+        setGameTimeout(() => { if(dist(p, enemy) < 25) {p.nianReS2 = false; enemy.takeDamage(80 * p.buffs.atk, 1);if(p.nianCrit == true){
+                           if(p.target.charIdx == 44){
+              
+                           } else {
+                           p.target.hp -= p.target.maxHp * 0.02
+                           floatTexts.push(new FloatText(enemy.x, enemy.y - 80, 0 - p.target.maxHp * 0.02, "white"));
+                        }
+                            
+                           }}p.activeWarning = null;}, 0);p.heal(100);p.addShield(50);
+        setGameTimeout(()=> {if(p.nianReS2 == false){p.cd.s2 = 4900; p.nianReS2 == true}else{p.cd.s2 = 300; p.nianReS2 = false}}, 100)
+        
+    }
     
     if(p.charIdx === 53){
         if(p.mbState == 1){
@@ -6801,6 +6910,55 @@ if (p.charIdx === 31) {
         if(p.status.stunned > 0 || p.status.disarmed > 0) return;
         p.cd.s3 = CHAR_DATA[p.charIdx].s3Cd;
     
+    if(p.charIdx === 54){
+        if(dist(p, p.target) < 300){
+            if(p.target.buffs.slow < 1){
+                let jx = p.target.x;
+                let jy = p.target.y;
+                let e = p.target
+               p.applyStatus("losegrip", 2000)
+               p.applyStatus("disarmed", 2000)
+               floatTexts.push(new FloatText(p.x, p.y-80, "已鎖定！", "cyan")); 
+               p.nianUlt = true
+               let c = 0
+               let k = setGameInterval(()=> {if(c < 20){c++; shakeAmount = 10} else {clearInterval(k)}},100)
+               setGameTimeout(() => {
+                        p.nianBuff = 0;
+                        setGameInterval(()=> {p.nianBuff += 100},300)
+                        let ballAng = Math.atan2(e.y - p.y, e.x - p.x);
+                        let proj = new Projectile(p.x, p.y, ballAng, 22, "cyan", 0, p, "❄️", 2.5, 1500, (hitE) => {
+                            hitE.hp -= 500 + p.nianBuff;
+                            if(hitE.hp <= 0) { hitE.hp = 1; hitE.casting = true; hitE.takeDamage(0, 40); 
+                            setGameTimeout(()=>{hitE.applyStatus("stunned", 100000); hitE.nianCube1 = true; setGameTimeout(()=>{hitE.nianCube2 = true; setGameTimeout(()=>{hitE.nianCube3 = true; setGameTimeout(()=> {for(let i=0; i<25; i++) particles.push(new Particle(jx + 40, jy, "cyan", "normal", "", 2.0)); hitE.takeDamage(99999); p.nianCube1 = false; p.nianCube2 = false; shakeAmount = 70; p.nianCube3 = false},1200)},300)
+                                
+                            },300)
+                                
+                            },300)
+                                
+                            }
+                            else { floatTexts.push(new FloatText(hitE.x, hitE.y - 40, 0 - (500 + p.nianBuff), "white")); }
+                            shakeAmount = 25;
+                        }, 40);
+                        proj.trackingTarget = e;
+                        let trackInt = setGameInterval(() => {
+                            if (proj.life <= 0 || !proj.trackingTarget) { clearInterval(trackInt); return; }
+                            let ta = Math.atan2(proj.trackingTarget.y - proj.y, proj.trackingTarget.x - proj.x);
+                            let aDiff = ta - proj.angle;
+                            if (aDiff > Math.PI) aDiff -= 2 * Math.PI; if (aDiff < -Math.PI) aDiff += 2 * Math.PI;
+                            proj.angle += aDiff * 0.15;
+                            proj.vx = Math.cos(proj.angle) * proj.speed; proj.vy = Math.sin(proj.angle) * proj.speed;
+                        }, 16);
+                        projectiles.push(proj);
+                        p.nianUlt = false
+                    }, 2000);
+            } else {
+                p.cd.s3 = 0
+            }
+        } else {
+            p.cd.s3 = 0
+            
+        }
+    }
     if(p.charIdx === 53){
         if(p.mbState == 1){
             p.color = "#F5D356"
@@ -8010,7 +8168,7 @@ if (p.charIdx === 31) {
                      projectiles.push(new Projectile(p.x, p.y, p.angle, 22, "gray", 50 + p.ultBuff, p, "🟣", 0.7, null,(e)=> {p.ultBuff += 5}));
                  } 
                   if(wave == 18) {
-                    projectiles.push(new Projectile(p.x, p.y, p.angle, 22, "gray", 75 + p.ultBuff, p, "❄️", 0.7, null,(e)=> {e.applyStatus("frozen", 300)}));
+                    projectiles.push(new Projectile(p.x, p.y, p.angle, 22, "gray", 75 + p.ultBuff, p, "❄️", 0.7, null,(e)=> {e.applyStatus("    frozen", 300)}));
                      p.hsMoveLock = false;
                      p.isCasting = false;
                      p.ultBuff = 70;
