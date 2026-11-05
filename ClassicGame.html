@@ -3494,7 +3494,7 @@ if (this.charIdx === 31) {
                 
                }
 
-            if(this.stoneUndying == true && this.hp - dmg <= 0){
+            if(this.stoneUndying == true && this.hp <= 0){
                this.target.dmg *= 0.5;
                this.stoneAddShd = false;
                this.undyingStatus = true;
@@ -6913,8 +6913,6 @@ if (p.charIdx === 31) {
     if(p.charIdx === 54){
         if(dist(p, p.target) < 300){
             if(p.target.buffs.slow < 1){
-                let jx = p.target.x;
-                let jy = p.target.y;
                 let e = p.target
                p.applyStatus("losegrip", 2000)
                p.applyStatus("disarmed", 2000)
@@ -6928,8 +6926,11 @@ if (p.charIdx === 31) {
                         let ballAng = Math.atan2(e.y - p.y, e.x - p.x);
                         let proj = new Projectile(p.x, p.y, ballAng, 22, "cyan", 0, p, "❄️", 2.5, 1500, (hitE) => {
                             hitE.hp -= 500 + p.nianBuff;
-                            if(hitE.hp <= 0) { hitE.hp = 1; hitE.casting = true; hitE.takeDamage(0, 40); 
-                            setGameTimeout(()=>{hitE.applyStatus("stunned", 100000); hitE.nianCube1 = true; setGameTimeout(()=>{hitE.nianCube2 = true; setGameTimeout(()=>{hitE.nianCube3 = true; setGameTimeout(()=> {for(let i=0; i<25; i++) particles.push(new Particle(jx + 40, jy, "cyan", "normal", "", 2.0)); hitE.takeDamage(99999); p.nianCube1 = false; p.nianCube2 = false; shakeAmount = 70; p.nianCube3 = false},1200)},300)
+                            if(hitE.hp <= 0) {let tempSA = 0; if (e.status && e.status.superArmor > 0) { 
+                            tempSA = e.status.superArmor; 
+                            e.status.superArmor = 0; // 暫時拔除原生霸體
+                        }p.isUntouchable = true; hitE.hp = 1; hitE.casting = true; hitE.takeDamage(0, 40); hitE.applyStatus("stunned", 100000);
+                            setGameTimeout(()=>{ hitE.nianCube1 = true; setGameTimeout(()=>{hitE.nianCube2 = true; setGameTimeout(()=>{hitE.nianCube3 = true; setGameTimeout(()=> {setGameTimeout(()=> p.isUntouchable = false, 200); for(let i=0; i<25; i++) particles.push(new Particle(p.target.x + 40, p.target.y, "cyan", "normal", "", 2.0)); hitE.takeDamage(99999); p.nianCube1 = false; p.nianCube2 = false; shakeAmount = 70; p.nianCube3 = false},1200)},300)
                                 
                             },300)
                                 
