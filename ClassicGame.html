@@ -222,7 +222,7 @@
         { name: "麥克大師", hp: 2600, atk: 110, speed: 2.6, color: "#B09B9B", s1Cd: 5000, s2Cd: 15000, s3Cd: 45000, atkInt: 1100 },
         { name: "布萊奧", hp: 2050, atk: 77, speed: 4.0, color: "#00610D", s1Cd: 8000, s2Cd: 8000, s3Cd: 10000, atkInt: 800 },
         { name: "芒果菠蘿", hp: 2300, atk: 130, speed: 2.3, color: "#EB7344", s1Cd: 5000, s2Cd: 6000, s3Cd: 30000, atkInt: 550 },
-        { name: "菍", hp: 2350, atk: 50, speed: 3.5, color: "#27D6F5", s1Cd: 5000, s2Cd: 5000, s3Cd: 30000, atkInt: 1000 },
+        { name: "菍", hp: 2550, atk: 50, speed: 3.5, color: "#27D6F5", s1Cd: 5000, s2Cd: 3000, s3Cd: 30000, atkInt: 1000 },
         { name: "堅", hp: 3600, atk: 50, speed: 3.0, color: "#6705F0", s1Cd: 10000, s2Cd: 13000, s3Cd: 45000, atkInt: 1500 }
     ]);
     function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
@@ -1658,8 +1658,8 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
         if (this.jianIsSquatting) {
             this.jianSquatTimer -= dt * timeScale;
             if (this.jianSquatTimer <= 0) {
-                if(this.jianS3){projectiles.push(new Projectile(this.target.x, this.target.y, this.angle, 0, "orange", 0, this.target, "🟤", 0.8, 200, (e) =>{
-                    this.heal(55)
+                if(this.target.jianS3){projectiles.push(new Projectile(this.x, this.y, this.angle, 0, "orange", 0, this, "🟤", 0.8, 200, (e) =>{
+                    this.target.heal(75)
                     }, 15, false, false, false, false));}
                 this.takeDamage(80, 76); // 深蹲對自己造成80點傷害
                 this.jianSquatCount--;
@@ -3760,7 +3760,7 @@ if (this.charIdx === 31) {
         setGameTimeout(() => { p.activeWarning = null; 
         if(dist(p, enemy) < 180) { let ang = Math.atan2(enemy.y-p.y, enemy.x-p.x); let diff = Math.abs(ang - p.angle); if(diff > Math.PI) diff = 2*Math.PI - diff; if(diff < Math.PI/4) { 
             if(p.jianS3){projectiles.push(new Projectile(p.target.x, p.target.y, p.angle, 0, "orange", 0, p.target, "🟤", 0.8, 200, (e) =>{
-                    p.heal(55)
+                    p.heal(75)
                     setGameTimeout(()=> p.jianS3 = false, 15000)
                     }, 15, false, false, false, false));}
                     
@@ -7085,7 +7085,7 @@ if (p.charIdx === 31) {
     if(p.charIdx === 55){
         projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "orange", 250, p, "🥩", 2.5, 200, (e) =>{
                     p.jianS3 = true
-                    p.jianS3buff = 2
+                    p.jianS3buff = 3.5
                     setGameTimeout(()=> {p.jianS3 = false; p.jianS3buff = 0.5} ,15000)
                     }, 15, false, false, false, false));
     }
@@ -7101,7 +7101,7 @@ if (p.charIdx === 31) {
                let k = setGameInterval(()=> {if(c < 20){c++; shakeAmount = 10} else {clearInterval(k)}},100)
                setGameTimeout(() => {
                         p.nianBuff = 0;
-                        setGameInterval(()=> {p.nianBuff += 100},300)
+                        setGameInterval(()=> {p.nianBuff += 100},200)
                         let ballAng = Math.atan2(e.y - p.y, e.x - p.x);
                         let proj = new Projectile(p.x, p.y, ballAng, 22, "cyan", 0, p, "❄️", 2.5, 1500, (hitE) => {
                             hitE.hp -= 500 + p.nianBuff;
