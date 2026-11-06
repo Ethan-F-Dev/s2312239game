@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Security-Policy" content="media-src * data: blob:;">
-    <title>巔峰對決 - 熱帶槍手 </title>
+    <title>巔峰對決 - 肥頭大耳 </title>
     <style>
         :root { --p1-ui: #3498db; --p2-ui: #e74c3c; --font-main: 'Noto Sans TC', sans-serif; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; user-select: none; 
@@ -221,9 +221,9 @@
         { name: "武爾杳杳", hp: 2450, atk: 110, speed: 2.8, color: "#FCDF6F", s1Cd: 500, s2Cd: 500, s3Cd: 500, atkInt: 950 },
         { name: "麥克大師", hp: 2600, atk: 110, speed: 2.6, color: "#B09B9B", s1Cd: 5000, s2Cd: 15000, s3Cd: 45000, atkInt: 1100 },
         { name: "布萊奧", hp: 2050, atk: 77, speed: 4.0, color: "#00610D", s1Cd: 8000, s2Cd: 8000, s3Cd: 10000, atkInt: 800 },
-        { name: "芒果菠蘿", hp: 2300, atk: 130, speed: 3.3, color: "#EB7344", s1Cd: 5000, s2Cd: 6000, s3Cd: 30000, atkInt: 550 },
+        { name: "芒果菠蘿", hp: 2300, atk: 130, speed: 2.3, color: "#EB7344", s1Cd: 5000, s2Cd: 6000, s3Cd: 30000, atkInt: 550 },
         { name: "菍", hp: 2350, atk: 50, speed: 3.5, color: "#27D6F5", s1Cd: 5000, s2Cd: 5000, s3Cd: 30000, atkInt: 1000 },
-        
+        { name: "堅", hp: 3600, atk: 50, speed: 3.0, color: "#6705F0", s1Cd: 10000, s2Cd: 13000, s3Cd: 45000, atkInt: 1500 }
     ]);
     function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
     function resize() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
@@ -547,6 +547,24 @@
         ctx.translate(width/2, height/2); ctx.scale(zoom, zoom); ctx.translate(-cx, -cy);
         if(shakeAmount > 1) ctx.translate((Math.random()-0.5)*shakeAmount, (Math.random()-0.5)*shakeAmount);
         [p1, p2].forEach(p => {
+            
+            if (p.charIdx === 55) {
+                // 畫對手掉落的咖啡色圓點
+                p.target.jianMeatDots.forEach(dot => {
+                    ctx.beginPath();
+                    ctx.arc(dot.x, dot.y, 6, 0, Math.PI * 2);
+                    ctx.fillStyle = "#8B4513"; 
+                    ctx.fill();
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = "white";
+                    ctx.stroke();
+                });
+                
+                if (p.jianMeatTimer > 0) {
+                ctx.font = "30px Arial";
+                ctx.fillText("🥩", p.x - 15, p.y - p.radius - 25);
+            }
+            }
 	// Slime Link Line
             if (p.charIdx === 42 && p.slLinkTarget) {
                 ctx.beginPath();
@@ -957,6 +975,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                 }
                 const bw = 100;
                 if(p.charIdx !== 49 || p.riseTrans !== true) {ctx.fillStyle = "#333"; ctx.fillRect(p.x - bw/2, p.y - 65, bw, 10); ctx.fillStyle = "#2ecc71"; ctx.fillRect(p.x - bw/2, p.y - 65, bw * (p.hp/p.maxHp), 10); }
+                if(p.charIdx === 55) {ctx.fillStyle = "black"; ctx.fillRect(p.x-34.3, p.y-65, 2, 7);ctx.fillRect(p.x-16.7, p.y-65, 2, 7);ctx.fillRect(p.x+0.9, p.y-65, 2, 7);ctx.fillRect(p.x+18.5, p.y-65, 2, 7);ctx.fillRect(p.x + 36.1, p.y-65, 2, 7)}
                 if(p.shield > 0) { ctx.fillStyle = "white"; ctx.fillRect(p.x - bw/2, p.y - 67, Math.min(bw, bw * p.shield/p.maxHp), 4); }
                 if(p.charIdx === 51) { ctx.fillStyle = "blue"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.makCount/3), 5); }
                 if(p.charIdx === 50) { ctx.fillStyle = "yellow"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.moonPower/100), 5); }
@@ -975,6 +994,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                 if(p.charIdx === 3) {ctx.fillStyle = "purple"; ctx.fillRect(p.x - bw/2, p.y + 55, bw * (p.rageEnhTimer/5000),5);}
                 if(p.charIdx === 44) {ctx.fillStyle = "blue"; ctx.fillRect(p.x - bw/2, p.y + 35, bw * (p.yCombo/8),5);}
                 if(p.charIdx === 20) {ctx.fillStyle = "blue"; ctx.fillRect(p.x - bw/2, p.y + 35, bw * (p.jlauPerformance/5),5);ctx.fillStyle = "black"; ctx.fillRect(p.x-30, p.y+35, 1, 5);ctx.fillRect(p.x-10, p.y+35, 1, 5);ctx.fillRect(p.x+10, p.y+35, 1, 5);ctx.fillRect(p.x+30, p.y+35, 1, 5);}
+                
                 if(p.charIdx === 10) { ctx.fillStyle = "pink"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.capacity/2500), 5); }
                 if(p.charIdx === 11) { ctx.fillStyle = "red"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.energy/1000), 5); ctx.fillStyle="black"; ctx.fillRect(p.x, p.y-75, 1, 5); }
                 if(p.charIdx === 14) { ctx.fillStyle = "green"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.luckStacks/6), 5); ctx.fillStyle="black"; ctx.fillRect(p.x, p.y-75, 1, 5); }
@@ -1081,6 +1101,16 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                     } enemy.applyStatus('slow', 200); enemy.buffs.slow = Math.min(enemy.buffs.slow, 0.9);
                 } return;
             }
+            
+            if (this.jianMeatTimer > 0 && dmg > 0) {
+                this.jianMeatDots.push({ 
+                    x: this.x + (Math.random()-0.5)*50, 
+                    y: this.y + (Math.random()-0.5)*50, 
+                    healAmt: dmg * 0.5, 
+                    life: 5000 
+                });
+            }
+            
 	// Clovis Flying S2 Split
             if (this.isClovisFlyingS2) {
                 this.splitTimer -= 16 * timeScale;
@@ -1524,6 +1554,17 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             this.nianReS2 = true
             this.nianUlt = false
             this.nianBuff = 0;
+            // Kin 
+            this.kinState = 6
+            this.jianMeatTimer = 0;
+            this.jianMeatDots = [];
+            this.jianSquatTimer = 0;
+            this.jianSquatCount = 0;
+            this.jianIsSquatting = false;
+            this.jianTauntReady = false;
+            this.jianBuffTimer = 0;
+            this.jianS3buff = 0
+            
         }
         triggerClovisPassive() {
             if (this.charIdx !== 35 || this.clovisPassiveCd > 0) return;
@@ -1576,6 +1617,66 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
         update(dt) {
             if(this.isDying) return;
             this.buffs.speed = 1.0 * this.buffs.slow; 
+// Kin (55) UL       
+        if(this.charIdx === 55){
+            this.kinState = Math.floor(this.hp / 600)
+            if (this.jianBuffTimer > 0) {
+                this.jianBuffTimer -= dt * timeScale;
+                this.buffs.speed *= 1.2;
+            }
+
+            // S2 深蹲觸發檢測
+            if (this.target.jianTauntReady && this.target.status.taunted > 0) {
+                if (dist(this, this.target) <= 200) {
+                    this.target.jianTauntReady = false;
+                    this.target.status.taunted = 0; // 取消一般嘲諷
+                    this.target.jianIsSquatting = true;
+                    this.target.jianSquatCount = 5;
+                    this.target.jianSquatTimer = 400; // 每次深蹲間隔 0.4 秒
+                    this.target.applyStatus('stunned', 2000); // 操作鎖定 2 秒
+                    floatTexts.push(new FloatText(this.target.x, this.target.y-60, "🏋️ 強制深蹲!", "yellow"));
+                }
+            }
+
+            // 撿起敵人腳下的咖啡色圓點
+            for (let i = this.target.jianMeatDots.length - 1; i >= 0; i--) {
+                let dot = this.target.jianMeatDots[i];
+                dot.life -= dt * timeScale;
+                if (dot.life <= 0) {
+                    this.target.jianMeatDots.splice(i, 1);
+                    continue;
+                }
+                if (dist(this, dot) < this.radius + 15) {
+                    this.heal(dot.healAmt);
+                    floatTexts.push(new FloatText(this.x, this.y-50, "+HP", "green"));
+                    this.target.jianMeatDots.splice(i, 1);
+                }
+            }
+        }
+
+        // 任何人若處於深蹲狀態的結算
+        if (this.jianIsSquatting) {
+            this.jianSquatTimer -= dt * timeScale;
+            if (this.jianSquatTimer <= 0) {
+                if(this.jianS3){projectiles.push(new Projectile(this.target.x, this.target.y, this.angle, 0, "orange", 0, this.target, "🟤", 0.8, 200, (e) =>{
+                    this.heal(55)
+                    }, 15, false, false, false, false));}
+                this.takeDamage(80, 76); // 深蹲對自己造成80點傷害
+                this.jianSquatCount--;
+                if (this.jianSquatCount > 0) {
+                    this.jianSquatTimer = 400;
+                    this.y += (this.jianSquatCount % 2 === 0 ? 15 : -15); // 視覺上下抖動模擬深蹲
+                } else {
+                    this.jianIsSquatting = false;
+                }
+            }
+        }
+
+        // 可口狀態倒數
+        if (this.jianMeatTimer > 0) {this.jianMeatTimer -= dt * timeScale;
+        }
+        
+        
 // Nian (54) UL 
         if(this.charIdx === 54){
            setGameInterval(()=> {if(this.target.hp * 2 > this.target.maxHp){this.nianCrit = true} else {this.nianCrit = false}},100)
@@ -1817,7 +1918,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                     if (this.zzPassiveTick >= 1000) {
                         this.zzPassiveTick -= 1000;
                         this.heal(50);
-                        this.addShield(50);
+                        this.addShield(20);
                         if (this.zzPassiveStacks < 10) { // 25層 * 2% = 50%
                             this.zzPassiveStacks++;
                             floatTexts.push(new FloatText(this.x, this.y - 80, "+5% 能力", "cyan"));
@@ -3494,7 +3595,7 @@ if (this.charIdx === 31) {
                 
                }
 
-            if(this.stoneUndying == true && this.hp <= 0){
+            if(this.stoneUndying == true && dmg >= this.hp){
                this.target.dmg *= 0.5;
                this.stoneAddShd = false;
                this.undyingStatus = true;
@@ -3602,7 +3703,7 @@ if (this.charIdx === 31) {
             
             this.mimPuppetDmgDealt = 0;
             this.cd.s3 = CHAR_DATA[33].s3Cd; // 開始計算大招冷卻
-            this.color = CHAR_DATA[33].color;tk$0
+            this.color = CHAR_DATA[33].color;
             this.speed = CHAR_DATA[33].speed;
             
             shakeAmount = 20;
@@ -3652,6 +3753,20 @@ if (this.charIdx === 31) {
     function castAtk(p) {
         const joy = p.id === 1 ? p1Touch : p2Touch;
         if(p.cd.atk > 0 || p.isLock || p.hp <= 0 || p.status.losegrip > 0) return; 
+         p.atkSpd = CHAR_DATA[p.charIdx].atkInt;
+    
+    if(p.charIdx === 55){
+        p.activeWarning = { type:'sector', r: 180, ap: Math.PI/2, color: 'purple' };
+        setGameTimeout(() => { p.activeWarning = null; 
+        if(dist(p, enemy) < 180) { let ang = Math.atan2(enemy.y-p.y, enemy.x-p.x); let diff = Math.abs(ang - p.angle); if(diff > Math.PI) diff = 2*Math.PI - diff; if(diff < Math.PI/4) { 
+            if(p.jianS3){projectiles.push(new Projectile(p.target.x, p.target.y, p.angle, 0, "orange", 0, p.target, "🟤", 0.8, 200, (e) =>{
+                    p.heal(55)
+                    setGameTimeout(()=> p.jianS3 = false, 15000)
+                    }, 15, false, false, false, false));}
+                    
+            let dmg = 50 * (1+((6 - p.kinState)* 0.1)); enemy.takeDamage(dmg);} }  }, 200);
+        CHAR_DATA[55].atkInt = 1500 / (p.jianS3buff + (1+(0.2 * (6 - p.kinState))))
+    }
     
     if(p.charIdx === 54){
         projectiles.push(new Projectile(p.x, p.y, p.angle, 30, "yellow", 50 * p.buffs.atk, p, "🌐", 1.3, false, (e) => {
@@ -4759,7 +4874,7 @@ if (this.charIdx === 31) {
         }
         else if(p.charIdx === 0) { let r = p.enhancedAtk ? 178.5 : 118; p.activeWarning = { type:'sector', r: r, ap: Math.PI*0.9, color: 'rgba(255, 0, 255, 0.6)' }; setGameTimeout(() => { if(dist(p, enemy) < r) { let dmg = (p.enhancedAtk ? 220 : 130) * p.buffs.atk; let act = enemy.takeDamage(dmg, 0); p.heal((act.hpDmg + act.shieldDmg) * 0.9); shakeAmount=5; floatTexts.push(new FloatText(p.x, p.y-80, "+HP", "magenta")); if(p.shiliLifelineActive) p.heal(dmg*0.8); } p.enhancedAtk = false; p.activeWarning = null; document.getElementById(`p${p.id}-btn-atk`).classList.remove('special-active'); }, 150); }
         else if(p.charIdx === 1) { p.activeWarning = { type:'rect', l: 180, h: 60}; setGameTimeout(() => { if(dist(p, enemy) < 180) { enemy.takeDamage(100 * p.buffs.atk, 1); p.flame += 2; shakeAmount=5; if(p.shiliLifelineActive) p.heal(100*0.8); } p.activeWarning = null; }, 100); }
-        else if(p.charIdx === 21){ if(p.divineEnh < 1){p.activeWarning = { type:'rect', l: 100, h: 60, color: 'yellow'}; setGameTimeout(() => { if(dist(p, enemy) < 100) {for(let i=0; i<15; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "☀️", 10.0)); enemy.takeDamage(30 * p.divineAtk , 1); shakeAmount=5; if(p.shiliLifelineActive) p.heal(60*0.8); if(p.divineSpd < 65){p.divineSpd += 1; p.speed = 5;};if(p.divineAtk < 1.65){p.divineAtk += 0.01;}} p.activeWarning = null; }, 100); } else {if(!Math.abs(joy.joyX) < 0.1 && !Math.abs(joy.joyY) < 0.1){p.cd.s1 -= 500; p.cd.s2 -= 500; p.cd.s3 -= 500; p.divineDash = true; p.activeWarning = { type:'rect', l: 120, h: 60, color: 'red'}; setGameTimeout(() => { if(dist(p, enemy) < 120) {for(let i=0; i<15; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "🌟", 10.0)); if(enemy.status.glitter > 0){enemy.takeDamage((65 * p.divineAtk) + (p.maxHp - p.hp) * 0.025 , 1);}else{enemy.takeDamage(65 * p.divineAtk , 1);} if(enemy.status.glitter > 0){p.heal(70 + (p.maxHp - p.hp)* 0.02)}else{p.heal(70)}; shakeAmount=5; if(p.shiliLifelineActive) p.heal(90*0.8); if(p.divineSpd < 65){p.divineSpd += 1; p.speed = 5;};if(p.divineAtk < 1.65){p.divineAtk += 0.01;}} p.activeWarning = null; p.cd.atk = 100; p.divineEnh -= 1;}, 100);let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*150, ty = p.y + Math.sin(aimAngle)*150; let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2; }, 16); setGameTimeout(() => {clearInterval(sInt);p.divineDash = false}, 150);}else{p.cd.atk = 0; floatTexts.push(new FloatText(p.x, p.y-80, "無法使用", "gray"));}}}
+        else if(p.charIdx === 21){ if(p.divineEnh < 1){p.activeWarning = { type:'rect', l: 100, h: 60, color: 'yellow'}; setGameTimeout(() => { if(dist(p, enemy) < 100) {for(let i=0; i<15; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "☀️", 10.0)); enemy.takeDamage(30 * p.divineAtk , 1); shakeAmount=5; if(p.shiliLifelineActive) p.heal(60*0.8); if(p.divineSpd < 0.65){p.divineSpd += 0.01; p.speed = 5;};if(p.divineAtk < 1.65){p.divineAtk += 0.03;}} p.activeWarning = null; }, 100); } else {if(!Math.abs(joy.joyX) < 0.1 && !Math.abs(joy.joyY) < 0.1){p.cd.s1 -= 500; p.cd.s2 -= 500; p.cd.s3 -= 500; p.divineDash = true; p.activeWarning = { type:'rect', l: 120, h: 60, color: 'red'}; setGameTimeout(() => { if(dist(p, enemy) < 120) {for(let i=0; i<15; i++) particles.push(new Particle(p.target.x, p.target.y, "orange", "normal", "🌟", 10.0)); if(enemy.status.glitter > 0){enemy.takeDamage((65 * p.divineAtk) + (p.maxHp - p.hp) * 0.025 , 1);}else{enemy.takeDamage(65 * p.divineAtk , 1);} if(enemy.status.glitter > 0){p.heal(70 + (p.maxHp - p.hp)* 0.02)}else{p.heal(70)}; shakeAmount=5; if(p.shiliLifelineActive) p.heal(90*0.8); if(p.divineSpd < 65){p.divineSpd += 1; p.speed = 5;};if(p.divineAtk < 1.65){p.divineAtk += 0.01;}} p.activeWarning = null; p.cd.atk = 100; p.divineEnh -= 1;}, 100);let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; let tx = p.x + Math.cos(aimAngle)*150, ty = p.y + Math.sin(aimAngle)*150; let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2; }, 16); setGameTimeout(() => {clearInterval(sInt);p.divineDash = false}, 150);}else{p.cd.atk = 0; floatTexts.push(new FloatText(p.x, p.y-80, "無法使用", "gray"));}}}
         else if(p.charIdx === 2) { projectiles.push(new Projectile(p.x, p.y, p.angle, 35, "yellow", 120 * p.buffs.atk, p, "☀️", 1.05, null, null, 5)); if(p.shiliLifelineActive) p.heal(156*0.8); }
         else if(p.charIdx === 3) { p.activeWarning = { type:'rect', l: 140, h: 50 }; setGameTimeout(() => { if(dist(p, enemy) < 140) {if(p.isRageEnh == false){enemy.takeDamage(120 * p.buffs.atk, 3); shakeAmount=5; if(p.shiliLifelineActive) p.heal(145*0.8); } else { if(p.target.hp * 0.08 >= 120){enemy.takeDamage((p.target.hp * 0.08) * p.buffs.atk, 3); shakeAmount=5; if(p.shiliLifelineActive) p.heal(145*0.8); } else { enemy.takeDamage(120 * p.buffs.atk, 3); shakeAmount=5; if(p.shiliLifelineActive) p.heal(145*0.8); }}} p.activeWarning = null; }, 100); }
         else if(p.charIdx === 7) { p.activeWarning = { type:'sector', r: 180, ap: Math.PI/2, color: 'rgba(0,0,255,0.5)' }; setGameTimeout(() => { p.activeWarning = null; if(dist(p, enemy) < 180) { let ang = Math.atan2(enemy.y-p.y, enemy.x-p.x); let diff = Math.abs(ang - p.angle); if(diff > Math.PI) diff = 2*Math.PI - diff; if(diff < Math.PI/4) { let dmg = 170 * (p.micahEnhanced ? 1.3 : 1.0); enemy.takeDamage(dmg, 7); if(p.shiliLifelineActive) p.heal(dmg*0.8); } }  }, 200); }
@@ -4986,6 +5101,30 @@ if (this.charIdx === 31) {
         p.speed = CHAR_DATA[p.charIdx].speed;
         if(p.charIdx === 6 && p.commanderMode) p.cd.s1 = 4000;
         const joy = p.id === 1 ? p1Touch : p2Touch;
+    
+    if(p.charIdx === 55){
+        p.addShield(200); // 獲得200點護盾
+        floatTexts.push(new FloatText(p.x, p.y-50, "🛡️ 護盾+200!", "cyan"));
+        let c = 0
+        let sk = setGameInterval(()=> {if(c <= 10){c++; shakeAmount = 10}else{clearInterval(sk)}},50)
+        setGameTimeout(() => {
+            p.activeWarning = null;
+            if(dist(p, enemy) < 350) {
+                let angleToTarget = Math.atan2(enemy.y - p.y, enemy.x - p.x);
+                let angleDiff = Math.abs(angleToTarget - p.angle);
+                if(angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
+                
+                if(angleDiff <= Math.PI/2.5) {
+                    enemy.applyStatus('slow', 5000, 0.2); // 80% 緩速 (保留20%速度)
+                    // 增加技能冷卻 3 秒
+                    if(enemy.cd) {
+                        enemy.cd.s1 += 3000; enemy.cd.s2 += 3000; enemy.cd.s3 += 3000;
+                    }
+                    
+                }
+            }
+        }, 500);
+    }
     
     if(p.charIdx === 54){
         for (let i = -1; i <= 1; i++) {
@@ -5779,7 +5918,7 @@ if (this.charIdx === 31) {
         }
         // JingCha S1
         if (p.charIdx === 13) {
-             projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "red", 400 * p.buffs.atk, p, "🚀", 1.5, 600, (e)=>{ e.applyStatus('slow', 2000); e.buffs.slow=0.8; }));
+             projectiles.push(new Projectile(p.x, p.y, p.angle, 15, "red", 250 * p.buffs.atk, p, "🚀", 1.5, 600, (e)=>{ e.applyStatus('slow', 2000); e.buffs.slow=0.8; }));
              return;
         }
         if(p.charIdx === 22) {projectiles.push(new Projectile(p.x, p.y, p.angle, 30, "gray", 450, p, "➖", 1.35, null, (e)=>{e.applyStatus("stunned", 500); let tx = e.x; let ty = e.y; p.x = tx -10 ; p.y = ty - 10;}, 10, false, false, false, false));}
@@ -5921,6 +6060,17 @@ if (this.charIdx === 31) {
         if(p.cd.s2 > 0 || p.isLock || p.status.disarmed > 0 || p.hp <= 0) return;
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
     
+     if(p.charIdx === 55){
+        let proj = new Projectile(p.x, p.y, p.angle, 12, "red", 150, p, "😡", 1.0, null, (e) => {
+            e.applyStatus('taunted', 5000);
+            e.tauntTarget = p;
+            e.jianTauntReady = true; // 標記為潛在深蹲目標
+            
+        });
+        projectiles.push(proj);
+    
+    }
+    
     if(p.charIdx === 54){
         if(dist(p, p.target) < 25){
             enemy.takeDamage(80)
@@ -5949,7 +6099,7 @@ if (this.charIdx === 31) {
                         }
                             
                            }}p.activeWarning = null;}, 0);p.heal(100);p.addShield(50);
-        setGameTimeout(()=> {if(p.nianReS2 == false){p.cd.s2 = 4900; p.nianReS2 == true}else{p.cd.s2 = 300; p.nianReS2 = false}}, 100)
+        setGameTimeout(()=> {if(p.nianReS2 == false){p.nianReS2 = true}else{p.cd.s2 = 300; p.nianReS2 = false}}, 100)
         
     }
     
@@ -6932,12 +7082,19 @@ if (p.charIdx === 31) {
         if(p.status.stunned > 0 || p.status.disarmed > 0) return;
         p.cd.s3 = CHAR_DATA[p.charIdx].s3Cd;
     
+    if(p.charIdx === 55){
+        projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "orange", 250, p, "🥩", 2.5, 200, (e) =>{
+                    p.jianS3 = true
+                    p.jianS3buff = 2
+                    setGameTimeout(()=> {p.jianS3 = false; p.jianS3buff = 0.5} ,15000)
+                    }, 15, false, false, false, false));
+    }
+    
     if(p.charIdx === 54){
         if(dist(p, p.target) < 300){
             if(p.target.buffs.slow < 1){
                 let e = p.target
                p.applyStatus("losegrip", 2000)
-               p.applyStatus("disarmed", 2000)
                floatTexts.push(new FloatText(p.x, p.y-80, "已鎖定！", "cyan")); 
                p.nianUlt = true
                let c = 0
@@ -6952,7 +7109,7 @@ if (p.charIdx === 31) {
                             tempSA = e.status.superArmor; 
                             e.status.superArmor = 0; // 暫時拔除原生霸體
                         }p.isUntouchable = true; hitE.hp = 1; hitE.casting = true; hitE.takeDamage(0, 40); hitE.applyStatus("stunned", 100000);
-                            setGameTimeout(()=>{ hitE.nianCube1 = true; setGameTimeout(()=>{hitE.nianCube2 = true; setGameTimeout(()=>{hitE.nianCube3 = true; setGameTimeout(()=> {setGameTimeout(()=> p.isUntouchable = false, 200); for(let i=0; i<25; i++) particles.push(new Particle(p.target.x + 40, p.target.y, "cyan", "normal", "", 2.0)); hitE.takeDamage(99999); p.nianCube1 = false; p.nianCube2 = false; shakeAmount = 70; p.nianCube3 = false},1200)},300)
+                            setGameTimeout(()=>{ hitE.nianCube1 = true; setGameTimeout(()=>{hitE.nianCube2 = true; setGameTimeout(()=>{hitE.nianCube3 = true; setGameTimeout(()=> {setGameTimeout(()=> p.isUntouchable = false, 200); enemy.applyStatus("stunned", 1); for(let i=0; i<25; i++) particles.push(new Particle(p.target.x + 40, p.target.y, "cyan", "normal", "", 2.0)); hitE.takeDamage(99999); p.nianCube1 = false; p.nianCube2 = false; shakeAmount = 70; p.nianCube3 = false},1200)},300)
                                 
                             },300)
                                 
@@ -7038,6 +7195,8 @@ if (p.charIdx === 31) {
             },500)
         }
     }
+    
+    
     
     if(p.charIdx === 52){
         p.cd.s1 -= 1000
@@ -7304,7 +7463,7 @@ if (p.charIdx === 31) {
                 
             } else {
                 // 遠程：扇形瞬間每0.5秒爆出20個🔪 (持續3秒 = 6波)，結束爆出巨大 💣
-                p.isCasting = true; // 引導施法
+                // 引導施法
                 let waveCount = 0;
                 
                 let waveInt = setGameInterval(() => {
@@ -7338,7 +7497,7 @@ if (p.charIdx === 31) {
                         p.cd.s1 = 0; p.cd.s2 = 0; // 刷新一二技能
                         floatTexts.push(new FloatText(p.x, p.y - 80, "絕殺陣", "purple"));
                     }
-                }, 500);
+                }, 300);
             }
             return;
         }
@@ -7629,6 +7788,7 @@ if (p.charIdx === 31) {
                 p.maxHp = CHAR_DATA[33].hp;
                 p.color = CHAR_DATA[p.charIdx].color;
                 p.speed = CHAR_DATA[p.charIdx].speed;
+                
                 
                 // 刷新所有技能
                 p.cd = { s1: 0, s2: 0, s3: 0, atk: 0, recover: p.cd.recover };
