@@ -7416,7 +7416,6 @@ if (p.charIdx === 31) {
             return;
         }
 	if (p.charIdx === 41) {
-            p.cd.s3 = 15000;
             let aimAngle = (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) ? Math.atan2(joy.joyY, joy.joyX) : p.angle;
             
             if (!p.nhIsRanged) {
