@@ -1622,7 +1622,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             this.kinState = Math.floor(this.hp / 600)
             if (this.jianBuffTimer > 0) {
                 this.jianBuffTimer -= dt * timeScale;
-                this.buffs.speed *= 1.2;
+                this.buffs.speed *= 1.5;
             }
 
             // S2 深蹲觸發檢測
@@ -6061,7 +6061,7 @@ if (this.charIdx === 31) {
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
     
      if(p.charIdx === 55){
-        let proj = new Projectile(p.x, p.y, p.angle, 12, "red", 150, p, "😡", 1.0, null, (e) => {
+        let proj = new Projectile(p.x, p.y, p.angle, 12, "red", 150, p, "😡", 1.5, null, (e) => {
             e.applyStatus('taunted', 5000);
             e.tauntTarget = p;
             e.jianTauntReady = true; // 標記為潛在深蹲目標
@@ -6072,8 +6072,8 @@ if (this.charIdx === 31) {
     }
     
     if(p.charIdx === 54){
-        if(dist(p, p.target) < 25){
-            enemy.takeDamage(80)
+        if(dist(p, p.target) < 50){
+            enemy.takeDamage(180)
             p.nianReS2 = false
             if(p.nianCrit == true){
                            if(p.target.charIdx == 44){
@@ -6090,7 +6090,7 @@ if (this.charIdx === 31) {
         let startX = p.x, startY = p.y; p.x += Math.cos(aimAngle)*200; p.y += Math.sin(aimAngle)*200; 
         for(let i=0; i<5; i++) { particles.push(new Particle(startX + (p.x-startX)*i/5, startY + (p.y-startY)*i/5, "gray", "normal", "🟦")); } 
         if(dist(p.target, {x:(startX+p.x)/2, y:(startY+p.y)/2}) < 100);shakeAmount = 0;
-        setGameTimeout(() => { if(dist(p, enemy) < 25) {p.nianReS2 = false; enemy.takeDamage(80 * p.buffs.atk, 1);if(p.nianCrit == true){
+        setGameTimeout(() => { if(dist(p, enemy) < 50) {p.nianReS2 = false; enemy.takeDamage(180 * p.buffs.atk, 1);if(p.nianCrit == true){
                            if(p.target.charIdx == 44){
               
                            } else {
@@ -7083,9 +7083,9 @@ if (p.charIdx === 31) {
         p.cd.s3 = CHAR_DATA[p.charIdx].s3Cd;
     
     if(p.charIdx === 55){
-        projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "orange", 250, p, "🥩", 2.5, 200, (e) =>{
+        projectiles.push(new Projectile(p.x, p.y, p.angle, 25, "orange", 250, p, "🥩", 2.5, 500, (e) =>{
                     p.jianS3 = true
-                    p.jianS3buff = 3.5
+                    p.jianS3buff = 5
                     setGameTimeout(()=> {p.jianS3 = false; p.jianS3buff = 0.5} ,15000)
                     }, 15, false, false, false, false));
     }
@@ -7101,7 +7101,7 @@ if (p.charIdx === 31) {
                let k = setGameInterval(()=> {if(c < 20){c++; shakeAmount = 10} else {clearInterval(k)}},100)
                setGameTimeout(() => {
                         p.nianBuff = 0;
-                        setGameInterval(()=> {p.nianBuff += 100},200)
+                        setGameInterval(()=> {p.nianBuff += 100},120)
                         let ballAng = Math.atan2(e.y - p.y, e.x - p.x);
                         let proj = new Projectile(p.x, p.y, ballAng, 22, "cyan", 0, p, "❄️", 2.5, 1500, (hitE) => {
                             hitE.hp -= 500 + p.nianBuff;
