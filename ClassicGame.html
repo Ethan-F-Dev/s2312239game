@@ -6383,7 +6383,7 @@ if (this.charIdx === 31) {
                 let aimAngle = Math.atan2(p.target.y - p.y, p.target.x - p.x);
                 p.nhS2SpdBuffTimer = 5000; // 自身速度上升30% 持續5秒
                 
-                projectiles.push(new Projectile(p.x, p.y, aimAngle, 12, "gray", 0, p, "🌪️", 4.0, 1500, (e) => {
+                projectiles.push(new Projectile(p.x, p.y, aimAngle, 10, "gray", 0, p, "🌪️", 4.0, 1500, (e) => {
                     let dmg = 300 * p.buffs.atk;
                     e.takeDamage(dmg, 41);
                     if (p.nhNightfallActive) p.heal(dmg * 0.6);
@@ -7455,6 +7455,7 @@ if (p.charIdx === 31) {
                         clearInterval(dashInt); 
                         p.isCasting = false; p.isUntouchable = false;
                         p.cd.s1 = 0; p.cd.s2 = 0; // 刷新一二技能
+                        p.cd.s3 = 22000
                         p.heal(200);              // 恢復 200 血
                         p.nhS3AtkSpdTimer = 5000; // 攻速上升 30% 持續 5 秒
                     }
@@ -7472,7 +7473,7 @@ if (p.charIdx === 31) {
                         let offsetAng = (Math.random() - 0.5) * Math.PI / 2; // 扇形擴散
                         let projAngle = aimAngle + offsetAng;
                         projectiles.push(new Projectile(p.x, p.y, projAngle, 18 + Math.random()*5, "gray", 0, p, "🔪", 1.2, 800, (e) => {
-                            let dmg = 10; // 真傷
+                            let dmg = 5; // 真傷
                             e.hp -= dmg;
                             if (e.hp <= 0) { e.hp = 1; e.takeDamage(9999, 41); }
                             else floatTexts.push(new FloatText(e.x, e.y - 40, "-10", "white"));
@@ -7494,6 +7495,7 @@ if (p.charIdx === 31) {
                         
                         p.isCasting = false;
                         p.cd.s1 = 0; p.cd.s2 = 0; // 刷新一二技能
+                        
                         floatTexts.push(new FloatText(p.x, p.y - 80, "絕殺陣", "purple"));
                     }
                 }, 300);
