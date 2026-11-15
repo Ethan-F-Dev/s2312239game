@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Security-Policy" content="media-src * data: blob:;">
-    <title>巔峰對決 - 肥頭大耳 </title>
+    <title>巔峰對決 - 新真傷更新 </title>
     <style>
         :root { --p1-ui: #3498db; --p2-ui: #e74c3c; --font-main: 'Noto Sans TC', sans-serif; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; user-select: none; 
@@ -3350,14 +3350,15 @@ if (this.charIdx === 31) {
                 this.activeWarning = null;
             }, time);
         }
+
+
         takeDamage(dmg, attackerCharIdx = -1, isCrit = false) {
             if(this.isUntouchable) return { hpDmg: 0, shieldDmg: 0 };
 // 刀俠 (43) 雙刀大絕：所有傷害轉換為真傷，吸血量增加50%
             let atkP = (attackerCharIdx !== -1 && p1.charIdx === attackerCharIdx) ? p1 : (p2.charIdx === attackerCharIdx ? p2 : null);
             if (atkP && atkP.charIdx === 43 && atkP.dxS3DualTimer > 0 && dmg > 0) {
-                this.hp -= dmg;
+                this.trueDamage(dmg)
                 if (this.hp <= 0) { this.hp = 1; this.takeDamage(9999, 43); }
-                else floatTexts.push(new FloatText(this.x, this.y - 40, `-${Math.round(dmg)}`, "white"));
                 
                 atkP.heal(dmg * 0.50); // 額外50%吸血
                 return { hpDmg: dmg, shieldDmg: 0 };
@@ -3683,6 +3684,16 @@ if (this.charIdx === 31) {
             }
             return { hpDmg, shieldDmg }; 
         }
+        trueDamage(dmg){
+             if(this.isUntouchable) return { dmg : 0 };
+             if(this.charIdx === 44){
+              this.takeDamage(dmg)
+             } else {
+                this.hp -= dmg;
+                floatTexts.push(new FloatText(this.x, this.y - 100, 0 - dmg, "white"));
+             }
+        }
+
         heal(amt) { if(this.hp <= 0) return; if(this.target.kCanHeal == false) return; if(this.wounds > 0) { amt *= (1 - 0.1 * this.wounds); if(amt < 0) amt = 0; } this.hp = Math.min(this.maxHp, this.hp + amt); if(amt > 21) floatTexts.push(new FloatText(this.x, this.y - 40, `+${Math.round(amt)}`, "#2ecc71")); }
 	endMimicPuppet() {
             if (!this.mimIsPuppet) return;
@@ -3775,8 +3786,8 @@ if (this.charIdx === 31) {
             if(p.target.charIdx == 44){
               
             } else {
-                p.target.hp -= p.target.maxHp * 0.02
-                floatTexts.push(new FloatText(enemy.x, enemy.y - 80, 0 - p.target.maxHp * 0.02, "white"));
+                let dmg = p.target.maxHp * 0.02
+                enemy.trueDamage(dmg)
             }
         }
         }, 25))
@@ -4115,7 +4126,7 @@ if (this.charIdx === 31) {
                     }, 150);
                 } else {
                     // 雙刀普攻
-                    p.activeWarning = { type: 'sector', r: 180, ap: Math.PI / 1.5, angle: aimAngle, color: 'rgba(255, 0, 0, 0.4)' };
+                    p.activeWarning = { type: 'sector', r: 180, ap: Math.PI / 1.5, angle: p.angle, color: 'rgba(255, 0, 0, 0.4)' };
                     setGameTimeout(() => {
                         p.activeWarning = null;
                         let distToTarget = Math.hypot(p.target.x - p.x, p.target.y - p.y);
@@ -4197,7 +4208,7 @@ if (this.charIdx === 31) {
             
             if (!p.nhIsRanged) {
                 // 近戰普攻：紅色扇形範圍 110 點傷害
-                p.activeWarning = { type: 'fan', r: 80, angle: aimAngle, span: Math.PI/2, color: 'rgba(255, 0, 0, 0.4)', x: p.x, y: p.y };
+                p.activeWarning = { type: 'rect', r: 80, angle: aimAngle, span: Math.PI/2, color: 'red', x: p.x, y: p.y };
                 setGameTimeout(() => { p.activeWarning = null; }, 100);
                 
                 let distToTarget = Math.hypot(p.target.x - p.x, p.target.y - p.y);
@@ -4234,9 +4245,9 @@ if (this.charIdx === 31) {
                 p.zzS2EnhancedAtk = false;
                 projectiles.push(new Projectile(p.x, p.y, aimAngle, 35, "cyan", 0, p, "▬", 3.0, 900, (e) => {
                     let dmg = 180* 1.5 * p.buffs.atk; // 強化給予倍率真傷
-                    e.hp -= dmg;
+                    e.trueDamage(dmg);
                     if(e.hp <= 0) { e.hp = 1; e.takeDamage(9999, 40); }
-                    else { floatTexts.push(new FloatText(e.x, e.y - 40, `-${Math.round(dmg)}`, "white")); }
+                    else { }
                     e.applyStatus('stunned', 1000);
                     shakeAmount = 25;
                     for(let i=0; i<15; i++) particles.push(new Particle(e.x, e.y, "cyan", "normal", "💥", 1.5));
@@ -4350,8 +4361,7 @@ if (this.charIdx === 31) {
                     let dmg = 60 * p.buffs.atk;
                     if (p.tlS2Timer > 0 && !p.target.isUntouchable) { 
                         // 真傷：無視護盾與防禦直接扣血
-                        p.target.hp -= dmg;
-                        floatTexts.push(new FloatText(p.target.x, p.target.y - 40, `-${Math.round(dmg)}`, "white"));
+                        p.target.trueDamage(dmg)
                         if(p.target.hp <= 0) { p.target.hp = 1; p.target.takeDamage(9999, 37); }
                     } else if (p.tlS2Timer <= 0) {
                         p.target.takeDamage(dmg, 37);
@@ -4642,14 +4652,13 @@ if (this.charIdx === 31) {
                 if (isTrueDmg) {
                     let finalDmg = dmg;
                     if(p.target.wounds > 0) finalDmg *= 1.2;
-                    p.target.hp -= finalDmg;
+                    p.target.trueDamage(finalDmg)
                     if(p.target.shield > 0) p.target.shield = Math.max(0, p.target.shield - finalDmg);
                     if(p.target.hp <= 0) {
                         p.target.hp = 1;
                         p.target.takeDamage(9999, 28);
                         p.wenBasicAim = false
                     } else {
-                        floatTexts.push(new FloatText(p.target.x, p.target.y-50, `-${Math.round(finalDmg)}`, "white"));
                         shakeAmount = 25;
                         p.wenBasicAim = false
                     }
@@ -5133,8 +5142,8 @@ if (this.charIdx === 31) {
                            if(p.target.charIdx == 44){
               
                            } else {
-                           p.target.hp -= p.target.maxHp * 0.02
-                           floatTexts.push(new FloatText(enemy.x, enemy.y - 80, 0 - p.target.maxHp * 0.02, "white"));
+                           let dmg = p.target.maxHp * 0.02
+                           enemy.trueDamage(dmg)
                         }
                             
                            }
@@ -5399,8 +5408,8 @@ if (this.charIdx === 31) {
                         
                         p.zzS1Phase++;
                         p.zzS1ComboTimer = 3000; // 3 秒內施放下一段
-                        p.cd.s1 = 500; // 命中刷新，不扣冷卻
-                        floatTexts.push(new FloatText(p.x, p.y - 80, `連段 ${p.zzS1Phase-1}`, "cyan"));
+                        p.cd.s1 = 500; // 命中刷新，不扣冷卻 
+                       floatTexts.push(new FloatText(p.x, p.y - 80, `連段 ${p.zzS1Phase-1}`, "cyan"));
                     } else {
                         p.zzS1Phase = 1;
                         p.cd.s1 = 6000; // 未命中進入冷卻
@@ -5508,7 +5517,7 @@ if (this.charIdx === 31) {
                     hit = true;
                     let dmg = 150 * p.buffs.atk;
                     if (p.tlS2Timer > 0 && !p.target.isUntouchable) { // 真傷
-                        p.target.hp -= dmg;
+                        p.target.trueDamage(dmg)
                         floatTexts.push(new FloatText(p.target.x, p.target.y - 40, `-${Math.round(dmg)}`, "white"));
                         if(p.target.hp <= 0) { p.target.hp = 1; p.target.takeDamage(9999, 35); }
                     } else if (p.tlS2Timer <= 0) {
@@ -6079,8 +6088,8 @@ if (this.charIdx === 31) {
                            if(p.target.charIdx == 44){
               
                            } else {
-                           p.target.hp -= p.target.maxHp * 0.02
-                           floatTexts.push(new FloatText(enemy.x, enemy.y - 80, 0 - p.target.maxHp * 0.02, "white"));
+                           let dmg = p.target.maxHp * 0.02
+                           enemy.trueDamage(dmg)
                         }
                             
                            }
@@ -7104,19 +7113,20 @@ if (p.charIdx === 31) {
                         setGameInterval(()=> {p.nianBuff += 100},120)
                         let ballAng = Math.atan2(e.y - p.y, e.x - p.x);
                         let proj = new Projectile(p.x, p.y, ballAng, 22, "cyan", 0, p, "❄️", 2.5, 1500, (hitE) => {
-                            hitE.hp -= 500 + p.nianBuff;
+                            let dmg = 500 + p.nianBuff
+                            enemy.trueDamage(dmg)
                             if(hitE.hp <= 0) {let tempSA = 0; if (e.status && e.status.superArmor > 0) { 
                             tempSA = e.status.superArmor; 
                             e.status.superArmor = 0; // 暫時拔除原生霸體
                         }p.isUntouchable = true; hitE.hp = 1; hitE.casting = true; hitE.takeDamage(0, 40); hitE.applyStatus("stunned", 100000);
-                            setGameTimeout(()=>{ hitE.nianCube1 = true; setGameTimeout(()=>{hitE.nianCube2 = true; setGameTimeout(()=>{hitE.nianCube3 = true; setGameTimeout(()=> {setGameTimeout(()=> p.isUntouchable = false, 200); enemy.applyStatus("stunned", 1); for(let i=0; i<25; i++) particles.push(new Particle(p.target.x + 40, p.target.y, "cyan", "normal", "", 2.0)); hitE.takeDamage(99999); p.nianCube1 = false; p.nianCube2 = false; shakeAmount = 70; p.nianCube3 = false},1200)},300)
+                            setGameTimeout(()=>{ p.target.nianCube1 = true; setGameTimeout(()=>{hitE.nianCube2 = true; setGameTimeout(()=>{hitE.nianCube3 = true; setGameTimeout(()=> {setGameTimeout(()=> p.isUntouchable = false, 200); enemy.applyStatus("stunned", 1); for(let i=0; i<25; i++) particles.push(new Particle(p.target.x + 40, p.target.y, "cyan", "normal", "", 2.0)); hitE.takeDamage(99999); p.target.nianCube1 = false; p.target.nianCube2 = false; shakeAmount = 70; p.target.nianCube3 = false},1200)},300)
                                 
                             },300)
                                 
                             },300)
                                 
                             }
-                            else { floatTexts.push(new FloatText(hitE.x, hitE.y - 40, 0 - (500 + p.nianBuff), "white")); }
+                            else { }
                             shakeAmount = 25;
                         }, 40);
                         proj.trackingTarget = e;
@@ -7440,9 +7450,8 @@ if (p.charIdx === 31) {
                     if (!hitTarget && Math.hypot(p.target.x - p.x, p.target.y - p.y) <= 60 + p.target.radius) {
                         hitTarget = true;
                         let dmg = 400; // 真實傷害
-                        p.target.hp -= dmg;
+                        p.target.trueDamage(dmg)
                         if (p.target.hp <= 0) { p.target.hp = 1; p.target.takeDamage(9999, 41); }
-                        else floatTexts.push(new FloatText(p.target.x, p.target.y - 40, "-450", "white"));
                         if (p.nhNightfallActive) p.heal(dmg * 0.6);
                         
                         p.target.applyStatus('stunned', 2000);
@@ -7474,7 +7483,7 @@ if (p.charIdx === 31) {
                         let projAngle = aimAngle + offsetAng;
                         projectiles.push(new Projectile(p.x, p.y, projAngle, 18 + Math.random()*5, "gray", 0, p, "🔪", 1.2, 800, (e) => {
                             let dmg = 5; // 真傷
-                            e.hp -= dmg;
+                            p.target.trueDamage(dmg)
                             if (e.hp <= 0) { e.hp = 1; e.takeDamage(9999, 41); }
                             else floatTexts.push(new FloatText(e.x, e.y - 40, "-10", "white"));
                             if (p.nhNightfallActive) p.heal(dmg * 0.6);
@@ -7527,9 +7536,9 @@ if (p.charIdx === 31) {
                         shots++;
                         let ballAng = Math.atan2(e.y - p.y, e.x - p.x) + (Math.random() - 0.5);
                         let proj = new Projectile(p.x, p.y, ballAng, 12, "cyan", 0, p, "🔹", 1.5, 1500, (hitE) => {
-                            if(p.target.charIdx == 44){e.takeDamage(180)}else{hitE.hp -= 180;}
+                            e.trueDamage(180)
                             if(hitE.hp <= 0) { hitE.hp = 1; hitE.takeDamage(9999, 40); }
-                            else { if(p.target.charIdx === 44){}else{floatTexts.push(new FloatText(hitE.x, hitE.y - 40, "-200", "white")); }}
+                            else { }
                             shakeAmount = 10;
                         }, 25);
                         proj.trackingTarget = e;
@@ -7552,9 +7561,9 @@ if (p.charIdx === 31) {
                     setGameTimeout(() => {
                         let ballAng = Math.atan2(e.y - p.y, e.x - p.x);
                         let proj = new Projectile(p.x, p.y, ballAng, 10, "cyan", 0, p, "💠", 2.5, 1500, (hitE) => {
-                            hitE.hp -= 500;
+                            hitE.trueDamage(500)
                             if(hitE.hp <= 0) { hitE.hp = 1; hitE.takeDamage(9999, 40); }
-                            else { floatTexts.push(new FloatText(hitE.x, hitE.y - 40, "-500", "white")); }
+                            else {}
                             hitE.applyStatus('stunned', 2000);
                             shakeAmount = 25;
                         }, 40);
@@ -7614,8 +7623,7 @@ if (p.charIdx === 31) {
             // 造成 300 點瞬間傷害
             let dmg = 300 * p.buffs.atk;
             if (p.tlS2Timer > 0 && !p.target.isUntouchable) { // 真傷
-                p.target.hp -= dmg;
-                floatTexts.push(new FloatText(p.target.x, p.target.y - 40, `-${Math.round(dmg)}`, "white"));
+                p.target.trueDamage(dmg)
                 if(p.target.hp <= 0) { p.target.hp = 1; p.target.takeDamage(9999, 37); }
             } else if (p.tlS2Timer <= 0) {
                 p.target.takeDamage(dmg, 37);
