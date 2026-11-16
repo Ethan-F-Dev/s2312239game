@@ -220,7 +220,7 @@
         { name: "瑞艾斯", hp: 2450, atk: 160, speed: 3.6, color: "#DEDEDE", s1Cd: 5000, s2Cd: 8000, s3Cd: 30000, atkInt: 400 },
         { name: "武爾杳杳", hp: 2150, atk: 110, speed: 2.8, color: "#FCDF6F", s1Cd: 500, s2Cd: 500, s3Cd: 500, atkInt: 950 },
         { name: "麥克大師", hp: 2600, atk: 110, speed: 2.6, color: "#B09B9B", s1Cd: 5000, s2Cd: 15000, s3Cd: 45000, atkInt: 1100 },
-        { name: "怒斧", hp: 2050, atk: 77, speed: 4.0, color: "#00610D", s1Cd: 8000, s2Cd: 8000, s3Cd: 10000, atkInt: 800 },
+        { name: "怒斧", hp: 3100, atk: 100, speed: 3.0, color: "#470024", s1Cd: 5000, s2Cd: 8000, s3Cd: 33000, atkInt: 1100 },
         { name: "芒果菠蘿", hp: 2300, atk: 130, speed: 2.3, color: "#EB7344", s1Cd: 5000, s2Cd: 6000, s3Cd: 30000, atkInt: 550 },
         // page 10
         { name: "菍", hp: 2550, atk: 50, speed: 3.5, color: "#27D6F5", s1Cd: 5000, s2Cd: 3000, s3Cd: 30000, atkInt: 1000 },
@@ -983,6 +983,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                 if(p.charIdx === 48) { ctx.fillStyle = "red"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.yinFuel/100), 5); }
                 if(p.charIdx === 45) { ctx.fillStyle = "gray"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.jEnergy/2), 5); }
                 if(p.charIdx === 3) { ctx.fillStyle = "red"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.rage/3), 5); }
+                if(p.charIdx === 52) { ctx.fillStyle = "red"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.axeRage/6), 5); }
                 if(p.charIdx === 18) { ctx.fillStyle = "white"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.ammo/4), 5); ctx.fillStyle = "black"; ctx.fillRect(p.x, p.y-75, 1, 5); }
                 if(p.charIdx === 7) { ctx.fillStyle = "gold"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.funds/100), 5); ctx.fillStyle = "black"; ctx.fillRect(p.x, p.y-75, 1, 5); }
                 if(p.charIdx === 19) {ctx.fillStyle = "gray"; ctx.fillRect(p.x - bw/2, p.y - 75, bw * (p.leoEnAtk/3),5);}
@@ -1538,24 +1539,24 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             this.makShowcase = false;
             this.makRa = 50;
             this.makS3State = false;
-            // Bailao (52)
-            this.flowerClone = null;
-            this.bCD = false;
-            // Mango 
+            // Axe (52)
+            this.axeRage = 0;
+            this.axeEnh = false;
+            // Mango (53)
             this.mbPineapple = false
             this.mbMango = 0
             this.mbState = 1
             this.mbTimer = 0
             this.mbEnh = 0
             this.mbSuper = false
-            // Nian
+            // Nian (54)
             this.nianCrit = true
             this.nianCount = 0
             this.nianRefresh = true
             this.nianReS2 = true
             this.nianUlt = false
             this.nianBuff = 0;
-            // Kin 
+            // Kin (55) 
             this.kinState = 6
             this.jianMeatTimer = 0;
             this.jianMeatDots = [];
@@ -3708,6 +3709,27 @@ if (this.charIdx === 31) {
             shakeAmount = 20;
             for(let i=0; i<30; i++) particles.push(new Particle(this.x, this.y, "purple", "normal", "🪞", 1.5));
         }
+        axePassive(){
+          if(this.status.stunned > 0){
+            this.axeRage += 1
+            floatTexts.push(new FloatText(this.x, this.y - 100, "暴怒!", "red"));
+          } else if(this.status.losegrip > 0){
+            this.axeRage += 1
+            floatTexts.push(new FloatText(this.x, this.y - 100, "暴怒!", "red"));
+          } else if(this.status.disarmed > 0){
+            this.axeRage += 1
+            floatTexts.push(new FloatText(this.x, this.y - 100, "暴怒!", "red"));
+          } else if (this.buffs.slow < 1){
+            this.axeRage += 1
+            floatTexts.push(new FloatText(this.x, this.y - 100, "暴怒!", "red"));
+          }
+          
+          this.status.stunned = 0
+          this.status.losegrip = 0
+          this.status.disarmed = 0
+          this.buffs.slow = 1
+        }
+        
         addShield(amt) { if(this.hp <= 0) return; this.shield += amt; if(amt>0) floatTexts.push(new FloatText(this.x, this.y - 60, `+${Math.round(amt)}`, "white")); }
         addStoneS3Circle(){if(this.stoneS3 == true) {ctx.strokeStyle = "gray"; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(0,0, this.radius + 10, 0, Math.PI*2); ctx.stroke();}}
         triggerDeath(attackerCharIdx) {
@@ -3815,7 +3837,15 @@ if (this.charIdx === 31) {
        }
     }
     
-    
+    if(p.charIdx === 52){
+        p.activeWarning = { type:'sector', r: 150, ap: Math.PI/2, color: 'red' };
+        setGameTimeout(() => { p.activeWarning = null; 
+        if(dist(p, enemy) < 150) { let ang = Math.atan2(enemy.y-p.y, enemy.x-p.x); let diff = Math.abs(ang - p.angle); if(diff > Math.PI) diff = 2*Math.PI - diff; if(diff < Math.PI/4) { 
+            p.target.takeDamage(100)
+        }
+    }
+        }, 200)
+    }
 
     if(p.charIdx === 51){
         if(p.makCount == 3){
@@ -5086,7 +5116,7 @@ if (this.charIdx === 31) {
     function castS1(p) {
         const enemy = p.target;
         p.color = CHAR_DATA[p.charIdx].color;
-        if(p.cd.s1 > 0 || (p.isLock && !p.isChargingUlt) || p.status.disarmed > 0 || p.hp <= 0) return;
+        if(p.cd.s1 > 0 || (p.isLock && !p.isChargingUlt) || p.status.disarmed > 0 || p.hp <= 0) if(p.charIdx != 52) return;
         if(p.charIdx === 8 && p.shiliS1Lock) return;
         p.cd.s1 = CHAR_DATA[p.charIdx].s1Cd;
         p.speed = CHAR_DATA[p.charIdx].speed;
@@ -5184,6 +5214,9 @@ if (this.charIdx === 31) {
         }
     }
     
+    if(p.charIdx === 52){
+        p.axePassive()
+    }
     
     if(p.charIdx === 51){
         if(p.makS3State == true){p.cd.s1 = 2000}
