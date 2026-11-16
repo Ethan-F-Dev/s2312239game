@@ -4236,13 +4236,14 @@ if (this.charIdx === 31) {
             let aimAngle = Math.atan2(p.target.y - p.y, p.target.x - p.x);
             
             // 計算大招攻速加成 (攻速上升 20% = 間隔縮小)
-            let currentAtkInt = 600;
+            let currentAtkInt = 950;
             if (p.nhS3AtkSpdTimer > 0) currentAtkInt *= 0.8; 
             p.cd.atk = currentAtkInt;
             
             if (!p.nhIsRanged) {
                 // 近戰普攻：紅色扇形範圍 110 點傷害
-                p.activeWarning = { type: 'rect', r: 80, angle: aimAngle, span: Math.PI/2, color: 'red', x: p.x, y: p.y };
+                let rectW = 80, rectH = 30; 
+                p.activeWarning = { type: 'rect', l: rectW, h: rectH, angle: p.angle, color: "red" };
                 setGameTimeout(() => { p.activeWarning = null; }, 100);
                 
                 let distToTarget = Math.hypot(p.target.x - p.x, p.target.y - p.y);
