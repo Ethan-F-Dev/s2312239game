@@ -5229,8 +5229,8 @@ if (this.charIdx === 31) {
                     p.heal(135);
                     let d = CHAR_DATA[p.id];
                     let enemyOrginalSpeed = d.speed;
-                    enemy.buffs.slow = 0.5;
-                    enemy.speed = enemy.speed / 2;
+                    enemy.buffs.slow = 0.66;
+                    enemy.speed = enemy.speed / 1.5;
                     setGameTimeout(()=> enemy.speed = enemyOrginalSpeed, 1500)
                 }, 25, false, false, false, true));
             }
@@ -6392,7 +6392,7 @@ if (this.charIdx === 31) {
                 let aimAngle = Math.atan2(p.target.y - p.y, p.target.x - p.x);
                 p.nhS2SpdBuffTimer = 5000; // 自身速度上升30% 持續5秒
                 
-                projectiles.push(new Projectile(p.x, p.y, aimAngle, 10, "gray", 0, p, "🌪️", 4.0, 1500, (e) => {
+                projectiles.push(new Projectile(p.x, p.y, aimAngle, 6, "gray", 0, p, "🌪️", 4.0, 1500, (e) => {
                     let dmg = 300 * p.buffs.atk;
                     e.takeDamage(dmg, 41);
                     if (p.nhNightfallActive) p.heal(dmg * 0.6);
@@ -7248,8 +7248,8 @@ if (p.charIdx === 31) {
     }
 
     if(p.charIdx === 50){
-     if(p.moonPower >= 50){
-         p.moonPower -= 40;
+     if(p.moonPower >= 60){
+         p.moonPower -= 50;
      floatTexts.push(new FloatText(p.x, p.y - 80, "月華之力！", "yellow"));
      p.applyStatus("SuperArmor")
      setGameTimeout(()=>{
@@ -7464,7 +7464,7 @@ if (p.charIdx === 31) {
                         clearInterval(dashInt); 
                         p.isCasting = false; p.isUntouchable = false;
                         p.cd.s1 = 0; p.cd.s2 = 0; // 刷新一二技能
-                        p.cd.s3 = 22000
+                        p.cd.s3 = 32000
                         p.heal(200);              // 恢復 200 血
                         p.nhS3AtkSpdTimer = 5000; // 攻速上升 30% 持續 5 秒
                     }
