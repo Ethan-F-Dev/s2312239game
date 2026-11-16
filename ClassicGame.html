@@ -939,6 +939,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                 if(p.charIdx === 44 && p.ySuper == true) { ctx.shadowBlur = 50; ctx.shadowColor = "blue"; }
                 if(p.charIdx === 21 && p.shine == true) { ctx.shadowBlur = 30; ctx.shadowColor = "gold"; };
                 if(p.charIdx === 53 && p.mbEnh > 0) { ctx.shadowBlur = 50; ctx.shadowColor = "Gold"; }
+                if(p.charIdx === 52 && p.axeEnh == true) { ctx.shadowBlur = 50; ctx.shadowColor = "Red"; } 
                 if(p.charIdx === 21 && p.divineS3 == 3) { ctx.shadowBlur = 50; ctx.shadowColor = "orange"; }
                 if(p.charIdx === 51 && p.makS3State == true) { ctx.shadowBlur = 50; ctx.shadowColor = "gold"; }
                 if(p.charIdx === 21 && p.isTransparent) ctx.globalAlpha = 0.5;
@@ -5216,6 +5217,10 @@ if (this.charIdx === 31) {
     
     if(p.charIdx === 52){
         p.axePassive()
+        p.speed = 4.2
+        p.axeEnh = true
+        shakeAmount = 20
+        setGameTimeout(()=> {p.speed = 3.0;},2000)
     }
     
     if(p.charIdx === 51){
