@@ -1543,6 +1543,9 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             // Axe (52)
             this.axeRage = 0;
             this.axeEnh = false;
+            this.axeCanHit = true;
+            this.axeS2 = false;
+            this.axeInt = 1;
             // Mango (53)
             this.mbPineapple = false
             this.mbMango = 0
@@ -3839,13 +3842,31 @@ if (this.charIdx === 31) {
     }
     
     if(p.charIdx === 52){
+        CHAR_DATA[52].atkInt = 1100 * p.axeInt
+        if(p.axeEnh === false){
         p.activeWarning = { type:'sector', r: 150, ap: Math.PI/2, color: 'red' };
         setGameTimeout(() => { p.activeWarning = null; 
         if(dist(p, enemy) < 150) { let ang = Math.atan2(enemy.y-p.y, enemy.x-p.x); let diff = Math.abs(ang - p.angle); if(diff > Math.PI) diff = 2*Math.PI - diff; if(diff < Math.PI/4) { 
             p.target.takeDamage(100)
+            if(p.axeS2 == true){
+                p.heal(160)
+            }
         }
-    }
-        }, 200)
+       }
+      }, 200)
+        } else {
+            p.addShield(120);
+            p.axeCanHit = true
+            p.axeEnh = false
+            let aimAngle = p.angle; if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1)
+            aimAngle = Math.atan2(joy.joyY, joy.joyX); 
+            p.angle = aimAngle; 
+            let tx = p.x + Math.cos(aimAngle)*250, ty = p.y + Math.sin(aimAngle)*250; 
+            if(dist(p, p.target) < 50){if(p.axeCanHit == true){p.axeCanHit = false; p.target.takeDamage(150);}}
+            let sInt = setGameInterval(() => { if(dist(p, p.target) < 50){if(p.axeCanHit == true){p.axeCanHit = false; p.target.takeDamage(150);}}; p.x += (tx - p.x)*0.1; p.y += (ty - p.y)*0.1; }, 16); setGameTimeout(() => {clearInterval(sInt)}, 150);
+            
+            
+        }
     }
 
     if(p.charIdx === 51){
@@ -6079,7 +6100,7 @@ if (this.charIdx === 31) {
     function castS2(p) {
         const enemy = p.target;
         const joy = p.id === 1 ? p1Touch : p2Touch;
-        if(p.cd.s2 > 0 || p.isLock || p.status.disarmed > 0 || p.hp <= 0) return;
+        if(p.cd.s2 > 0 || p.isLock || p.status.disarmed > 0 || p.hp <= 0) if(p.charIdx != 52) return;
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
     
      if(p.charIdx === 55){
@@ -6128,7 +6149,7 @@ if (this.charIdx === 31) {
     if(p.charIdx === 53){
         if(p.mbState == 1){
             shakeAmount = 20
-            p.activeWarning = { type:'circle', r: 200, x: p.x, y: p.y, color: 'orange' }; 
+            p.activeWarning = { type:'circle', r: 100, x: p.x, y: p.y, color: 'orange' }; 
             setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 100) {p.target.applyStatus("stunned", 900); } }, 100);   
         } else {
             p.addShield(90)
@@ -6142,6 +6163,20 @@ if (this.charIdx === 31) {
         }
     }
     
+    if(p.charIdx === 52){
+        p.activeWarning = { type:'circle', r: 100, x: p.x, y: p.y, color: 'red' }; 
+        p.axePassive()
+        setGameTimeout(()=>{
+            p.activeWarning = null;
+        if(dist(p, p.target) < 100){
+            p.target.takeDamage(180)
+            p.target.buffs.slow = 0.5
+            p.axeInt = 0.4
+            p.axeS2 = true
+            setGameTimeout(()=>{p.axeInt = 1; p.axeS2 = false},1900)
+        }
+      },100)
+    }
 
     if(p.charIdx === 51){
          if(p.makS2 == 1){
@@ -7090,7 +7125,7 @@ if (p.charIdx === 31) {
         const enemy = p.target;
         if(p.cd.s3 > 0 || p.hp <= 0) return;
         // Tai S3 Restriction
-        if(p.status.stunned > 0 || p.status.disarmed > 0 || p.isCasting) return;
+        if(p.status.stunned > 0 || p.status.disarmed > 0 || p.isCasting) if(p.charIdx != 52) return;
         if(p.status.stunned > 0 || p.status.disarmed > 0) return;
         p.cd.s3 = CHAR_DATA[p.charIdx].s3Cd;
     
