@@ -6209,16 +6209,16 @@ if (this.charIdx === 31) {
     if(p.charIdx === 50){
         if(p.moonPower >= 20){
            if(p.moonPower < 50){
-            p.speed= 5.2;
-            p.moonPower -= 20;
+            p.speed= 4.2;
+            p.moonPower -= 30;
             let aimAngle = p.angle;
         if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; 
         let tx = p.x + Math.cos(aimAngle)*150, ty = p.y + Math.sin(aimAngle)*150; let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2; }, 16); setGameTimeout(() => clearInterval(sInt), 150);
         let c = 0;
         let ms = setGameInterval(()=> {if(c < 8){ c++; p.activeWarning = { type:'rect', l: 120, h: 30, color: "yellow"}; setGameTimeout(() => { if(dist(p, enemy) < 121) { p.heal(12);enemy.takeDamage(40, 1); } p.activeWarning = null; }, 50);} else {p.speed = 4.0; clearInterval(ms)}},250)
            } else {
-           p.speed = 5.2
-            p.moonPower -= 20;
+           p.speed = 4.2
+            p.moonPower -= 30;
             let aimAngle = p.angle;
         if (Math.abs(joy.joyX) > 0.1 || Math.abs(joy.joyY) > 0.1) aimAngle = Math.atan2(joy.joyY, joy.joyX); p.angle = aimAngle; 
         let tx = p.x + Math.cos(aimAngle)*150, ty = p.y + Math.sin(aimAngle)*150; let sInt = setGameInterval(() => { p.x += (tx - p.x)*0.2; p.y += (ty - p.y)*0.2; }, 16); setGameTimeout(() => clearInterval(sInt), 150);
