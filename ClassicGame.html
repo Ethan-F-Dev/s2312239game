@@ -3682,7 +3682,13 @@ if (this.charIdx === 31) {
              if(this.charIdx === 44){
               this.takeDamage(dmg)
              } else {
+                if(dmg < this.hp){
                 this.hp -= dmg;
+                } else{
+                    this.hp = 1
+                    setGameTimeout(()=> this.takeDamage(dmg) ,10)
+                    
+                }
                 floatTexts.push(new FloatText(this.x, this.y - 100, 0 - dmg, "white"));
              }
         }
@@ -6165,16 +6171,16 @@ if (this.charIdx === 31) {
     }
     
     if(p.charIdx === 52){
-        p.activeWarning = { type:'circle', r: 100, x: p.x, y: p.y, color: 'red' }; 
+        p.activeWarning = { type:'circle', r: 150, x: p.x, y: p.y, color: 'red' }; 
         p.axePassive()
         setGameTimeout(()=>{
             p.activeWarning = null;
-        if(dist(p, p.target) < 100){
+        if(dist(p, p.target) < 150){
             p.target.takeDamage(180)
             p.target.buffs.slow = 0.5
             p.axeInt = 0.4
             p.axeS2 = true
-            setGameTimeout(()=>{p.axeInt = 1; p.axeS2 = false},1900)
+            setGameTimeout(()=>{p.axeInt = 1; p.axeS2 = false},2900)
         }
       },100)
     }
@@ -7243,6 +7249,20 @@ if (p.charIdx === 31) {
             },50)
             },500)
         }
+    }
+    
+    if(p.charIdx === 52){
+        setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 250) {
+            let c = 0;
+            let rd = setGameInterval(()=> {
+                if(c < 10){
+                shakeAmount = 1
+                let tx = (enemy.x - p.x)/ (11-c);
+                let ty = (enemy.y - p.y)/ (11 - c);
+                p.x += tx; p.y += ty;
+                c++
+                }else{for(let j=0; j<25; j++) particles.push(new Particle(enemy.x, enemy.y, "orange", "normal", "🩸", 3.0)); clearInterval(rd);enemy.trueDamage(500); shakeAmount = 100;}},10)
+            }else{p.cd.s3 = 0;} }, 100); 
     }
 
     if(p.charIdx === 51){
