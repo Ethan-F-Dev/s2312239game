@@ -5170,6 +5170,7 @@ if (this.charIdx === 31) {
     function castS1(p) {
         const enemy = p.target;
         p.color = CHAR_DATA[p.charIdx].color;
+        if(p.cd.s1 > 0) return;
         if(p.cd.s1 > 0 || (p.isLock && !p.isChargingUlt) || p.status.disarmed > 0 || p.hp <= 0) if(p.charIdx != 52) return;
         if(p.charIdx === 8 && p.shiliS1Lock) return;
         p.cd.s1 = CHAR_DATA[p.charIdx].s1Cd;
@@ -6132,6 +6133,7 @@ if (this.charIdx === 31) {
     function castS2(p) {
         const enemy = p.target;
         const joy = p.id === 1 ? p1Touch : p2Touch;
+        if(p.cd.s2 > 0) return;
         if(p.cd.s2 > 0 || p.isLock || p.status.disarmed > 0 || p.hp <= 0) if(p.charIdx != 52) return;
         p.cd.s2 = CHAR_DATA[p.charIdx].s2Cd;
     
@@ -7163,7 +7165,6 @@ if (p.charIdx === 31) {
         if(p.cd.s3 > 0 || p.hp <= 0) return;
         // Tai S3 Restriction
         if(p.status.stunned > 0 || p.status.disarmed > 0 || p.isCasting) if(p.charIdx != 52) return;
-        if(p.status.stunned > 0 || p.status.disarmed > 0) return;
         p.cd.s3 = CHAR_DATA[p.charIdx].s3Cd;
     
     if(p.charIdx === 55){
@@ -7284,6 +7285,8 @@ if (p.charIdx === 31) {
     if(p.charIdx === 52){
         setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 250) {
             p.axeFly = true
+            p.axePassive()
+            p.isCasting = true
             let c = 0;
             let rd = setGameInterval(()=> {
                 if(c < 10){
@@ -7296,6 +7299,7 @@ if (p.charIdx === 31) {
                     particles.push(new Particle(enemy.x, enemy.y, "red", "normal", "跳砍！", 3.0)); 
                     p.axeS3 = true 
                     p.axeFly = false
+                    p.isCasting = false
                     p.heal(200)
                     enemy.trueDamage(550 + p.axeRage * 66); 
                     setGameTimeout(()=> p.axeS3 = false, 5000)
