@@ -858,6 +858,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                         ctx.beginPath(); ctx.arc(0, 0, currentR, 0, Math.PI * 2);
                         ctx.fillStyle = "rgba(0, 100, 0, 0.2)"; ctx.fill();
                         ctx.strokeStyle = "rgba(0, 100, 0, 0.8)"; ctx.lineWidth = 3; ctx.stroke();
+                        
                     }
                     ctx.restore();
                 });
@@ -1549,6 +1550,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             this.axeS3 = false
             this.axeFly = false
             this.axeInt = 1;
+            this.axeTimer = 5000;
             // Mango (53)
             this.mbPineapple = false
             this.mbMango = 0
@@ -2178,7 +2180,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                     this.lpS2Ticks--;
                     
                     let aimAngle = Math.atan2(this.target.y - this.y, this.target.x - this.x);
-                    projectiles.push(new Projectile(this.x, this.y, aimAngle, 20, "green", 100 * this.buffs.atk, this, "❓", 1.5, 800, (e) => {
+                    projectiles.push(new Projectile(this.x, this.y, aimAngle, 20, "green", 70 * this.buffs.atk, this, "❓", 1.5, 800, (e) => {
                         // 【修復：正確判定狀態的霸體並繞過，精準賦予暈眩】
                         let tempSA = 0;
                         if (e.status && e.status.superArmor > 0) { 
@@ -2779,7 +2781,9 @@ if (this.charIdx === 31) {
                     if (z.tickTimer >= 1000) z.tickTimer = 0;
                     
                     if (z.timer <= 0 && z.type === 's3') {
-                        floatTexts.push(new FloatText(z.x, z.y, "🌺", "red", 100));
+                        for(let i=0; i<20; i++) {
+                        let ang = (Math.PI*2 * i) / 20;
+                         particles.push(new Particle(z.x, z.y, "pink", "normal", "🌺", 1.0, 2, this.angle)); }
                         if (dist(this.target, z) < currentR) {
                             let act = this.target.takeDamage(300, 26);
                             if (this.yushanEnhanced) this.heal((act.hpDmg + act.shieldDmg) * 0.2);
@@ -3130,6 +3134,11 @@ if (this.charIdx === 31) {
                 this.leoTimer += dt * timeScale;
                 if (this.leoTimer >= 3000) { this.leoEnAtk = Math.min(3, this.leoEnAtk + 1); this.leoTimer = 0; } 
                        }
+            }
+            
+            if(this.charIdx === 52){
+                this.axeTimer -= dt * timeScale;
+                if (this.axeTimer <= 0) {this.axeTimer = 5000; if(this.axeRage >= 1){this.axeRage -= 1}}
             }
             
             if(this.charIdx === 51){
@@ -3695,7 +3704,7 @@ if (this.charIdx === 31) {
                     setGameTimeout(()=> this.takeDamage(dmg) ,10)
                     
                 }
-                floatTexts.push(new FloatText(this.x, this.y - 100, 0 - dmg, "white"));
+                floatTexts.push(new FloatText(this.x, this.y - 100, parseInt(0-dmg), "white"));
              }
         }
 
@@ -3726,20 +3735,28 @@ if (this.charIdx === 31) {
             for(let i=0; i<30; i++) particles.push(new Particle(this.x, this.y, "purple", "normal", "🪞", 1.5));
         }
         axePassive(){
-          if(this.status.stunned > 0){
+          if(this.status.stunned > 0 || this.status.bound > 0 || this.status.frozen > 0 || this.status.taunted > 0){
             this.axeRage += 1
+            this.axeTimer = 5000
             floatTexts.push(new FloatText(this.x, this.y - 100, "暴怒!", "red"));
           } else if(this.status.losegrip > 0){
             this.axeRage += 1
+            this.axeTimer = 5000
             floatTexts.push(new FloatText(this.x, this.y - 100, "暴怒!", "red"));
           } else if(this.status.disarmed > 0){
             this.axeRage += 1
+            this.axeTimer = 5000
             floatTexts.push(new FloatText(this.x, this.y - 100, "暴怒!", "red"));
           } else if (this.buffs.slow < 1){
             this.axeRage += 1
+            this.axeTimer = 5000
             floatTexts.push(new FloatText(this.x, this.y - 100, "暴怒!", "red"));
           }
           
+          this.status.intimidated = 0
+          this.status.bound = 0
+          this.status.frozen = 0
+          this.status.taunted = 0
           this.status.stunned = 0
           this.status.losegrip = 0
           this.status.disarmed = 0
@@ -6213,7 +6230,7 @@ if (this.charIdx === 31) {
             p.target.takeDamage(180 + 22 * p.axeRage)
             if(p.axeS3 == true){
                 p.heal((180 + p.axeRage * 22) * 0.5)
-                p.target.trueDamage(44)
+                p.target.trueDamage((180 + p.axeRage * 22) * 0.2)
             }
             p.target.buffs.slow = 0.5
             p.axeInt = 0.3
