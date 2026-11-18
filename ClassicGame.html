@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Security-Policy" content="media-src * data: blob:;">
     <title>巔峰對決 - 新真傷更新 </title>
+    <script type="module">
+      // Use "rapier2d-compat" instead if your game is 2D
+      import RAPIER from 'https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-compat@0.21.0/+esm';
+      await RAPIER.init();
+      window.RAPIER = RAPIER;
+      window.dispatchEvent(new Event('rapier-ready'));
+    </script>
     <style>
         :root { --p1-ui: #3498db; --p2-ui: #e74c3c; --font-main: 'Noto Sans TC', sans-serif; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; user-select: none; 
