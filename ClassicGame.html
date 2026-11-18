@@ -1685,6 +1685,9 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
         if (this.jianMeatTimer > 0) {this.jianMeatTimer -= dt * timeScale;
         }
         
+        if(this.charIdx === 52){
+           setGameInterval(()=> {if (this.axeRage > 6){this.axeRage = 6}},100)
+        }
         
 // Nian (54) UL 
         if(this.charIdx === 54){
@@ -3822,6 +3825,8 @@ if (this.charIdx === 31) {
         projectiles.push(new Projectile(p.x, p.y, p.angle, 30, "yellow", 90 * p.buffs.atk, p, "", 1.2, false, (e) => {
             if (p.mbPineapple != true){
                 p.mbMango += 1
+            } else {
+                enemy.trueDamage(18 * p.buffs.atk)
             }
         }, 25))
        } else {
@@ -3859,7 +3864,7 @@ if (this.charIdx === 31) {
         if(dist(p, enemy) < 150) { let ang = Math.atan2(enemy.y-p.y, enemy.x-p.x); let diff = Math.abs(ang - p.angle); if(diff > Math.PI) diff = 2*Math.PI - diff; if(diff < Math.PI/4) { 
             p.target.takeDamage(100 + p.axeRage * 12)
             if(p.axeS2 == true){
-                p.heal(160)
+                p.heal(80)
             }
             if(p.axeS3 == true){
                 p.heal((100 + p.axeRage * 12) * 0.5)
@@ -3879,7 +3884,7 @@ if (this.charIdx === 31) {
             let tx = p.x + Math.cos(aimAngle)*250, ty = p.y + Math.sin(aimAngle)*250; 
             if(dist(p, p.target) < 50){if(p.axeCanHit == true){
                 if(p.axeS2 == true){
-                p.heal(160)
+                p.heal(80)
             }
             if(p.axeS3 == true){
                 p.heal((150 + p.axeRage * 18) * 0.5)
@@ -3888,7 +3893,7 @@ if (this.charIdx === 31) {
                 p.axeCanHit = false; p.target.takeDamage(150 + 18 * p.axeRage);}}
             let sInt = setGameInterval(() => { if(dist(p, p.target) < 50){if(p.axeCanHit == true){
                 if(p.axeS2 == true){
-                p.heal(160)
+                p.heal(80)
             }
             if(p.axeS3 == true){
                 p.heal((150 + p.axeRage * 18) * 0.5)
@@ -5243,6 +5248,8 @@ if (this.charIdx === 31) {
         if(c<10){c++; projectiles.push(new Projectile(p.x, p.y, p.angle, 30, "yellow", 50 * p.buffs.atk, p, "", 1.2, false, (e) => {
             if (p.mbPineapple != true){
                 p.mbMango += 1
+            } else {
+                enemy.trueDamage(10 * p.buffs.atk)
             }
             p.heal(9 * p.buffs.atk)
         }, 25))
@@ -7271,6 +7278,8 @@ if (p.charIdx === 31) {
                       enemy.takeDamage(20 * p.buffs.atk)
                       if (!p.mbPineapple){
                           p.mbMango += 1
+                      } else {
+                          enemy.trueDamage(4 * p.buffs.atk)
                       }
                     }
                 } else{
