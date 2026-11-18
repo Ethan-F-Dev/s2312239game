@@ -391,7 +391,6 @@
      * @param {string} [textColor="#ffffff"] - Hex or CSS color for text (e.g., "#fff", "#ffff00").
      */
     function showAchievement(text, bannerRGB = "255, 215, 0", textColor = "#ffffff") {
-        if(currentGameMode === "normal"){return}
         const uiLayer = document.getElementById('ui-layer');
         if (!uiLayer) return;
         if (uiLayer.dataset.achievementPlaying === "true") return;
