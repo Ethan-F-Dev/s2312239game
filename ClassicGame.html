@@ -3706,9 +3706,12 @@ if (this.charIdx === 31) {
                 if(dmg < this.hp){
                 this.hp -= dmg;
                 } else{
-                    this.hp = 1
+                    if(this.target.charIdx != 54){
+                        this.hp = 1
                     setGameTimeout(()=> this.takeDamage(dmg) ,10)
-                    
+                    } else {
+                        this.hp = 1
+                    }
                 }
                 floatTexts.push(new FloatText(this.x, this.y - 100, parseInt(0-dmg), "white"));
              }
@@ -7221,7 +7224,7 @@ if (p.charIdx === 31) {
                         let proj = new Projectile(p.x, p.y, ballAng, 22, "cyan", 0, p, "❄️", 2.5, 1500, (hitE) => {
                             let dmg = 500 + p.nianBuff
                             enemy.trueDamage(dmg)
-                            if(hitE.hp <= 0) {let tempSA = 0; if (e.status && e.status.superArmor > 0) { 
+                            if(hitE.hp <= 1) {let tempSA = 0; if (e.status && e.status.superArmor > 0) { 
                             tempSA = e.status.superArmor; 
                             e.status.superArmor = 0; // 暫時拔除原生霸體
                         }p.isUntouchable = true; hitE.hp = 1; hitE.casting = true; hitE.takeDamage(0, 40); hitE.applyStatus("stunned", 100000);
