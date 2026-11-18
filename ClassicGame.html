@@ -5667,7 +5667,7 @@ if (this.charIdx === 31) {
                 // 【穿透修改 2】：命中敵人後不再呼叫 stopCrutch，讓拐杖貫穿過去
                 if (!hit && Math.hypot(p.target.x - projX, p.target.y - projY) <= 30 + p.target.radius) {
                     hit = true; // 確保只會造成一次傷害
-                    p.target.takeDamage(180 * p.buffs.atk, 36);
+                    p.target.takeDamage(100 * p.buffs.atk, 36);
                     p.target.applyStatus('slow', 2000);
                     p.target.buffs.slow = Math.min(p.target.buffs.slow, 0.2); 
                     // 拔除原本在這裡的強制落地與座標綁定
@@ -7757,7 +7757,7 @@ if (p.charIdx === 31) {
             setGameTimeout(() => {
                 p.activeWarning = null;
                 if (dist(p, p.target) <= 100 + p.target.radius) {
-                    p.target.takeDamage(210 * p.buffs.atk, 36);
+                    p.target.takeDamage(110 * p.buffs.atk, 36);
                     let pushAng = Math.atan2(p.target.y - p.y, p.target.x - p.x);
                     p.target.x += Math.cos(pushAng) * 100;
                     p.target.y += Math.sin(pushAng) * 100;
