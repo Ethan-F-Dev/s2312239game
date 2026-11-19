@@ -3144,7 +3144,7 @@ if (this.charIdx === 31) {
             
             if(this.charIdx === 52){
                 this.axeTimer -= dt * timeScale;
-                if (this.axeTimer <= 0) {this.axeTimer = 5000; if(this.axeRage >= 1){this.axeRage -= 1}}
+                if (this.axeTimer <= 0) {this.axeTimer = 7000; if(this.axeRage >= 1){this.axeRage -= 1}}
             }
             
             if(this.charIdx === 51){
@@ -3884,7 +3884,7 @@ if (this.charIdx === 31) {
     if(p.charIdx === 52){
         
         if(p.axeEnh === false){
-            CHAR_DATA[52].atkInt = 1100 * p.axeInt
+            CHAR_DATA[52].atkInt = 900 * p.axeInt
         p.activeWarning = { type:'sector', r: 150, ap: Math.PI/2, color: 'red' };
         setGameTimeout(() => { p.activeWarning = null; 
         if(dist(p, enemy) < 150) { let ang = Math.atan2(enemy.y-p.y, enemy.x-p.x); let diff = Math.abs(ang - p.angle); if(diff > Math.PI) diff = 2*Math.PI - diff; if(diff < Math.PI/4) { 
@@ -6241,8 +6241,8 @@ if (this.charIdx === 31) {
                 p.heal((180 + p.axeRage * 22) * 0.5)
                 p.target.trueDamage((180 + p.axeRage * 22) * 0.2)
             }
-            p.target.buffs.slow = 0.5
-            p.axeInt = 0.3
+            p.target.buffs.slow = 0.4
+            p.axeInt = 0.2
             CHAR_DATA[52].atkInt = 0
             p.axeS2 = true
             setGameTimeout(()=>{p.axeInt = 1; p.axeS2 = false},2900)
@@ -7318,7 +7318,7 @@ if (p.charIdx === 31) {
     }
     
     if(p.charIdx === 52){
-        setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 250) {
+        setGameTimeout(()=>{ p.activeWarning = null; if(dist(p, p.target) < 280) {
             p.axeFly = true
             p.axePassive()
             p.isCasting = true
@@ -7338,7 +7338,7 @@ if (p.charIdx === 31) {
                     p.heal(200)
                     enemy.trueDamage(550 + p.axeRage * 66); 
                     setGameTimeout(()=> p.axeS3 = false, 5000)
-                    for(let j=0; j<25; j++) particles.push(new Particle(enemy.x, enemy.y, "orange", "normal", "🩸", 3.0)); clearInterval(rd);shakeAmount = 100;}},10)
+                    for(let j=0; j<25; j++) particles.push(new Particle(enemy.x, enemy.y, "orange", "normal", "🩸", 3.0)); clearInterval(rd);shakeAmount = 150;}},10)
             }else{
                 p.cd.s3 = 0;
                 particles.push(new Particle(enemy.x, enemy.y, "red", "normal", "距離過遠！", 3.0)); 
