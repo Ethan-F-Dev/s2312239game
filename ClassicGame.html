@@ -1556,7 +1556,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
             this.axeS3 = false
             this.axeFly = false
             this.axeInt = 1;
-            this.axeTimer = 5000;
+            this.axeTimer = 10000;
             // Mango (53)
             this.mbPineapple = false
             this.mbMango = 0
@@ -3144,7 +3144,7 @@ if (this.charIdx === 31) {
             
             if(this.charIdx === 52){
                 this.axeTimer -= dt * timeScale;
-                if (this.axeTimer <= 0) {this.axeTimer = 7000; if(this.axeRage >= 1){this.axeRage -= 1}}
+                if (this.axeTimer <= 0) {this.axeTimer = 10000; if(this.axeRage >= 1){this.axeRage -= 1}}
             }
             
             if(this.charIdx === 51){
@@ -3746,19 +3746,19 @@ if (this.charIdx === 31) {
         axePassive(){
           if(this.status.stunned > 0 || this.status.bound > 0 || this.status.frozen > 0 || this.status.taunted > 0){
             this.axeRage += 1
-            this.axeTimer = 5000
+            this.axeTimer = 10000
             floatTexts.push(new FloatText(this.x, this.y - 100, "暴怒!", "red"));
           } else if(this.status.losegrip > 0){
             this.axeRage += 1
-            this.axeTimer = 5000
+            this.axeTimer = 10000
             floatTexts.push(new FloatText(this.x, this.y - 100, "暴怒!", "red"));
           } else if(this.status.disarmed > 0){
             this.axeRage += 1
-            this.axeTimer = 5000
+            this.axeTimer = 10000
             floatTexts.push(new FloatText(this.x, this.y - 100, "暴怒!", "red"));
           } else if (this.buffs.slow < 1){
             this.axeRage += 1
-            this.axeTimer = 5000
+            this.axeTimer = 10000
             floatTexts.push(new FloatText(this.x, this.y - 100, "暴怒!", "red"));
           }
           
