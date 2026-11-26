@@ -2263,7 +2263,7 @@ drawImage("https://cdn.jsdelivr.net/gh/s2312239-sketch/s2312239Database@main/pho
                     
                     let extraTime = Math.max(0, (this.clovisFlyTimer / 1000) - 10);
                     let bonus = Math.floor(extraTime) * 50;
-                    let explosionDmg = 350 + bonus;
+                    let explosionDmg = 500 + bonus;
                     this.addShield(bonus);
                     
                     this.activeWarning = { type: 'circle', r: 200, color: 'rgba(100,100,100,0.5)', x: this.x, y: this.y };
@@ -3010,7 +3010,7 @@ if (this.charIdx === 31) {
             if(this.buffs.slow < 1.0) { this.buffs.slow = Math.min(1.0, this.buffs.slow + 0.005 * timeScale); }
             if (this.struggleSpeedStacks > 0) { if (Math.random() < 0.01) this.struggleSpeedStacks = Math.max(0, this.struggleSpeedStacks - 1); this.buffs.speed += this.struggleSpeedStacks * 0.05; }
             if (this.target && this.target.charIdx === 5 && !this.target.isJimingUlt) { this.struggleSpeedStacks = 0; }
-            if (this.charIdx === 1) { if ((this.hp / this.maxHp) < 0.5) { this.taiRegenTimer += dt * timeScale; if (this.taiRegenTimer >= 1000) { this.heal(80); this.taiRegenTimer = 0; } } else { this.taiRegenTimer = 0; } }
+            if (this.charIdx === 1) { if ((this.hp / this.maxHp) < 0.5) { this.taiRegenTimer += dt * timeScale; if (this.taiRegenTimer >= 1000) { this.heal(40); this.taiRegenTimer = 0; } } else { this.taiRegenTimer = 0; } }
             if (this.charIdx === 44) { if (this.yProtection >= 1 && this.ySuper == false) { this.yRegenTimer += dt * timeScale; if (this.yRegenTimer >= 200) { this.yProtection -= 1; this.yRegenTimer = 0; } } else { this.yRegenTimer = 0; } }
             if (this.charIdx === 10) { this.hanhanRegenTimer += dt; if(this.hanhanRegenTimer >= 1000) { this.heal(50); this.hanhanRegenTimer = 0; } }
             // Jiming Passive
@@ -3852,7 +3852,7 @@ if (this.charIdx === 31) {
             if (p.mbPineapple != true){
                 p.mbMango += 1
             } else {
-                enemy.trueDamage(18 * p.buffs.atk)
+                enemy.trueDamage(28 * p.buffs.atk)
             }
         }, 25))
        } else {
@@ -3872,7 +3872,7 @@ if (this.charIdx === 31) {
                     projectiles.push(new Projectile(p.x, p.y, ang, 25, "orange", 30 * p.buffs.atk, p, "", 0.5, 200, (e) =>{
                     p.cd.atk = 100
                     if (p.mbPineapple != true){
-                          p.heal(18*p.buffs.atk)
+                          p.heal(28*p.buffs.atk)
                           p.mbMango += 1
                          }    
                     }, 15, false, false, false, false));
@@ -3885,9 +3885,9 @@ if (this.charIdx === 31) {
         
         if(p.axeEnh === false){
             CHAR_DATA[52].atkInt = 900 * p.axeInt
-        p.activeWarning = { type:'sector', r: 150, ap: Math.PI/2, color: 'red' };
+        p.activeWarning = { type:'sector', r: 120, ap: Math.PI/2, color: 'red' };
         setGameTimeout(() => { p.activeWarning = null; 
-        if(dist(p, enemy) < 150) { let ang = Math.atan2(enemy.y-p.y, enemy.x-p.x); let diff = Math.abs(ang - p.angle); if(diff > Math.PI) diff = 2*Math.PI - diff; if(diff < Math.PI/4) { 
+        if(dist(p, enemy) < 120) { let ang = Math.atan2(enemy.y-p.y, enemy.x-p.x); let diff = Math.abs(ang - p.angle); if(diff > Math.PI) diff = 2*Math.PI - diff; if(diff < Math.PI/4) { 
             p.target.takeDamage(100 + p.axeRage * 12)
             if(p.axeS2 == true){
                 p.heal(120)
@@ -5158,7 +5158,7 @@ if (this.charIdx === 31) {
                      let localX = vX * Math.cos(-aimAngle) - vY * Math.sin(-aimAngle);
                      let localY = vX * Math.sin(-aimAngle) + vY * Math.cos(-aimAngle);
                      if (localX >= 0 && localX <= 300 && Math.abs(localY) <= 75 + enemy.radius) {
-                         let dmg = 300 * 1.5 * p.buffs.atk; 
+                         let dmg = 200 * 1.5 * p.buffs.atk; 
                          dmg *= (1 + p.soldiers.length * 0.02);
                          dmg = Math.min(1500, dmg); 
                          
@@ -5180,7 +5180,7 @@ if (this.charIdx === 31) {
                      let localX = vX * Math.cos(-aimAngle) - vY * Math.sin(-aimAngle);
                      let localY = vX * Math.sin(-aimAngle) + vY * Math.cos(-aimAngle);
                      if (localX >= 0 && localX <= 300 && Math.abs(localY) <= 75 + enemy.radius) {
-                          let dmg = 200 * p.buffs.atk * (1 + (p.commanderMode?p.soldiers.length*0.02:0));
+                          let dmg = 130 * p.buffs.atk * (1 + (p.commanderMode?p.soldiers.length*0.02:0));
                           dmg = Math.min(1000, dmg);
                           let act = enemy.takeDamage(dmg, 6);
                           p.heal((act.hpDmg + act.shieldDmg) * 0.3); 
@@ -5271,13 +5271,13 @@ if (this.charIdx === 31) {
         p.applyStatus("disarmed", 1800)
         let c = 0
         let s = setGameInterval(() =>{
-        if(c<10){c++; projectiles.push(new Projectile(p.x, p.y, p.angle, 30, "yellow", 50 * p.buffs.atk, p, "", 1.2, false, (e) => {
+        if(c<10){c++; projectiles.push(new Projectile(p.x, p.y, p.angle, 30, "yellow", 60 * p.buffs.atk, p, "", 1.2, false, (e) => {
             if (p.mbPineapple != true){
                 p.mbMango += 1
             } else {
-                enemy.trueDamage(10 * p.buffs.atk)
+                enemy.trueDamage(12 * p.buffs.atk)
             }
-            p.heal(9 * p.buffs.atk)
+            p.heal(14 * p.buffs.atk)
         }, 25))
      } else {
          clearInterval(s)
@@ -6241,8 +6241,8 @@ if (this.charIdx === 31) {
                 p.heal((180 + p.axeRage * 22) * 0.5)
                 p.target.trueDamage((180 + p.axeRage * 22) * 0.2)
             }
-            p.target.buffs.slow = 0.4
-            p.axeInt = 0.2
+            p.target.buffs.slow = 0.45
+            p.axeInt = 0.35
             CHAR_DATA[52].atkInt = 0
             p.axeS2 = true
             setGameTimeout(()=>{p.axeInt = 1; p.axeS2 = false},2900)
@@ -7140,7 +7140,7 @@ if (p.charIdx === 31) {
              if(p.commanderMode) {
                  // Enhanced S2: Only grant Super Atk + Heal. No Charge.
                  p.superEnhancedAtk = true; 
-                 p.heal(200); p.soldiers.forEach(s=>s.hp+=200);
+                 p.heal(100); p.soldiers.forEach(s=>s.hp+=200);
                  floatTexts.push(new FloatText(p.x, p.y-80, "S-Ready!", "purple"));
              } else {
                  if(p.soldiers.length < 5) {
@@ -7152,7 +7152,7 @@ if (p.charIdx === 31) {
                  }
              }        } else if(p.charIdx === 7) { // Micah S2
              if(dist(p, p.target) < 180) { // Range check
-                p.target.takeDamage(500, 7); p.target.applyStatus('slow', 2000); p.target.buffs.slow = 0.8;
+                p.target.takeDamage(400, 7); p.target.applyStatus('slow', 2000); p.target.buffs.slow = 0.8;
                 p.heal(200); p.funds = Math.max(0, p.funds - 20);
                 let ang = Math.atan2(p.target.y - p.y, p.target.x - p.x);
                 // Force Push
